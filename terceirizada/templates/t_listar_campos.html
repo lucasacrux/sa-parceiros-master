@@ -1,0 +1,84 @@
+
+{% extends "t_base.html" %}
+
+
+{% load static %}
+
+{% block content %}
+<style>
+  .card-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+  th, td {
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f4f4f4;
+  }
+
+  @media (max-width: 1280px) {
+    .card-wrapper {
+      max-width: 1024px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .card-wrapper {
+      max-width: 900px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .card-wrapper {
+      max-width: 700px;
+    }
+  }
+</style>
+
+<main id="content" role="main" class="main">
+  <!-- Content -->
+  <div class="content container-fluid">
+    <div class="card-wrapper">
+      <div class="card card-lg">
+        <div class="card-body">
+          <h1>Lista de Campos</h1>
+          <table>
+            <thead>
+                <tr>
+                    <th>Tipo do Campo</th>
+                    <th>Campo</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in campos %}
+                <tr>
+                    <td>{{ item.tipo }}</td>
+                    <td>{{ item.campo }}</td>
+                    <td>
+                      -
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Content -->
+</main>
+<!-- ========== END MAIN CONTENT ========== -->
+
+{% endblock %}

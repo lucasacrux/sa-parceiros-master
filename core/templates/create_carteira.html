@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+  <div class="container mt-5">
+    <!-- Step Form -->
+    <form id="createCarteiraForm" class="js-step-form"
+      data-hs-step-form-options='{
+        "progressSelector": "#basicStepFormProgress",
+        "stepsSelector": "#basicStepFormContent",
+        "endSelector": "#generateCarteiraBtn"
+      }'>
+    <!-- Step -->
+    <ul id="basicStepFormProgress" class="js-step-progress step step-sm step-icon-sm step-inline step-item-between mb-7">
+      <li class="step-item">
+        <a class="step-content-wrapper" href="javascript:;"
+          data-hs-step-form-next-options='{
+            "targetSelector": "#stepName"
+          }'>
+          <span class="step-icon step-icon-soft-dark">1</span>
+          <div class="step-content">
+            <span class="step-title">Nome</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="step-item">
+        <a class="step-content-wrapper" href="javascript:;"
+          data-hs-step-form-next-options='{
+            "targetSelector": "#stepJurosMulta"
+          }'>
+          <span class="step-icon step-icon-soft-dark">2</span>
+          <div class="step-content">
+            <span class="step-title">Juros e multa</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="step-item">
+        <a class="step-content-wrapper" href="javascript:;"
+          data-hs-step-form-next-options='{
+            "targetSelector": "#stepCondicoesPagamento"
+          }'>
+          <span class="step-icon step-icon-soft-dark">3</span>
+          <div class="step-content">
+            <span class="step-title">Condições de pagamento</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="step-item">
+        <a class="step-content-wrapper" href="javascript:;"
+          data-hs-step-form-next-options='{
+            "targetSelector": "#stepDescontos"
+          }'>
+          <span class="step-icon step-icon-soft-dark">4</span>
+          <div class="step-content">
+            <span class="step-title">Descontos</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="step-item">
+        <a class="step-content-wrapper" href="javascript:;"
+          data-hs-step-form-next-options='{
+            "targetSelector": "#stepAgrupamentoDividas"
+          }'>
+          <span class="step-icon step-icon-soft-dark">5</span>
+          <div class="step-content">
+            <span class="step-title">Agrupamento de dívidas</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+    <!-- End Step -->
+
+    <!-- Content Step Form -->
+    <div id="basicStepFormContent">
+      <div id="stepName" class="active">
+        <!-- Card -->
+        <div class="card">
+          <div class="card-body p-5">
+            <h4 class="mb-5">Nome da carteira</h4>
+            <!-- Form Group -->
+            <div class="mb-4">
+              <input type="text" class="form-control" id="walletName" placeholder="Escolha um nome para a carteira" aria-label="Nome">
+            </div>
+            <!-- End Form Group -->
+          
+                <!-- Footer -->
+            <div class="d-flex align-items-center">
+              <div class="ms-auto">
+                <button type="button" class="btn btn-primary"
+                        data-hs-step-form-next-options='{
+                          "targetSelector": "#stepJurosMulta"
+                        }'>
+                        Próximo <i class="bi-chevron-right small"></i>
+                </button>
+              </div>
+            </div>
+            <!-- End Footer -->
+          </div>
+        </div>
+        <!-- End Card -->
+      </div>
+
+      <div id="stepJurosMulta" style="display: none;">
+        <!-- Card -->
+        <div class="card">
+          <div class="card-body p-5">
+            <h4 class="mb-5">Configure os juros e a multa das dívidas:</h4>
+            <h5 class="mb-4">Escolha qual tipo de juros deseja aplicar</h5>
+            <!-- Form Group -->
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <!-- Form Check -->
+                <div class="form-check form-check-inline">
+                  <input type="radio" id="formInlineRadio1" class="form-check-input" name="tipoJuros" value="composto">
+                  <label class="form-check-label" for="formInlineRadio1">Composto</label>
+                </div>
+                <!-- End Form Check -->
+                <!-- Form Check -->
+                <div class="form-check form-check-inline">
+                  <input type="radio" id="formInlineRadio2" class="form-check-input indeterminate-checkbox" name="tipoJuros" value="simples">
+                  <label class="form-check-label" for="formInlineRadio2">Simples</label>
+                </div>
+                <!-- End Form Check -->
+                <p class="mt-2">O início para cálculo de juros será desde o primeiro dia de atraso da dívida</p>
+              </div>
+              <div class="col-md-6">
+                <label for="porcentagemJuros">Juros anual a partir da dívida:</label>
+                <div class="input-group mb-3">
+                  <span class="input-group-text" id="basic-addon1">%</span>
+                  <input type="number" id="porcentagemJuros" class="form-control" placeholder="Porcentagem de juros" aria-label="Juros" aria-describedby="basic-addon1" name="porcentagemJuros">
+                </div>
+              </div>
+            </div>
+            <!-- End Form Group -->
+            <h5 class="mb-4">Multa da dívida</h5>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <!-- Form Check -->
+                <div class="form-check form-check-inline">
+                  <input type="radio" id="formInlineRadio3" class="form-check-input" name="tipoJuros" value="SemMulta">
+                  <label class="form-check-label" for="formInlineRadio3">Sem Multa</label>
+                </div>
+                <!-- End Form Check -->
+                <!-- Form Check -->
+                <div class="form-check form-check-inline">
+                  <input type="radio" id="formInlineRadio4" class="form-check-input indeterminate-checkbox" name="tipoJuros" value="ComMulta">
+                  <label class="form-check-label" for="formInlineRadio4">Com Multa</label>
+                </div>
+                <!-- End Form Check -->
+                <p class="mt-2">A multa é aplicada sobre o valor original da dívida uma única vez, sem considerar o tempo de atraso</p>
+              </div>
+              <div class="col-md-6">
+                <label for="porcentagemJuros">Valor da multa:</label>
+                <div class="input-group mb-3">
+                  <span class="input-group-text" id="basic-addon1">%</span>
+                  <input type="number" id="porcentagemJuros" class="form-control" placeholder="Porcentagem de juros" aria-label="Juros" aria-describedby="basic-addon1" name="porcentagemJuros">
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="d-flex align-items-center">
+              <button type="button" class="btn btn-ghost-secondary me-2"
+                data-hs-step-form-prev-options='{
+                  "targetSelector": "#stepName"
+                }'>
+                <i class="bi-chevron-left small"></i> Etapa anterior
+              </button>
+
+              <div class="ms-auto">
+                <button type="button" class="btn btn-primary"
+                        data-hs-step-form-next-options='{
+                          "targetSelector": "#stepCondicoesPagamento"
+                        }'>
+                  Próximo <i class="bi-chevron-right small"></i>
+                </button>
+              </div>
+            </div>
+            <!-- End Footer -->
+          </div>
+        </div>
+        <!-- End Card -->
+      </div>
+
+      <div id="stepCondicoesPagamento" style="display: none;">
+        <!-- Card -->
+        <div class="card">
+          <div class="card-body p-5">
+            <h4 class="mb-5">Configure as regras de renegociação de dívidas para seus devedores</h4>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <label for="numeroParcelas">Número de Parcelas:</label>
+                <div class="input-group mb-3">
+                  <input type="number" id="numeroParcelas" class="form-control" placeholder="Número de Parcelas" aria-label="Numero de parcelas" name="numeroParcelas">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label for="valorMinimoParcela">Valor Mínimo por Parcela:</label>
+                <div class="input-group mb-3">
+                  <span class="input-group-text" id="basic-addon1">R$</span>
+                  <input type="number" id="valorMinimoParcela" class="form-control" placeholder="Valor Mínimo por Parcela" aria-label="Valor minimo por parcela" aria-describedby="basic-addon1" name="valorMinimoParcela">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <label for="diasUteisPrimeiroVencimento">Dias (úteis) máximo para o 1º vencimento:</label>
+                <div class="input-group mb-3">
+                  <input type="number" id="diasUteisPrimeiroVencimento" class="form-control" placeholder="Dias (úteis) máximo para o 1º vencimento" aria-label="Dias uteis maximo para o 1º vencimento" name="diasUteisPrimeiroVencimento">
+                </div>
+              </div>
+            </div>
+            <!-- Footer -->
+            <div class="d-flex align-items-center">
+              <button type="button" class="btn btn-ghost-secondary me-2"
+                data-hs-step-form-prev-options='{
+                  "targetSelector": "#stepJurosMulta"
+                }'>
+                <i class="bi-chevron-left small"></i> Etapa anterior
+              </button>
+      
+              <div class="ms-auto">
+                <button type="button" class="btn btn-primary"
+                        data-hs-step-form-next-options='{
+                          "targetSelector": "#stepDescontos"
+                        }'>
+                        Próximo <i class="bi-chevron-right small"></i>
+                </button>
+              </div>
+            </div>
+            <!-- End Footer -->
+          </div>
+        </div>
+        <!-- End Card -->
+      </div>
+
+      <div id="stepDescontos" style="display: none;">
+        <!-- Card -->
+        <div class="card">
+          <div class="card-body p-5">
+            <h4 class="mb-5">Configure o desconto que deseja aplicar</h4>
+            <div class="row mb-2">
+              <h5 class="mb-2">Tipo de desconto</h5>
+              <p class="mt-2">Os descontos são aplicados ao valor atualizado da divida (valor original + juros e multa)</p>
+              <div class="col-md-2">
+                <!-- Form Check -->
+                <div class="form-check form-check-inline">
+                  <input type="radio" id="formInlineRadio5" class="form-check-input" name="tipoDesconto" value="predefinido">
+                  <label class="form-check-label" for="formInlineRadio5">Predefinido</label>
+                </div>
+                <!-- End Form Check -->
+              </div>
+              <div class="col-md-2">
+                <!-- Form Check -->
+                <div class="form-check form-check-inline">
+                  <input type="radio" id="formInlineRadio6" class="form-check-input" name="tipoDesconto" value="personalizado">
+                  <label class="form-check-label" for="formInlineRadio6">Personalizado</label>
+                </div>
+                <!-- End Form Check -->
+              </div>
+              <div class="col-md-2">
+                <!-- Form Check -->
+                <div class="form-check form-check-inline">
+                  <input type="radio" id="formInlineRadio7" class="form-check-input" name="tipoDesconto" value="semDesconto">
+                  <label class="form-check-label" for="formInlineRadio7">Sem desconto</label>
+                </div>
+                <!-- End Form Check -->
+              </div>
+            </div>
+            <div class="row mb-2">
+              <h5 class="mb-4 mt-2">Defina o desconto que deseja dar a seus clientes de acordo com o tempo que a dívida existe.</h5>
+              <div class="card-body p-5 d-flex">
+                <div class="col-md-5" style="padding-right: 35px;">
+                  <h5 class="mb-2">Dias de atraso</h5>
+                  <div style="display: flex; justify-content: space-between; gap: 25px;">
+                    <div>
+                      <label for="deDias" class="form-label">De</label>
+                      <input class="form-control" type="text" id="deDias" name="deDias" placeholder="Dias">
+                    </div>
+  
+                    <div class="display: flex;">
+                      <label for="ateDias" class="form-label">Até</label>
+                      <input class="form-control" type="text" id="ateDias" name="ateDias" placeholder="Dias">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-7" style="padding-left: 35px;">
+                  <h5 class="mb-2">Desconto</h5>
+
+                  <!-- Input Group -->
+                  <div class="mb-3">
+                    <label for="descontoAVista" class="form-label">Desconto à vista</label>
+
+                    <div class="input-group input-group-merge input-group-hover-light">
+                      <input type="text" class="form-control" id="descontoAVista" name="descontoAVista" placeholder="%">
+                    </div>
+                  </div>
+                  <!-- End Input Group -->
+
+                  <!-- Input Group -->
+                  <div class="mb-3">
+                    <div style="display: flex; justify-content: space-between; gap: 25px;">
+                      <div>
+                        <label for="deDias" class="form-label">De</label>
+                        <input type="text" class="form-control" id="deParcelas" name="deParcelas" placeholder="Parcelas">
+                      </div>
+    
+                      <div>
+                        <label for="ateDias" class="form-label">Até</label>
+                        <input type="text" class="form-control" id="ateParcelas" name="ateParcelas" placeholder="Parcelas">
+                      </div>
+
+                      <div>
+                        <label for="descontoAVista" class="form-label">Desconto de</label>
+                        <input type="text" class="form-control" id="descontoParcelas" name="descontoParcelas" placeholder="%">
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+      
+            <!-- Footer -->
+            <div class="d-flex align-items-center">
+              <button type="button" class="btn btn-ghost-secondary me-2"
+                data-hs-step-form-prev-options='{
+                  "targetSelector": "#stepCondicoesPagamento"
+                }'>
+                <i class="bi-chevron-left small"></i> Etapa anterior
+              </button>
+      
+              <div class="ms-auto">
+                <button type="button" class="btn btn-primary"
+                        data-hs-step-form-next-options='{
+                          "targetSelector": "#stepAgrupamentoDividas"
+                        }'>
+                        Próximo <i class="bi-chevron-right small"></i>
+                </button>
+              </div>
+            </div>
+            <!-- End Footer -->
+          </div>
+        </div>
+        <!-- End Card -->
+      </div>
+      </div>
+
+      <div id="stepAgrupamentoDividas" style="display: none;">
+        <!-- Card -->
+        <div class="card">
+          <div class="card-body p-5">
+            <h4 class="mb-5">Configuração de Agrupamento de dividas</h4>
+            <p>Você deseja agrupar as dívidas de um mesmo cliente em uma única oferta?</p>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <!-- Form Check -->
+                <div class="form-check form-check-inline">
+                  <input type="radio" id="formInlineRadio8" class="form-check-input" name="agrupdiv" value="Sim">
+                  <label class="form-check-label" for="formInlineRadio8">Sim</label>
+                </div>
+                <!-- End Form Check -->
+                <!-- Form Check -->
+                <div class="form-check form-check-inline">
+                  <input type="radio" id="formInlineRadio9" class="form-check-input indeterminate-checkbox" name="agrupdiv" value="Não">
+                  <label class="form-check-label" for="formInlineRadio9">Não</label>
+                </div>
+                <!-- End Form Check -->
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="d-sm-flex align-items-center">
+              <button type="button" class="btn btn-ghost-secondary mb-3 mb-sm-0 me-2"
+                data-hs-step-form-prev-options='{
+                  "targetSelector": "#stepDescontos"
+                }'>
+                <i class="bi-chevron-left small"></i> Etapa anterior
+              </button>
+
+              <div class="d-flex justify-content-end ms-auto">
+                <button type="button" class="btn btn-white me-2" data-dismiss="modal" aria-label="Close">Cancelar</button>
+                <button id="generateCarteiraBtn" type="button" class="btn btn-primary">Gerar Carteira</button>
+              </div>
+            </div>
+            <!-- End Footer -->
+          </div>
+        </div>
+        <!-- End Card -->
+      </div>
+    <!-- End Content Step Form -->
+    <!-- Message Body -->
+      <div id="basicStepSuccessMessage" class="js-success-message" style="display:none;">
+        <div class="text-center">
+          <div class="mb-4">
+            <h2>Sucesso!</h2>
+            <p>Nova carteira criada com sucesso.</p>
+          </div>
+
+          <div class="d-flex justify-content-center gap-3">
+            <a class="btn btn-white" href="#">
+              <i class="bi-chevron-left small ms-1"></i>  Voltar para carteiras
+            </a>
+            <a class="btn btn-primary" href="#">
+              <i class="tio-city me-1"></i> Adicionar nova carteira
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Message Body -->
+    </form>
+    <!-- End Step Form -->
+  </div>
+  <script>
+    document.getElementById("generateCarteiraBtn").addEventListener("click", function() {
+      // Capturar o nome da carteira
+      var nomeCarteira = document.getElementById("walletName").value;
+  
+      // Gerar um ID único ascendente
+      var carteiras = JSON.parse(localStorage.getItem("carteiras")) || [];
+      var proximoId = carteiras.length > 0 ? carteiras[carteiras.length - 1].id + 1 : 1;
+  
+      // Registrar o horário de criação formatado
+      var dataHoraCriacao = new Date().toLocaleString('pt-BR', {timeZone: 'UTC'});
+  
+      // Adicionar a nova carteira ao array
+      carteiras.push({ id: proximoId, nome: nomeCarteira, criado_em: dataHoraCriacao });
+  
+      // Armazenar as carteiras no Local Storage
+      localStorage.setItem("carteiras", JSON.stringify(carteiras));
+  
+      // Redirecionar de volta para a página de carteira
+      window.location.href = "/carteiras";
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+{% extends "t_base.html" %}
+{% block content %}
+
+<style>
+  .flatpickr-calendar .flatpickr-day.today {
+    background-color: #377dff30 !important;
+    color: #1e2022 !important;
+    border-color: transparent !important;
+  }
+
+  .valor-parcela {
+    white-space: pre-line;
+  }
+</style>
+
+<div class="px-5 pb-10">
+  <!-- Modal confirmar aceite -->
+  <div class="modal fade" id="aceiteModal" tabindex="-1" role="dialog" aria-labelledby="aceiteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="aceiteModalLabel">Confirmação de aceite</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalMessage" style="font-size: 16px;">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="continueBtn" class="btn btn-warning">
+                  <div id="continuarSpinner" class="spinner-border spinner-border-sm text-dark d-none" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <span>Continuar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+  </div>
+  <!-- End Modal -->
+
+  <!-- Modal confirmar sobrescrever -->
+  <div class="modal fade" id="sobrescreverModal" tabindex="-1" role="dialog" aria-labelledby="sobrescreverModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="sobrescreverModalLabel">Confirmação de sobrescrever</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalMessage2" style="font-size: 16px;">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="sobrescreverBtn" class="btn btn-danger">
+                  <div id="sobrescreverSpinner" class="spinner-border spinner-border-sm text-light d-none" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <span>Sobrescrever</span>
+                </button>
+            </div>
+        </div>
+    </div>
+  </div>
+  <!-- End Modal -->
+
+  <!-- Modal confirmar excluir acordo -->
+  <div class="modal fade" id="excluirAcordoModal" tabindex="-1" role="dialog" aria-labelledby="excluirAcordoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="excluirAcordoModalLabel">Tem certeza que deseja excluir essa Simulação?</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="font-size: 16px;">
+              Ao clicar em excluir essa simulação será excluida permanentemente 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="excluirAcordoBtn" class="btn btn-danger">
+                  <div id="excluirSpinner" class="spinner-border spinner-border-sm text-light d-none" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <span>Excluir</span>
+                </button>
+            </div>
+        </div>
+    </div>
+  </div>
+  <!-- End Modal -->
+
+    <div class="row" style="margin-top: 30px;">
+      <form action="{% url 't_listar_leads' %}">
+    
+        <div class="row" style="font-size: 10px;">
+
+          <div class="mb-2 col-lg-2">
+            <labe class="form-label" style="font-size: 11px;">CPF</label>
+            <input type="text" class="form-control" value="{{cpf_pesquisa}}" name="cpf_pesquisa"style="font-size: 11px; margin-top:9px"/>
+          </div>
+
+          <div class="mb-2 col-lg-2 mt-4">
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+              <input type="submit"  name="op" class="btn btn-primary" value="Filtrar">
+            </div>              
+          </div>
+        </div>
+    </form>
+  </div>
+
+
+  <div class="card mt-5">
+    <div class="card-header">
+      <h4 class="card-header-title">Leads</h4>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive datatable-custom">
+      {% if leads %}
+      <table class="js-datatable table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
+             data-hs-datatables-options='{
+                     "order": [],
+                     "isResponsive": false,
+                     "isShowPaging": false,
+                     "pagination": "datatableWithPaginationPagination"
+                   }'>
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">CPF</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Sexo</th>
+            <th scope="col">Data Nascimento</th>
+            <th scope="col">UF</th>
+          </tr>
+        </thead>
+  
+        <tbody>
+          {% for lead in leads %}
+            <tr>
+              <td>
+                <a class="badge bg-soft-primary text-primary p-2" href="busca?cpf={{ lead.cpf }}">{{ lead.cpf }}</a>
+
+             </td>
+              <td>{{ lead.nome|upper }}</td>
+              <td>{{ lead.sexo }}</td>
+              <td>{{ lead.data_nascimento|date:"d/m/Y"|default:"-" }}</td>
+              <td>{{ lead.uf_nascimento }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>Nenhum lead encontrado.</p>
+      {% endif %}
+    </div>
+    <!-- End Table -->
+  
+        <!-- End Tab Content -->
+        <div class="card-footer">
+          <div class="row justify-content-center justify-content-sm-between align-items-sm-center">
+            <div class="col-sm mb-2 mb-sm-0">
+              <div class="d-flex justify-content-center justify-content-sm-start align-items-center">
+                <span class="me-2">Registros: {{total_registros}}</span>
+              </div>
+            </div>
+            <!-- End Col -->
+
+            <div class="col-md-auto">
+              <div class="d-flex justify-content-center justify-content-sm-end">
+                <!-- Pagination -->
+                <nav id="datatablePagination" aria-label="Activity pagination" style="">
+                  <div class="dataTables_paginate paging_simple_numbers" id="datatable_paginate">
+                    <ul id="datatable_pagination" class="pagination datatable-custom-pagination">
+                      {% if leads.has_previous %}
+                          <a href="?{{url_filtro}}&page=1">&laquo;</a>
+                          <a href="?{{url_filtro}}&page={{ leads.previous_page_number }}" class="paginate_button previous page-link" aria-controls="datatable" data-dt-idx="0" tabindex="0" id="datatable_previous"><span aria-hidden="true">&laquo;</span></a>
+                      {% else %}
+                        <li class="paginate_item page-item disabled">
+                          <a class="paginate_button previous page-link" aria-controls="datatable" data-dt-idx="0" tabindex="0" id="datatable_previous"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                      {% endif %}
+                      <li class="paginate_item page-item active">
+                        <a class="paginate_button page-link" aria-controls="datatable" data-dt-idx="1" tabindex="0">{{ leads.number }}  de {{ leads.paginator.num_pages }}</a>
+                      </li>
+                      {% if leads.has_next %}
+                          <a href="?{{url_filtro}}&page={{ leads.next_page_number }}" class="paginate_button next page-link" aria-controls="datatable" data-dt-idx="3" tabindex="0" id="datatable_next"><span aria-hidden="true">&raquo;</span></a>
+                          <a href="?{{url_filtro}}&page={{ leads.paginator.num_pages }}" class="paginate_button next page-link" aria-controls="datatable" data-dt-idx="3" tabindex="0" id="datatable_next"><span aria-hidden="true">&raquo;</span></a>
+                      {% else %}
+                        <li class="paginate_item page-item disabled">
+                          <a class="paginate_button previous page-link" aria-controls="datatable" data-dt-idx="0" tabindex="0" id="datatable_previous"><span aria-hidden="true">Pŕoxima</span></a>
+                        </li>
+                      {% endif %}
+                    </ul>
+                  </div>
+                </nav>
+              </div>
+            </div>
+            <!-- End Col -->
+          </div>
+          <!-- End Row -->
+        </div>
+
+       <!-- Modal -->
+       <div id="exampleModalCenter" class="modal modal-xl fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalCenterTitle">Detalhes do acordo</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!-- Table -->
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>CPF:</strong> <span id="acordoCpf"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Carteira ID:</strong> <span id="acordoCarteiraId"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Contratos contemplados:</strong> <span id="acordoContratos"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Valor acordo:</strong> <span id="acordoValorAcordo"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Nº parcelas:</strong> <span id="acordoNumParcelas"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Valor Parcela:</strong> <span id="acordoValorParcela" class="valor-parcela"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Venc Primeira Parc:</strong> <span id="acordoVencimentoPrim"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Venc Próximas Parc:</strong> <span id="acordoVencimentoProx"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Status:</strong> <span id="acordoStatus"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Ativo:</strong> <span>Sim</span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Data aceite:</strong> <span id="acordoDataAceite"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Id acordo:</strong> <span id="acordoId"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Email:</strong> <span id="acordoEmail"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Telefone:</strong> <span id="acordoTelefone"></span></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- End Table -->
+              <!-- Accordion -->
+              <div class="accordion mt-4" id="accordionExample">
+                <div class="accordion-item">
+                  <div class="accordion-header" id="headingTwo">
+                    <a class="accordion-button collapsed" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                      Parcelas
+                    </a>
+                  </div>
+                  <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                      <div>
+                        <table class="table">
+                          <thead class="thead-light">
+                            <tr>
+                              <th scope="col">Nº parcela</th>
+                              <th scope="col">Valor parcela</th>
+                              <th scope="col">Data de vencimento</th>
+                              <th scope="col">Data do pagamento</th>
+                              <th scope="col">Situação Parcela</th>
+                              <th scope="col">Pagamento</th>
+                            </tr>
+                          </thead>
+                          <tbody id="parcelasBody">
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- End Accordion -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Modal -->
+
+      <div id="editModalCenter" class="modal modal-xl fade" tabindex="-1" role="dialog" aria-labelledby="editModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h4>Detalhes do acordo</h4>
+              <!-- Table -->
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>CPF:</strong> <span id="acordoCpf2"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Carteira ID:</strong> <span id="acordoCarteiraId2"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Contratos contemplados:</strong> <span id="acordoContratos2"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Valor acordo:</strong> <span id="acordoValorAcordo2"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Nº parcelas:</strong> <span id="acordoNumParcelas2"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Valor Parcela:</strong> <span id="acordoValorParcela2" class="valor-parcela"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Venc Primeira Parc:</strong> <span id="acordoVencimentoPrim2"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Venc Próximas Parc:</strong> <span id="acordoVencimentoProx2"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Status:</strong> <span id="acordoStatus2"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Ativo:</strong> <span>Sim</span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Data aceite:</strong> <span id="acordoDataAceite2"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Id acordo:</strong> <span id="acordoId2"></span></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row"></th>
+                    <td>
+                      <div><strong>Email:</strong> <span id="acordoEmail2"></span></div>
+                    </td>
+                    <td>
+                      <div><strong>Telefone:</strong> <span id="acordoTelefone2"></span></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- End Table -->
+  
+            <div class="mb-6"></div>
+              <h4>Editar Acordo</h4>
+              <form id="editAcordoForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="editValorAcordo" class="form-label">Valor do Acordo:</label>
+                  <div class="input-group">
+                    <span class="input-group-text">R$</span>
+                    <input type="text" class="form-control" id="editValorAcordo" name="valorAcordo">
+                  </div>
+                  <div>
+                    <small id="valorAcordoError" class="form-text text-danger" style="display:none;"></small>
+                  </div>
+                </div>
+
+                <div class="row mb-4" style="background-color: #f8f8f8;border: 1px solid #ecedf0;border-radius: 10px;">
+                  <!-- Nav -->
+                  <ul class="nav nav-pills justify-content-center mb-3" role="tablist">
+                    <li class="nav-item" style="width: 48%;border: 1px solid #86affc;border-radius: 10px;">
+                      <a class="nav-link active" id="nav-one-eg2-tab" href="#nav-one-eg2" data-bs-toggle="pill" data-bs-target="#nav-one-eg2" role="tab" aria-controls="nav-one-eg2" aria-selected="true">
+                        <div class="d-flex align-items-center">
+                          <i class="bi-card-checklist" style="margin-right: 10px;"></i> Parcelas fixas
+                        </div>
+                      </a>
+                    </li>
+                    <li class="nav-item" style="width: 48%;border: 1px solid #86affc;border-radius: 10px;">
+                      <a class="nav-link" id="nav-two-eg2-tab" href="#nav-two-eg2" data-bs-toggle="pill" data-bs-target="#nav-two-eg2" role="tab" aria-controls="nav-two-eg2" aria-selected="false">
+                        <div class="d-flex align-items-center">
+                          <i class="bi-card-list" style="margin-right: 10px;"></i> Parcelas personalizadas
+                        </div>
+                      </a>
+                    </li>
+                  </ul>
+                  <!-- End Nav -->
+
+                  <!-- Tab Content -->
+                  <div class="tab-content">
+                    <div class="tab-pane fade show active" id="nav-one-eg2" role="tabpanel" aria-labelledby="nav-one-eg2-tab">
+                      <div class="mb-3">
+                        <label for="editValorAcordo" class="form-label">Parcelas:</label>
+                        <div class="col-sm-12">
+                          <div class="input-group input-group-md-vertical" style="display: flex; align-items: center;">
+                            <input type="text" class="form-control" id="editParcelaAcordo" name="parcelaAcordo" style="margin-right: 20px;">
+                            <input type="range" class="form-range" id="customRange1" style="width: 75%;">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="editValorAcordo" class="form-label">Valor parcela:</label>
+                        <div class="input-group">
+                          <span class="input-group-text">R$</span>
+                          <input type="text" class="form-control" id="editValorParcelaAcordo" name="valorParcelaAcordo" disabled>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-two-eg2" role="tabpanel" aria-labelledby="nav-two-eg2-tab">
+
+                      <div style="display: flex;width: 100%;height: 1px;background-color: #ecedf0;margin: 10px 0px;"></div>
+
+                      <div class="row mb-4 parcela-segmento" style="display: flex;align-items: center;align-content: center;">
+                        <div class="col-sm-2">
+                          <label for="De" class="form-label">De:</label>
+                          <input type="text" class="form-control" name="de_parc" id="de_parc" value="1" readonly>
+                        </div>
+              
+                        <div class="col-sm-2">
+                          <label for="Até" class="form-label">Até:</label>
+                          <input type="text" class="form-control" name="ate_parc" id="ate_parc">
+                        </div>
+              
+                        <div class="col-sm-2" style="margin-top: 25px;">
+                          <span>Parcelas</span>
+                        </div>
+                        
+                        <div class="col-sm-4" style="margin-top: 15px;">
+                          <label for="valor_parcela_perso" class="form-label">Valor parcela:</label>
+                          <div class="col-sm-9">
+                            <div class="input-group mb-3">
+                              <span class="input-group-text">R$</span>
+                              <input type="text" class="form-control" name="valor_parcela_perso" id="valor_parcela_perso" value="0,00">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style="display: flex;width: 100%;height: 1px;background-color: #ecedf0;margin: 10px 0px;"></div>
+
+                      <div id="personalizadasContainer"></div>
+
+                      <div class="row mb-4" style="display: flex;align-items: center;justify-content: space-between;align-content: center;">
+                        <div class="col-sm-6">
+                          <label for="" class="form-label">Total de parcelas:</label>
+                          <div class="col-sm-9">
+                            <div class="input-group mb-3" style="width: 50%;">
+                              <input type="text" class="form-control" name="total_parc" id="total_parc">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-6" style="display: flex;justify-content: flex-end;">
+                          <button type="button" class="btn btn-sm btn-white" id="addParcelaBtn"><i class="bi bi-plus"></i> Adicionar nova parcela</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End Tab Content --> 
+                </div>
+
+                <div class="mb-3">
+                  <label for="editDataVencimentoPrim" class="form-label">Vencimento primeira parcela:</label>
+                  <div class="col-sm-12">
+                    <div class="form-group">                          
+                      <div id="projectDeadlineNewProjectFlatpickr" class="flatpickr-custom input-group">
+                        <div class="input-group-prepend input-group-text" data-bs-toggle>
+                          <i class="bi-calendar-week"></i>
+                        </div>
+                        <input type="text" name="dataVencimentoPrim" class="form-control" id="editDataVencimentoPrim" placeholder="Selecione uma data">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="editDataVencimentoProx" class="form-label">Vencimento próximas parcelas:</label>
+                    <div class="col-sm-12">
+                      <div class="form-group">                          
+                          <select name="dataVencimentoProx" class="form-control" id="editDataVencimentoProx">
+                          </select>
+                      </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="editEmailAcordo" class="form-label">Email:</label>
+                  <input type="text" class="form-control" id="editEmailAcordo" name="editEmailAcordo" placeholder="exemplo@saparceiros.com">
+                </div>
+                <div class="mb-3">
+                  <label for="editTelefoneAcordo" class="form-label">Telefone:</label>
+                  <div class="col-sm-12">
+                    <input type="text" class="js-input-mask form-control" name="editTelefoneAcordo" id="editTelefoneAcordo" placeholder="(xx) x xxxx-xxxx"
+                    data-hs-mask-options='{
+                      "mask": "(00) 0 0000-0000"
+                    }'>
+                  </div>
+                </div>
+                <input type="hidden" id="acordoId3" name="acordoId">
+                <input type="hidden" id="editMinParcelasAcordo" name="editMinParcelasAcordo">
+                <input type="hidden" id="editMaxParcelasAcordo" name="editMaxParcelasAcordo">
+                <input type="hidden" id="editMaiorDescontoAcordo" name="editMaiorDescontoAcordo">
+                <input type="hidden" id="editMenorDescontoAcordo" name="editMenorDescontoAcordo">
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="editarAcordoBtn">Salvar Alterações</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-info').forEach(button => {
+      button.addEventListener('click', function() {
+        const acordoId = this.getAttribute('data-acordo-id');
+        fetch(`/detalhes-acordo/${acordoId}/`)
+            .then(response => response.json())
+            .then(acordo => {
+              document.getElementById('acordoId').textContent = acordo.acordo_id;
+              document.getElementById('acordoCpf').textContent = acordo.cpf;
+              document.getElementById('acordoContratos').textContent = acordo.contratos;
+              document.getElementById('acordoCarteiraId').textContent = acordo.carteira_id;
+              document.getElementById('acordoValorAcordo').textContent = acordo.valor_do_acordo;
+              document.getElementById('acordoNumParcelas').textContent = acordo.num_parcelas_acordo;
+              document.getElementById('acordoVencimentoPrim').textContent = acordo.dia_vencimento_primeira_parcela;
+              document.getElementById('acordoVencimentoProx').textContent = acordo.dia_vencimento_proxima_parcela;
+              document.getElementById('acordoEmail').textContent = acordo.email;
+              document.getElementById('acordoTelefone').textContent = acordo.telefone;
+              document.getElementById('acordoStatus').textContent = acordo.status;
+              document.getElementById('acordoDataAceite').textContent = acordo.data_aceite;
+              
+              const parcelasTableBody = document.getElementById('parcelasBody');
+              parcelasTableBody.innerHTML = '';
+              
+              if (acordo.valor_parcela === "0.00") {
+                const groupedParcelas = groupParcelasByValue(acordo.parcelas);
+                let parcelasText = '';
+                let isFirst = true;
+                groupedParcelas.forEach(group => {
+                  if (isFirst) {
+                    parcelasText += `\nParcelas ${group.start} a ${group.end}: R$ ${group.valor} cada\n`;
+                    isFirst = false;
+                  } else {
+                    parcelasText += `Parcelas ${group.start} a ${group.end}: R$ ${group.valor} cada\n`;
+                  }
+                });
+                document.getElementById('acordoValorParcela').textContent = parcelasText;
+              } else {
+                document.getElementById('acordoValorParcela').textContent = acordo.valor_parcela;
+              }
+                    
+              let gerarBoletoFlag = false;
+              acordo.parcelas.forEach((parcela, index) => {
+                  const row = document.createElement('tr');
+                  row.innerHTML = `
+                      <td>${parcela.numero}</td>
+                      <td>${parcela.valor}</td>
+                      <td>${parcela.dataVencimento}</td>
+                      <td>${parcela.dataPagamento || '-'}</td>
+                      <td>${parcela.situacao || '-'}</td>
+                      <td>${parcela.botao_parcela || '-'}</td>
+                  `;
+                  parcelasTableBody.appendChild(row);
+              });
+          });
+      });
+    });
+  });
+
+  function groupParcelasByValue(parcelas) {
+  const groups = [];
+  let currentGroup = null;
+
+  parcelas.forEach((parcela, index) => {
+    const valor = parcela.valor;
+    if (currentGroup && currentGroup.valor === valor) {
+      currentGroup.end = parcela.numero;
+    } else {
+      if (currentGroup) {
+        groups.push(currentGroup);
+      }
+      currentGroup = { start: parcela.numero, end: parcela.numero, valor: valor };
+    }
+  });
+
+  if (currentGroup) {
+    groups.push(currentGroup);
+  }
+
+  return groups;
+  }
+</script>
+
+<script>
+  const editModal = document.getElementById('editModalCenter');
+  
+  editModal.addEventListener('hidden.bs.modal', function () {
+    document.getElementById('acordoCpf2').textContent = '';
+    document.getElementById('acordoId2').textContent = '';
+    document.getElementById('acordoId3').textContent = '';
+    document.getElementById('acordoCarteiraId2').textContent = '';
+    document.getElementById('acordoCpf2').textContent = '';
+    document.getElementById('acordoContratos2').textContent = '';
+    document.getElementById('acordoValorAcordo2').textContent = '';
+    document.getElementById('acordoValorParcela2').textContent = '';
+    document.getElementById('acordoNumParcelas2').textContent = '';
+    document.getElementById('acordoVencimentoPrim2').textContent = '';
+    document.getElementById('acordoVencimentoProx2').textContent = '';
+    document.getElementById('acordoEmail2').textContent = '';
+    document.getElementById('acordoTelefone2').textContent = '';
+    document.getElementById('acordoStatus2').textContent = '';
+    document.getElementById('acordoDataAceite2').textContent = '';
+    document.getElementById('editValorAcordo').value = '';
+    document.getElementById('editValorParcelaAcordo').value = '';
+    document.getElementById('editParcelaAcordo').value = '';
+    document.getElementById('editDataVencimentoPrim').value = '';
+    document.getElementById('editDataVencimentoProx').value = '';
+    document.getElementById('editEmailAcordo').value = '';
+    document.getElementById('editTelefoneAcordo').value = '';
+    document.getElementById('editMinParcelasAcordo').value = '';
+    document.getElementById('editMaxParcelasAcordo').value = '';
+    document.getElementById('editMaiorDescontoAcordo').value = '';
+    document.getElementById('editMenorDescontoAcordo').value = '';
+  });
+
+  let ultimoAcordoIdClicado = null;
+
+  function calcularValorTotalAcordo() {
+      const parcelas = document.querySelectorAll('.parcela-segmento');
+      let valorTotal = 0;
+
+      parcelas.forEach(segmento => {
+        const valorParcelaInput = segmento.querySelector('[name="valor_parcela_perso"]');
+        const valorParcela = parseFloat(valorParcelaInput.value.replace(/[\D]/g, '')) / 100;
+        const deParcInput = segmento.querySelector('[name="de_parc"]');
+        const ateParcInput = segmento.querySelector('[name="ate_parc"]');
+        const deParc = parseInt(deParcInput.value);
+        const ateParc = parseInt(ateParcInput.value);
+        const numeroParcelas = ateParc - deParc + 1;
+
+        valorTotal += valorParcela * numeroParcelas;
+      });
+
+      const valorAcordoInput = document.getElementById('editValorAcordo');
+      valorAcordoInput.value = valorTotal.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+    }
+
+    document.getElementById('valor_parcela_perso').addEventListener('input', function(e) {
+      let valor = this.value.replace(/[\D]/g, '');
+      valor = (valor / 100).toFixed(2);
+      valor = valor.replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+      
+      this.value = valor;
+      calcularValorTotalAcordo();
+    });
+
+    const ateInput = document.getElementById('ate_parc');
+
+    ateInput.addEventListener('change', function() {
+      updateTotalParc();
+      calcularValorTotalAcordo();
+    });
+
+    function updateTotalParc() {
+      const allAteInputs = document.querySelectorAll('[name="ate_parc"]');
+      const lastAteValue = allAteInputs[allAteInputs.length - 1].value;
+      totalParcInput.value = lastAteValue;
+    }
+
+    const personalizadasContainer = document.getElementById('personalizadasContainer');
+    const totalParcInput = document.getElementById('total_parc');
+    const addParcelaBtn = document.getElementById('addParcelaBtn');
+
+    document.getElementById('valor_parcela_perso').addEventListener('input', function(e) {
+      let valor = this.value.replace(/[\D]/g, '');
+      valor = (valor / 100).toFixed(2);
+      valor = valor.replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+      
+      this.value = valor;
+    });
+
+    addParcelaBtn.addEventListener('click', function() {
+      let lastAte = parseInt(document.getElementById('ate_parc').value, 10);
+      let lastSegment = personalizadasContainer.lastElementChild;
+      if (lastSegment) {
+        lastAte = parseInt(lastSegment.querySelector('[name="ate_parc"]').value, 10);
+      }
+
+      const deValueParc = lastAte + 1;
+      const ateValueParc = deValueParc + 1;
+      
+      addParcelaSegment(deValueParc, ateValueParc);
+      updateTotalParc();
+      calcularValorTotalAcordo();
+    });
+
+    function addParcelaSegment(deValueParc, ateValueParc) {
+      const segmentoId = 'parcelaSegmento' + deValueParc;
+      const segmento = document.createElement('div');
+      segmento.id = segmentoId;
+      segmento.className = "parcela-segmento";
+      segmento.innerHTML = `
+        <div class="row mb-4" style="display: flex;align-items: center;align-content: center;">
+          <div class="col-sm-2">
+            <label for="De" class="form-label">De:</label>
+            <input type="text" class="form-control" value="${deValueParc}" name="de_parc" readonly>
+          </div>
+
+          <div class="col-sm-2">
+            <label for="Até" class="form-label">Até:</label>
+            <input type="text" class="form-control" value="${ateValueParc}" name="ate_parc">
+          </div>
+
+          <div class="col-sm-2" style="margin-top: 25px;">
+            <span>Parcelas</span>
+          </div>
+          
+          <div class="col-sm-4" style="margin-top: 15px;">
+            <label for="valor_parcela_perso" class="form-label">Valor parcela:</label>
+            <div class="col-sm-9">
+              <div class="input-group mb-3">
+                <span class="input-group-text">R$</span>
+                <input type="text" class="form-control" name="valor_parcela_perso" id="valor_parcela_perso" value="0,00">
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-2" style="margin-top: 25px;">
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeSegmento('${segmentoId}')"><i class="bi-trash"></i></button>
+          </div>
+        </div>
+
+        <div style="display: flex;width: 100%;height: 1px;background-color: #ecedf0;margin: 10px 0px;"></div>
+      `;
+      
+      personalizadasContainer.appendChild(segmento);
+
+      const ateInput = segmento.querySelector('[name="ate_parc"]');
+      const valorInput = segmento.querySelector('[name="valor_parcela_perso"]');
+      valorInput.addEventListener('input', calcularValorTotalAcordo);
+
+      ateInput.addEventListener('change', function() {
+        updateTotalParc();
+        calcularValorTotalAcordo();
+      });
+
+      valorInput.addEventListener('input', function() {
+        let valor = this.value.replace(/[\D]/g, '');
+        valor = (valor / 100).toFixed(2);
+        valor = valor.replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+        
+        this.value = valor;
+      });
+
+      updateTotalParc();
+      calcularValorTotalAcordo();
+    }
+
+    function updateTotalParc() {
+      const allAteInputs = document.querySelectorAll('[name="ate_parc"]');
+      const lastAteValue = allAteInputs[allAteInputs.length - 1].value;
+      totalParcInput.value = lastAteValue;
+    }
+
+    window.removeSegmento = function(segmentId) {
+      const segmentToRemove = document.getElementById(segmentId);
+      if (segmentToRemove) {
+        personalizadasContainer.removeChild(segmentToRemove);
+        updateTotalParc();
+        calcularValorTotalAcordo();
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var excluirAcordoModal = document.getElementById('excluirAcordoModal');
+
+      excluirAcordoModal.addEventListener('show.bs.modal', function(event) {
+        var button = event.relatedTarget;
+        var acordoId = button.getAttribute('data-acordo-id');
+        var excluirAcordoBtn = document.getElementById('excluirAcordoBtn');
+        const excluirSpinner = this.querySelector('.excluirSpinner');
+        
+        excluirAcordoBtn.setAttribute('data-acordo-id', acordoId);
+      });
+
+      document.getElementById('excluirAcordoBtn').onclick = function() {
+        var acordoId = this.getAttribute('data-acordo-id');
+        excluirSpinner.classList.remove('d-none');
+        fetch(`/t/acordos/excluir/${acordoId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+        })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = '/t/acordos';
+            excluirSpinner.classList.add('d-none');
+          }
+        })
+        .catch((error) => {
+          console.error('Erro:', error);
+          excluirSpinner.classList.add('d-none');
+          alert('Erro ao excluir o acordo: ' + error.message);
+        });
+      };
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.aceitarBtn').forEach(button => {
+        button.addEventListener('click', function(event) {
+          const acordoId = this.getAttribute('data-acordo-id');
+          const spinner = this.querySelector('.spinner-border');
+          const checkIcon = this.querySelector('.bi-check');
+          const continueBtn = document.getElementById('continueBtn');
+          const sobrescreverBtn = document.getElementById('sobrescreverBtn');
+
+          console.log('Acordo ID:', acordoId);
+
+          checkIcon.classList.add('d-none');
+          spinner.classList.remove('d-none');
+
+          fetch('/t/acordos/enviar/' + acordoId, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(err => { throw err; });
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.error) {
+              console.error(data.error);
+            } else {
+              console.log('Acordo enviado com sucesso:', data);
+              checkIcon.classList.remove('d-none');
+              spinner.classList.add('d-none');
+              window.location.href = '/t/acordos/';
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+
+            const errorMessage = (error && error.error) ? error.error : JSON.stringify(error);
+
+            if (errorMessage.includes('Deseja prosseguir?')) {
+              document.getElementById('modalMessage').innerText = errorMessage;
+              var myModal = new bootstrap.Modal(document.getElementById('aceiteModal'));
+              myModal.show();
+            } else if (errorMessage.includes('Deseja sobrescrever?')) {
+              document.getElementById('modalMessage2').innerText = errorMessage;
+              var myModal2 = new bootstrap.Modal(document.getElementById('sobrescreverModal'));
+              myModal2.show();
+            }
+            checkIcon.classList.remove('d-none');
+            spinner.classList.add('d-none');
+          });
+
+          continueBtn.onclick = function() {
+            const continuarSpinner = document.getElementById('continuarSpinner');
+            continuarSpinner.classList.remove('d-none');
+            fetch(`/t/acordos/enviar/${acordoId}/?continuar=True`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+              },
+            })
+            .then(response => {
+              if (!response.ok) {
+                return response.json().then(err => { throw err; });
+              }
+              window.location.href = '/t/acordos/';
+              return response.json();
+            })
+            .then(data => {
+              if (data.error) {
+                console.error(data.error);
+                var myModal = bootstrap.Modal.getInstance(document.getElementById('aceiteModal'));
+                continuarSpinner.classList.add('d-none');
+                myModal.hide();
+              } else {
+                console.log('Acordo enviado com sucesso:', data);
+                window.location.href = '/t/acordos/';
+                continuarSpinner.classList.add('d-none');
+              }
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+              const errorMessage2 = (error && error.error) ? error.error : JSON.stringify(error);
+              console.log(errorMessage2);
+
+              if (!errorMessage2 || errorMessage2 === "null" || errorMessage2 === "undefined") {
+                window.location.href = '/t/acordos/';
+              } else if (errorMessage2.includes('Deseja sobrescrever?')) {
+                var myModal = bootstrap.Modal.getInstance(document.getElementById('aceiteModal'));
+                sobrescreverSpinner.classList.add('d-none');
+                myModal.hide();
+                document.getElementById('modalMessage2').innerText = errorMessage2;
+                var myModal2 = new bootstrap.Modal(document.getElementById('sobrescreverModal'));
+                myModal2.show();
+              }
+            });
+          };
+
+          sobrescreverBtn.onclick = function() {
+            const sobrescreverSpinner = document.getElementById('sobrescreverSpinner');
+            sobrescreverSpinner.classList.remove('d-none');
+            fetch(`/t/acordos/enviar/${acordoId}/?continuar=True&subs=True`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+              },
+            })
+            .then(response => {
+              if (!response.ok) {
+                return response.json().then(err => { throw err; });
+              }
+              window.location.href = '/t/acordos/';
+              return response.json();
+            })
+            .then(data => {
+              console.log('Acordo enviado com sucesso:', data);
+              window.location.href = '/t/acordos/';
+              sobrescreverSpinner.classList.add('d-none');
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+              window.location.href = '/t/acordos/';
+              sobrescreverSpinner.classList.add('d-none');
+            });
+          };
+        });
+      });
+    });
+
+  document.querySelectorAll('.btn-warning').forEach(button => {
+    let acordoIdAtualizado;
+    button.addEventListener('click', function() {
+      const acordoId = this.getAttribute('data-acordo-id');
+      fetch(`/detalhes-acordo/${acordoId}`)
+        .then(response => response.json())
+        .then(acordo => {
+          document.getElementById('acordoId2').textContent = acordo.acordo_id;
+          document.getElementById('acordoId3').textContent = acordo.acordo_id;
+          document.getElementById('acordoCarteiraId2').textContent = acordo.carteira_id;
+          document.getElementById('acordoCpf2').textContent = acordo.cpf;
+          document.getElementById('acordoContratos2').textContent = acordo.contratos;
+          document.getElementById('acordoValorAcordo2').textContent = acordo.valor_do_acordo;
+          document.getElementById('acordoNumParcelas2').textContent = acordo.num_parcelas_acordo;
+          document.getElementById('acordoVencimentoPrim2').textContent = acordo.dia_vencimento_primeira_parcela;
+          document.getElementById('acordoVencimentoProx2').textContent = acordo.dia_vencimento_proxima_parcela;
+          document.getElementById('acordoEmail2').textContent = acordo.email;
+          document.getElementById('acordoTelefone2').textContent = acordo.telefone;
+          document.getElementById('acordoStatus2').textContent = acordo.status;
+          document.getElementById('acordoDataAceite2').textContent = acordo.data_aceite;
+          document.getElementById('editValorAcordo').value = acordo.valor_do_acordo;
+          document.getElementById('editValorParcelaAcordo').value = acordo.valor_parcela;
+          document.getElementById('editParcelaAcordo').value = acordo.num_parcelas_acordo;
+          document.getElementById('editDataVencimentoPrim').value = acordo.dia_vencimento_primeira_parcela;
+          document.getElementById('editDataVencimentoProx').value = acordo.dia_vencimento_proxima_parcela;
+          document.getElementById('editEmailAcordo').value = acordo.email;
+          document.getElementById('editTelefoneAcordo').value = acordo.telefone;
+          document.getElementById('editMinParcelasAcordo').value = acordo.min_parcelas;
+          document.getElementById('editMaxParcelasAcordo').value = acordo.max_parcelas;
+          document.getElementById('editMaiorDescontoAcordo').value = acordo.maior_desconto_valor;
+          document.getElementById('editMenorDescontoAcordo').value = acordo.menor_desconto_valor;
+
+          if (acordo.valor_parcela === "0.00") {
+            const groupedParcelas = groupParcelasByValue(acordo.parcelas);
+            let parcelasText = '';
+            let isFirst = true;
+            groupedParcelas.forEach(group => {
+              if (isFirst) {
+                parcelasText += `\nParcelas ${group.start} a ${group.end}: R$ ${group.valor} cada\n`;
+                isFirst = false;
+              } else {
+                parcelasText += `Parcelas ${group.start} a ${group.end}: R$ ${group.valor} cada\n`;
+              }
+            });
+            document.getElementById('acordoValorParcela2').textContent = parcelasText;
+          } else {
+            document.getElementById('acordoValorParcela2').textContent = acordo.valor_parcela;
+          }
+
+          var firstDatePicker = flatpickr("#editDataVencimentoPrim", {
+            dateFormat: "d/m/Y",
+            minDate: "today",
+            maxDate: new Date().setDate(new Date().getDate() + 5),
+            onChange: function(selectedDates, dateStr, instance) {
+              updateProximoVencimento(selectedDates[0]);
+            }
+          });
+
+          var proximoVencimentoSelect = document.getElementById('editDataVencimentoProx');
+          
+          function updateProximoVencimento(dataSelecionada) {
+            proximoVencimentoSelect.innerHTML = '';
+            var proximoMes = new Date(dataSelecionada);
+            proximoMes.setMonth(proximoMes.getMonth() + 1);
+
+            var diasHabilitados = [5, 10, 15, 20, 25, 30];
+
+            diasHabilitados.forEach(function(dia) {
+              var proximoVencimento = new Date(dataSelecionada.getFullYear(), dataSelecionada.getMonth(), dia);
+              if (proximoVencimento > dataSelecionada) {
+                var option = document.createElement('option');
+                option.value = proximoVencimento.toISOString().slice(0, 10);
+                option.textContent = ('0' + dia).slice(-2) + '/' + ('0' + (proximoVencimento.getMonth() + 1)).slice(-2);
+                proximoVencimentoSelect.appendChild(option);
+                if (option.value === acordo.dia_vencimento_proxima_parcela) {
+                  option.selected = true;
+                }
+              }
+            });
+
+            diasHabilitados.forEach(function(dia) {
+              var proximoVencimento = new Date(dataSelecionada.getFullYear(), dataSelecionada.getMonth() + 1, dia);
+              if (proximoVencimento <= proximoMes) {
+                var option = document.createElement('option');
+                option.value = proximoVencimento.toISOString().slice(0, 10);
+                option.textContent = ('0' + dia).slice(-2) + '/' + ('0' + (proximoVencimento.getMonth() + 1)).slice(-2);
+                proximoVencimentoSelect.appendChild(option);
+                if (option.value === acordo.dia_vencimento_proxima_parcela) {
+                  option.selected = true;
+                }
+              }
+            });
+          }
+          
+          var initialDate = document.getElementById('editDataVencimentoPrim').value;
+          if (initialDate) {
+            initialDate = new Date(initialDate.split('/').reverse().join('-') + 'T00:00:00');
+            updateProximoVencimento(initialDate);
+          } else {
+            console.log('Data inicial não está definida ou é inválida.');
+          }
+
+          acordoIdAtualizado = acordoId;
+
+          console.log(acordoId)
+
+          limiteValorAcordo(acordo);
+          limiteRangeSlider(acordo.min_parcelas, acordo.max_parcelas, acordo.num_parcelas_acordo);
+          calcularValorParcela();
+        });
+    });
+
+    function groupParcelasByValue(parcelas) {
+    const groups = [];
+    let currentGroup = null;
+
+    parcelas.forEach((parcela, index) => {
+      const valor = parcela.valor;
+      if (currentGroup && currentGroup.valor === valor) {
+        currentGroup.end = parcela.numero;
+      } else {
+        if (currentGroup) {
+          groups.push(currentGroup);
+        }
+        currentGroup = { start: parcela.numero, end: parcela.numero, valor: valor };
+      }
+    });
+
+    if (currentGroup) {
+      groups.push(currentGroup);
+    }
+
+    return groups;
+    }
+
+    let parcelasGeradas = [];
+    const editarAcordoBtn = document.getElementById('editarAcordoBtn');
+    const tabFixas = document.getElementById('nav-one-eg2-tab');
+    const tabPersonalizadas = document.getElementById('nav-two-eg2-tab');
+    const editValorAcordo = document.getElementById('editValorAcordo');
+    const valorParcelaPerso = document.getElementById('valor_parcela_perso');
+    const valorAcordoError = document.getElementById('valorAcordoError');
+    const editMaiorDescontoAcordo = parseFloat(document.getElementById('editMaiorDescontoAcordo').value);
+    const editMenorDescontoAcordo = parseFloat(document.getElementById('editMenorDescontoAcordo').value);
+
+    const rangeSlider = document.getElementById('customRange1');
+    const editMinParcelasAcordo = document.getElementById('editMinParcelasAcordo');
+    const editMaxParcelasAcordo = document.getElementById('editMaxParcelasAcordo');
+    const editParcelaAcordo = document.getElementById('editParcelaAcordo');
+    const editValorParcelaAcordo = document.getElementById('editValorParcelaAcordo');
+
+    const editDataVencimentoPrim = document.getElementById('editDataVencimentoPrim');
+    const editDataVencimentoProx = document.getElementById('editDataVencimentoProx');
+    const editEmailAcordo = document.getElementById('editEmailAcordo');
+    const editTelefoneAcordo = document.getElementById('editTelefoneAcordo');
+
+    function limiteValorAcordo(acordo) {
+      document.getElementById('editValorAcordo').value = acordo.valor_do_acordo;
+      document.getElementById('editMaiorDescontoAcordo').value = acordo.maior_desconto_valor;
+      document.getElementById('editMenorDescontoAcordo').value = acordo.menor_desconto_valor;
+    }
+
+    function limiteRangeSlider(min, max, value) {
+      rangeSlider.min = min;
+      rangeSlider.max = max;
+      rangeSlider.value = value;
+    }
+
+    function calcularValorParcela() {
+      const numParcelas = rangeSlider.value;
+      const valorAcordo = parseFloat(editValorAcordo.value.replace(/,/g, '.'));
+      if (!isNaN(valorAcordo) && numParcelas > 0) {
+        const valorParcela = valorAcordo / numParcelas;
+        editValorParcelaAcordo.value = valorParcela.toFixed(2).replace('.', ',');
+      }
+    }
+
+    editValorAcordo.addEventListener('input', function() {
+      const maiorDesconto = parseFloat(document.getElementById('editMaiorDescontoAcordo').value);
+      const menorDesconto = parseFloat(document.getElementById('editMenorDescontoAcordo').value);
+      const valor = parseFloat(this.value.replace(/,/g, '.'));
+      
+      if (valor < maiorDesconto || valor > menorDesconto) {
+        valorAcordoError.style.display = 'none';
+        // valorAcordoError.style.display = 'block';
+        // valorAcordoError.textContent = 'O valor do acordo deve estar entre R$' + maiorDesconto + ' e R$' + menorDesconto;
+      } else {
+        valorAcordoError.style.display = 'none';
+      }
+    });
+
+    rangeSlider.addEventListener('input', function() {
+      editParcelaAcordo.value = this.value;
+      calcularValorParcela();
+    });
+
+    editValorAcordo.addEventListener('change', calcularValorParcela);
+
+    function gerarParcelasFixas() {
+      const editValorAcordo = parseFloat(document.getElementById('editValorAcordo').value.replace(/\./g, '').replace(',', '.'));
+      const editParcelaAcordo = parseInt(document.getElementById('editParcelaAcordo').value);
+      const editValorParcelaAcordo = editValorAcordo / editParcelaAcordo;
+
+      const editDataVencimentoPrim = document.getElementById('editDataVencimentoPrim').value;
+      const editDataVencimentoProx = document.getElementById('editDataVencimentoProx').value;
+
+      let dataVencimento = new Date(editDataVencimentoPrim.split('/').reverse().join('-') + 'T00:00:00');
+      let proximaData = new Date(editDataVencimentoProx.split('/').reverse().join('-') + 'T00:00:00');
+
+      let diaParc = proximaData.getDate();
+      let mesParc = proximaData.getMonth();
+      let anoParc = proximaData.getFullYear();
+
+      let mes = mesParc;
+
+      for (let i = 1; i <= editParcelaAcordo; i++ ) {
+        if ( i > 1 ) {
+          diaParc = proximaData.getDate();
+          mes = parseInt(mes) + 1;
+        } else {
+          diaParc = dataVencimento.getDate();
+          mes = mes;
+        }
+
+        if ( mes === 13 ) {
+          mes = 1;
+          anoParc = anoParc + 1;
+        }
+
+        dia = diaParc;
+
+        if ( mes === 2 && diaParc > 28 ) {
+          diaParc = 28;
+        }
+
+        if ( mes < 10 ) {
+          mes = '0' + mes;
+        }
+
+        if ( diaParc < 10 ) {
+          diaParc = '0' + diaParc;
+        }
+
+        const parcela = {
+          numero: `${i}`,
+          valor: `${document.getElementById('editValorParcelaAcordo').value}`,
+          dataVencimento: `${diaParc}/${mes}/${anoParc}`
+        };
+
+        parcelasGeradas.push(parcela);
+
+        diaParc = dia;
+      }
+    }
+
+    function gerarParcelasPersonalizadas() {
+      const numeroParcelas = document.getElementById('total_parc').value;
+      const segmentos = document.querySelectorAll('.parcela-segmento');
+      const valorParcela = parseFloat(valorParcelaPerso.value);
+
+      const editDataVencimentoPrim = document.getElementById('editDataVencimentoPrim').value;
+      const editDataVencimentoProx = document.getElementById('editDataVencimentoProx').value;
+
+      let dataVencimento = new Date(editDataVencimentoPrim.split('/').reverse().join('-') + 'T00:00:00');
+      let proximaData = new Date(editDataVencimentoProx.split('/').reverse().join('-') + 'T00:00:00');
+
+      let diaParc = proximaData.getDate();
+      let mesParc = proximaData.getMonth();
+      let anoParc = proximaData.getFullYear();
+
+      let mes = mesParc;
+
+      for (let i = 1; i <= numeroParcelas; i++ ) {
+        if ( i > 1 ) {
+          diaParc = proximaData.getDate();
+          mes = parseInt(mes) + 1;
+        } else {
+          diaParc = dataVencimento.getDate();
+          mes = mes;
+        }
+
+        if ( mes === 13 ) {
+          mes = 1;
+          anoParc = anoParc + 1;
+        }
+
+        dia = diaParc;
+
+        if ( mes === 2 && diaParc > 28 ) {
+          diaParc = 28;
+        }
+
+        if ( mes < 10 ) {
+          mes = '0' + mes;
+        }
+
+        if ( diaParc < 10 ) {
+          diaParc = '0' + diaParc;
+        }
+
+        let valorParcelaAtual = 0;
+        segmentos.forEach(segmento => {
+          const de = parseInt(segmento.querySelector('[name="de_parc"]').value, 10);
+          const ate = parseInt(segmento.querySelector('[name="ate_parc"]').value, 10);
+          const valor = parseFloat(segmento.querySelector('[name="valor_parcela_perso"]').value.replace(',', '.'));
+          if (i >= de && i <= ate) {
+              valorParcelaAtual = valor;
+          }
+        });
+
+        const parcela = {
+          numero: `${i}`,
+          valor: `${valorParcelaAtual.toFixed(2).replace('.', ',')}`,
+          dataVencimento: `${diaParc}/${mes}/${anoParc}`
+        };
+
+        parcelasGeradas.push(parcela);
+
+        diaParc = dia;
+      }
+    }
+
+    editarAcordoBtn.addEventListener('click', function() {
+      if (tabFixas.classList.contains('active')) {
+        editarAcordo();
+      } else if (tabPersonalizadas.classList.contains('active')) {
+        editarAcordoTwo();
+      }
+    });
+
+    function formatarData(data) {
+      if (data.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const partes = data.split('-');
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+      }
+      return data;
+    }
+
+    function editarAcordo() {
+      gerarParcelasFixas();
+
+      if (!acordoIdAtualizado) {
+        return; 
+      }
+
+      const FormData = {
+        acordo_id: acordoIdAtualizado,
+        valor_do_acordo: document.getElementById('editValorAcordo').value,
+        numParcelas: document.getElementById('editParcelaAcordo').value,
+        valor_parcela: document.getElementById('editValorParcelaAcordo').value,
+        dia_vencimento_primeira_parcela: formatarData(document.getElementById('editDataVencimentoPrim').value),
+        dia_vencimento_proxima_parcela: document.getElementById('editDataVencimentoProx').value,
+        parcelas: parcelasGeradas,
+        email: document.getElementById('editEmailAcordo').value,
+        telefone: document.getElementById('editTelefoneAcordo').value,
+      };
+
+      fetch('editar_acordo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(FormData)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          alert(result.message);
+          location.reload();
+        }
+      })
+      .catch(error => console.error('Erro ao editar o acordo:', error));
+    }
+
+    function editarAcordoTwo() {
+      gerarParcelasPersonalizadas();
+
+      if (!acordoIdAtualizado) {
+        return; 
+      }
+
+      const FormData = {
+        acordo_id: acordoIdAtualizado,
+        valor_do_acordo: document.getElementById('editValorAcordo').value,
+        numParcelas: document.getElementById('total_parc').value,
+        valor_parcela: "0,00",
+        dia_vencimento_primeira_parcela: formatarData(document.getElementById('editDataVencimentoPrim').value),
+        dia_vencimento_proxima_parcela: document.getElementById('editDataVencimentoProx').value,
+        parcelas: parcelasGeradas,
+        email: document.getElementById('editEmailAcordo').value,
+        telefone: document.getElementById('editTelefoneAcordo').value,
+      };
+
+      fetch('editar_acordo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(FormData)
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          alert(result.message);
+          location.reload();
+        }
+      })
+      .catch(error => console.error('Erro ao editar o acordo:', error));
+    }
+  });
+</script>
+
+{% endblock %}

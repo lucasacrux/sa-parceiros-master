@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+{% load static %}
+<form class="js-step-form"
+  enctype="multipart/form-data"
+  method="POST"
+  action="{% url import_url %}"
+  data-hs-step-form-options='{
+    "progressSelector": "#progress_{{ import_type }}",
+    "stepsSelector": "#steps_{{ import_type }}",
+    "endSelector": "#finishBtn_{{ import_type }}"
+  }'>
+  {% csrf_token %}
+
+  <!-- Barra de progresso -->
+  <ul id="progress_{{ import_type }}" class="js-step-progress step step-sm step-icon-sm step-inline step-item-between mb-4">
+    <li class="step-item active">
+      <a class="step-content-wrapper" href="javascript:;">
+        <span class="step-icon step-icon-soft-dark">1</span>
+        <span class="step-title">Importar Planilha</span>
+      </a>
+    </li>
+    <li class="step-item">
+      <a class="step-content-wrapper" href="javascript:;">
+        <span class="step-icon step-icon-soft-dark">2</span>
+        <span class="step-title">Mapear Campos</span>
+      </a>
+    </li>
+    <li class="step-item">
+      <a class="step-content-wrapper" href="javascript:;">
+        <span class="step-icon step-icon-soft-dark">3</span>
+        <span class="step-title">Configurar e Finalizar</span>
+      </a>
+    </li>
+  </ul>
+
+  <p class="text-muted">Para validar corretamente, o arquivo deve conter os seguintes campos obrigatórios: <strong>{{ required_fields }}</strong>.</p>
+
+  <div id="steps_{{ import_type }}">
+    <!-- Upload -->
+    <div id="step1_{{ import_type }}" class="active">
+      <div class="mb-4">
+        <div id="dropzone_{{ import_type }}" class="js-dropzone row dz-dropzone dz-dropzone-card">
+          <div class="dz-message">
+            <h5>Arraste e solte o arquivo aqui</h5>
+            <p>ou</p>
+            <span class="btn btn-primary">Selecione um arquivo</span>
+          </div>
+        </div>
+        <input type="file" id="fileInput_{{ import_type }}" name="file" style="display: none;" accept=".csv,.xls,.xlsx,.txt" />
+        <p id="selectedFile_{{ import_type }}" class="text-muted"></p>
+        <div id="errorMessages_{{ import_type }}" class="mt-4 text-danger" style="display: none;">
+          <strong>Erro(s):</strong>
+          <ul id="errorList_{{ import_type }}"></ul>
+        </div>
+      </div>
+      <div class="d-flex justify-content-end">
+        <button type="button" class="btn btn-primary btn-proximo" 
+                data-from-step="step1" data-to-step="step2" data-import-type="{{ import_type }}">
+            Próximo <i class="bi-chevron-right small"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mapeamento -->
+    <div id="step2_{{ import_type }}" class="step" style="display: none;">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Coluna do Arquivo</th>
+              <th>Pré-visualização</th>
+              <th>Campo do Lead</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="mappingTable_{{ import_type }}"></tbody>
+        </table>
+      </div>
+      <p>Confirme os campos e clique em "Próximo" para continuar.</p>
+      <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary btn-voltar" 
+                data-from-step="step2" data-to-step="step1" data-import-type="{{ import_type }}">
+            <i class="bi-chevron-left small"></i> Voltar
+        </button>
+        <button type="button" class="btn btn-primary btn-proximo" 
+                data-from-step="step2" data-to-step="step3" data-import-type="{{ import_type }}">
+            Próximo <i class="bi-chevron-right small"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Finalização -->
+    <div id="step3_{{ import_type }}" class="step" style="display: none;">
+      <p>Confirme as configurações e clique em "Importar" para finalizar.</p>
+      <div class="table-responsive">
+          <table class="table">
+              <thead>
+                  <tr>
+                      <th>Coluna do Arquivo</th>
+                      <th>Pré-visualização</th>
+                      <th>Campo do Lead</th>
+                  </tr>
+              </thead>
+              <tbody id="finalTable_{{ import_type }}"></tbody>
+          </table>
+      </div>
+      <div class="d-flex justify-content-between">
+        <button type="button" class="btn btn-secondary btn-voltar" 
+          data-from-step="step3" data-to-step="step2" data-import-type="{{ import_type }}">
+          <i class="bi-chevron-left small"></i> Voltar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-primary btn-importar"
+          data-import-type="{{ import_type }}"
+        >
+        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+          <span class="import-text">Importar</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensagem de Sucesso -->
+    <div id="importSuccessMessage_{{ import_type }}" class="js-success-message" style="display:none;">
+      <div class="text-center">
+          <img class="img-fluid mb-3" src="{% static 'core/svg/illustrations/oc-megaphone.svg' %}" 
+              alt="Importação Concluída" style="max-width: 15rem;">
+          <div class="mb-4">
+              <h2>Importação Concluída!</h2>
+              <p>Os contatos foram importados com sucesso.</p>
+          </div>
+          <div class="d-flex justify-content-center gap-3">
+              <a class="btn btn-white" href="{% url 't_listar_leads_banco' %}">
+                  <i class="bi-chevron-left small ms-1"></i> Ir para lista de leads
+              </a>
+              <a class="btn btn-primary" href="#">
+                  <i class="bi-plus-circle me-1"></i> Importar contratos
+              </a>
+          </div>
+      </div>
+    </div>
+  </div>
+</form>

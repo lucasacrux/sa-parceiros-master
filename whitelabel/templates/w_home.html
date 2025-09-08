@@ -1,0 +1,55 @@
+{% extends "w_base.html" %}
+
+{% load static %}
+{% block content %}
+
+<main id="content" role="main" class="main" style="margin-top: 100px;">
+    <div class="row justify-content-lg-center justify-content-sm-center">
+        <div class="col-lg-6" style="position: relative;">
+          <div class="col-lg-6 ant-select"></div>
+
+          <form method="POST">
+            {% csrf_token %}
+            <!-- Content Step Form -->
+            <div id="addUserStepFormContent">
+                <div id="addUserStepProfile" class="card card-lg " style="display: block; opacity: 1.0325;">
+                <div class="card-body">
+                    <!-- Form -->
+                    <div class="row mb-4">
+                    <label for="emailLabel" class="col-sm-4 col-form-label form-label">CPF:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="js-input-mask form-control" required name="cpf" data-name="cpf" placeholder="xxx.xxx.xxx-xx" aria-label="xxx.xxx.xxx-xx" data-hs-mask-options="{
+                        &quot;mask&quot;: &quot;000.000.000-00&quot;
+                        }">
+                        <small id="cpfError" class="form-text text-danger" style="display:none;">CPF não encontrado ou inválido.</small>
+                    </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <label for="emailLabel" class="col-sm-4 col-form-label form-label">Nome Completo:</label>
+                        <div class="col-sm-8">
+                        <input type="text" required class="form-control" name="nome" data-name="nome">
+                        </div>
+                    </div>
+                    <!-- End Form -->
+                </div>
+                <!-- Footer -->
+                <div class="card-footer d-flex justify-content-end align-items-center">
+                    <button type="submit" class="btn btn-primary">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                    Consultar <i class="bi-chevron-right"></i>
+                    </button>
+                </div>
+                <!-- End Footer -->
+                </div>
+
+            </div>
+          </form>
+
+          
+        </div>
+      </div>
+  </main>
+  
+  <!-- ========== END MAIN CONTENT ========== -->
+{% endblock %}

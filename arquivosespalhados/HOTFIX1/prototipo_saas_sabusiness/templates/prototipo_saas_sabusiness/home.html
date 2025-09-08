@@ -1,0 +1,109 @@
+{% extends "prototipo_saas_sabusiness/base.html" %}
+{% block title %}SaiuAcordo Business • Cobrança 360 com Whitelabel{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <h1>Conta de cobrança completa e <span class="ui-ink">whitelabel</span></h1>
+      <p>Emita boletos, Pix, cartão de crédito, dispare SMS, e-mail e WhatsApp (oficial) e
+         ative um portal de autoatendimento com a sua marca. Integrações com Serasa e big data,
+         fluxo de <b>KYC</b>, assinatura digital e esteira jurídica integrada.</p>
+
+      <form class="hero-signup" method="get" action="{% url 'saas:signup' %}">
+        <input type="email" name="email" placeholder="Informe seu e-mail" required>
+        <input type="hidden" name="origin" value="HOME_HERO">
+        <button class="btn primary">Criar conta grátis</button>
+      </form>
+
+      <div class="hero-badges">
+        <span class="ui-tag">Sem mensalidade no início</span>
+        <span class="ui-tag">API Pública</span>
+        <span class="ui-tag">Portal whitelabel</span>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="device-mockup" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<section class="compare">
+  <div class="maxw">
+    <h2>Aqui sua operação tem tudo <span class="ui-ink">em um só lugar</span></h2>
+
+    <div class="toggle-tabs" role="tablist" aria-label="Comparativo">
+      <input type="radio" id="tab-sem"   name="cmp" checked>
+      <label for="tab-sem">Sem o SaiuAcordo Business</label>
+      <input type="radio" id="tab-com"   name="cmp">
+      <label for="tab-com">Com o SaiuAcordo Business</label>
+      <span class="pill"></span>
+    </div>
+
+    <div class="compare-grid">
+      <div class="col sem">
+        <div class="flow">
+          <div class="card flow-item">Oferecer meios de pagamento</div>
+          <div class="card flow-item">Gateway / Adquirente / Banco</div>
+          <div class="card flow-item">Planilhas, conciliação manual</div>
+          <div class="card flow-item">Disparo de SMS/E-mail terceirizado</div>
+          <div class="card flow-item">Sem portal whitelabel</div>
+          <div class="card flow-item warn">Gerenciamento manual de tudo</div>
+          <div class="card flow-item">Custos altos e baixa conversão</div>
+        </div>
+      </div>
+
+      <div class="col com">
+        <div class="flow">
+          <div class="card flow-item ok">Receber pagamentos (Boleto, Pix, Cartão)</div>
+          <div class="card flow-item ok">Motor de cobranças omnichannel (SMS, E-mail, WhatsApp)</div>
+          <div class="card flow-item ok">Portal Whitelabel + API pública</div>
+          <div class="card flow-item ok">Serasa & big data integrados</div>
+          <div class="card flow-item ok">Onboarding/KYC e assinatura digital</div>
+          <div class="card flow-item ok">Carteiras e subcarteiras com regras</div>
+          <div class="card flow-item ok">Esteira jurídica com escritórios homologados</div>
+        </div>
+        <div class="saas-core">SA • Business</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn primary" href="{% url 'saas:signup' %}?origin=COMPARE">Criar conta</a>
+      <a class="btn" href="{% url 'saas:signup' %}?origin=TRIAL">Solicitar teste</a>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="maxw grid4">
+    <article class="card feat">
+      <h3>Carteiras & Subcarteiras</h3>
+      <p>Regras de desconto, juros e priorização por perfil do cliente.</p>
+    </article>
+    <article class="card feat">
+      <h3>Portal Whitelabel</h3>
+      <p>Autenticação por CPF + OTP, autoatendimento e renegociação.</p>
+    </article>
+    <article class="card feat">
+      <h3>Disparo Omnichannel</h3>
+      <p>SMS, E-mail e WhatsApp (oficial e não oficial), com templates e trilhas.</p>
+    </article>
+    <article class="card feat">
+      <h3>Esteira Jurídica</h3>
+      <p>Integração com escritórios homologados e ajuizamento automatizado.</p>
+    </article>
+  </div>
+  <div class="center">
+    <a class="btn" href="{% url 'saas:developers' %}">Ver APIs públicas</a>
+  </div>
+</section>
+
+<!-- CTA fixo mobile -->
+<div class="mobile-bottom-cta">
+  <div class="bar">
+    <span class="label">Pronto para começar?</span>
+    <a class="btn primary" href="{% url 'saas:signup' %}?origin=CTA_MOBILE_BAR">Criar conta grátis</a>
+  </div>
+</div>
+{% endblock %}

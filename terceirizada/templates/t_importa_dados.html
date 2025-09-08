@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+{% extends "t_base.html" %}
+{% load static %}
+{% block content %}
+<style>
+.card-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1280px) {
+    .card-wrapper {
+        max-width: 1024px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .card-wrapper {
+        max-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-wrapper {
+        max-width: 700px;
+    }
+}
+</style>
+
+<main id="content" role="main" class="main">
+<!-- Content -->
+<div class="content container-fluid">
+    <div class="card-wrapper">
+    <!-- Card -->
+    <div class="card card-lg" style="margin-bottom: 15px;">
+        <div class="card-body">
+            <!-- Tabs de Seleção -->
+            <ul class="nav nav-tabs mb-4" id="importTabs" style="display: flex;align-items: center;justify-content: center;">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#tabPessoas">Importação de Pessoas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#tabContratos">Importação de Contratos</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- Card -->
+    <div class="card card-lg">
+        <div class="card-body">
+            <div class="tab-content">
+            <!-- Importação de Pessoas -->
+            <div id="tabPessoas" class="tab-pane fade show active">
+                {% include "partials/import_step_form.html" with import_type="pessoas" import_url="t_importa_dados_pessoas" required_fields="CPF, Nome Completo" %}
+            </div>
+            <!-- Importação de Contratos -->
+            <div id="tabContratos" class="tab-pane fade">
+                {% include "partials/import_step_form.html" with import_type="contratos" import_url="t_importa_dados_contratos" required_fields="CPF, Número do Contrato, Saldo a Pagar" %}
+            </div>
+        </div>
+        </div>
+    </div>
+    <!-- End Card -->
+    </div>
+</div>
+<!-- End Content -->
+</main>
+<!-- ========== END MAIN CONTENT ========== -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const contratosTab = document.querySelector("a[href='#tabContratos']");
+    contratosTab.classList.add("disabled");
+    contratosTab.style.pointerEvents = "none";
+    contratosTab.style.opacity = "0.5";
+
+    document.querySelectorAll(".btn-importar").forEach(button => {
+        button.addEventListener("click", function () {
+            const importType = this.getAttribute("data-import-type");
+            if (importType === "pessoas") {
+                sendImportData(importType, this, enableContractsTab);
+            } else {
+                sendImportData(importType, this);
+            }
+        });
+    });
+
+    function enableContractsTab() {
+        contratosTab.classList.remove("disabled");
+        contratosTab.style.pointerEvents = "auto";
+        contratosTab.style.opacity = "1";
+    }
+
+    document.querySelectorAll(".nav-link").forEach(tab => {
+        tab.addEventListener("click", function () {
+            document.querySelectorAll(".tab-pane").forEach(pane => {
+                pane.querySelector("form").reset();
+                pane.querySelector(".step-item.active").classList.remove("active");
+                pane.querySelector(".step-item:first-child").classList.add("active");
+                pane.querySelector(".text-muted").innerText = "";
+                pane.querySelector("#mappingTable").innerHTML = "";
+            });
+        });
+    });
+
+    document.querySelectorAll(".btn-proximo").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const importType = this.getAttribute("data-import-type");
+            validateFile(importType);
+        });
+    });
+
+    document.querySelectorAll("input[type='file']").forEach(fileInput => {
+        fileInput.addEventListener("change", function () {
+            const importType = this.id.replace("fileInput_", "");
+            const fileNameDisplay = document.getElementById(`selectedFile_${importType}`);
+            if (this.files.length > 0) {
+                console.log(`Arquivo detectado (${importType}): ${this.files[0].name}`);
+                fileNameDisplay.innerText = `Arquivo selecionado: ${this.files[0].name}`;
+            } else {
+                console.log(`Nenhum arquivo detectado (${importType})`);
+                fileNameDisplay.innerText = "";
+            }
+        });
+    });
+
+    document.querySelectorAll(".dz-message").forEach(dropzone => {
+        dropzone.addEventListener("click", function () {
+            const importType = this.closest(".js-dropzone").id.replace("dropzone_", "");
+            console.log(`Abrindo seleção de arquivo para ${importType}`);
+            document.getElementById(`fileInput_${importType}`).click();
+        });
+    });
+
+    document.querySelectorAll(".js-dropzone").forEach(dropzone => {
+        dropzone.addEventListener("dragover", function (e) {
+            e.preventDefault();
+        });
+
+        dropzone.addEventListener("drop", function (e) {
+            e.preventDefault();
+            const importType = this.id.replace("dropzone_", "");
+            const fileInput = document.getElementById(`fileInput_${importType}`);
+            
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                console.log(`Arquivo solto no Dropzone (${importType}): ${fileInput.files[0].name}`);
+                fileInput.dispatchEvent(new Event("change"));
+            }
+        });
+    });
+});
+
+let ignoredFields = new Set();
+let customFields = new Set();
+
+function toggleIgnore(button, columnName, event) {
+    event.preventDefault();
+
+    if (ignoredFields.has(columnName)) {
+        ignoredFields.delete(columnName);
+        button.classList.remove("btn-danger");
+        button.classList.add("btn-light");
+        button.innerText = "Ignorar";
+    } else {
+        ignoredFields.add(columnName);
+        button.classList.remove("btn-light");
+        button.classList.add("btn-danger");
+        button.innerText = "Ignorado";
+    }
+
+    console.log("Campos ignorados:", Array.from(ignoredFields));
+}
+
+function addCustomField(event, selectElement) {
+    event.preventDefault();
+
+    const inputField = selectElement.parentElement.querySelector(".custom-field-input");
+    const addButton = selectElement.parentElement.querySelector(".add-custom-field");
+    const newField = inputField.value.trim();
+
+    if (newField && !customFields.has(newField)) {
+        customFields.add(newField);
+
+        const newOption = document.createElement("option");
+        newOption.value = newField;
+        newOption.textContent = newField;
+        newOption.selected = true;
+
+        selectElement.insertBefore(newOption, selectElement.lastElementChild);
+        inputField.value = "";
+
+        console.log("Campo personalizado adicionado:", newField);
+    }
+
+    inputField.style.display = "none";
+    addButton.style.display = "none";
+}
+
+let serverResponseData = {};
+
+function validateFile(importType) {
+    const fileInput = document.getElementById(`fileInput_${importType}`);
+    const file = fileInput.files.length > 0 ? fileInput.files[0] : null;
+
+    console.log(`Validando arquivo para ${importType}:`, file ? file.name : "Nenhum arquivo selecionado");
+
+    if (!file) {
+        alert("Por favor, selecione um arquivo antes de prosseguir.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("import_type", importType);
+
+    let importUrl = `/t/import/`;
+
+    fetch(importUrl, {
+        method: "POST",
+        body: formData,
+        headers: { "X-CSRFToken": "{{ csrf_token }}" },
+    })
+    .then(response => {
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            console.error("Resposta não está no formato JSON!");
+            return response.text().then(text => { throw new Error(text); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Resposta do servidor:", data);
+        serverResponseData[importType] = data;
+        const errorDiv = document.getElementById(`errorMessages_${importType}`);
+        const errorList = document.getElementById(`errorList_${importType}`);
+        errorDiv.style.display = "none";
+        errorList.innerHTML = "";
+
+        if (data.error) {
+            errorDiv.style.display = "block";
+
+            if (data.missing_columns) {
+                errorList.insertAdjacentHTML("beforeend", `<li>O arquivo não contém os seguintes campos obrigatórios: <strong>${data.missing_columns.join(", ")}</strong></li>`);
+            }
+
+            if (data.invalid_cpfs) {
+                data.invalid_cpfs.forEach(err => {
+                    errorList.insertAdjacentHTML("beforeend", `<li>Linha ${err.row}: CPF inválido (${err.cpf})</li>`);
+                });
+            }
+
+            if (data.error_file_id) {
+                const downloadButton = document.createElement("button");
+                downloadButton.className = "btn btn-primary mt-3";
+                downloadButton.innerText = "Baixar relatório completo";
+
+                downloadButton.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    const downloadUrl = `/t/download-error-file/${data.error_file_id}`;
+                    window.open(downloadUrl, "_blank");
+                });
+
+                errorList.insertAdjacentElement("afterend", downloadButton);
+            }
+
+            return;
+        }
+
+        const tableBody = document.getElementById(`mappingTable_${importType}`);
+        tableBody.innerHTML = "";
+        ignoredFields.clear();
+
+        data.columns.forEach((col) => {
+            let options = `
+                <option value="">Combine ou crie campos</option>
+                ${importType === "pessoas" ? `
+                    <option value="cpf" ${col === "cpf" ? "selected" : ""}>CPF</option>
+                    <option value="nome_completo" ${col === "nome_completo" ? "selected" : ""}>Nome Completo</option>` : ""}
+                ${importType === "contratos" ? `
+                    <option value="cpf" ${col === "cpf" ? "selected" : ""}>CPF</option>
+                    <option value="numero_do_contrato" ${col === "numero_do_contrato" ? "selected" : ""}>Número do Contrato</option>
+                    <option value="saldo_a_pagar" ${col === "saldo_a_pagar" ? "selected" : ""}>Saldo a Pagar</option>` : ""}
+                ${importType === "contatos" ? `
+                    <option value="cpf" ${col === "cpf" ? "selected" : ""}>CPF</option>
+                    <option value="telefone" ${col === "telefone" ? "selected" : ""}>Telefone</option>
+                    <option value="email" ${col === "email" ? "selected" : ""}>Email</option>` : ""}
+            `;
+
+            const row = `
+                <tr>
+                    <td>${col}</td>
+                    <td>${data.preview[0][col] || ""}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <select class="form-select">${options}
+                                <option value="custom">Criar Campo Personalizado</option>
+                            </select>
+                            <input type="text" class="form-control custom-field-input" placeholder="Novo campo" style="display: none; width: 150px; margin-left: 5px;">
+                            <button class="btn btn-sm btn-primary add-custom-field" style="display: none; margin-left: 5px;" >Adicionar</button>
+                        </div>
+                    </td>
+                    <td><button class="btn btn-light btn-sm" onclick="toggleIgnore(this, '${col}', event)">Ignorar</button></td>
+                </tr>`;
+
+            tableBody.insertAdjacentHTML("beforeend", row);
+        });
+
+        document.querySelectorAll(".form-select").forEach(select => {
+        select.addEventListener("change", function () {
+            const inputField = this.parentElement.querySelector(".custom-field-input");
+            const addButton = this.parentElement.querySelector(".add-custom-field");
+
+            if (this.value === "custom") {
+                inputField.style.display = "block";
+                addButton.style.display = "block";
+                addButton.onclick = (event) => addCustomField(event, this);
+            } else {
+                inputField.style.display = "none";
+                addButton.style.display = "none";
+            }
+        });
+        });
+
+        document.getElementById(`step1_${importType}`).style.display = "none";
+        document.getElementById(`step2_${importType}`).style.display = "block";
+    })
+    .catch(err => console.error("Erro na requisição:", err));
+}
+
+function navigateStep(importType, fromStep, toStep) {
+    let currentStep = document.getElementById(`${fromStep}_${importType}`);
+    let nextStep = document.getElementById(`${toStep}_${importType}`);
+
+    if (!currentStep || !nextStep) {
+        console.error("Passo não encontrado:", { fromStep, toStep });
+        return;
+    }
+
+    currentStep.style.display = "none";
+
+    if (toStep === "step3") {
+        let step2 = document.getElementById(`step2_${importType}`);
+        if (step2) step2.style.display = "none";
+
+        generateFinalStep(importType);
+    }
+
+    nextStep.style.display = "block";
+    updateProgressIndicator(importType, toStep);
+}
+
+function updateProgressIndicator(importType, activeStep) {
+    const progressSteps = document.querySelectorAll(`#progress_${importType} .step-item`);
+
+    progressSteps.forEach((step, index) => {
+        step.classList.remove("active", "focus");
+        
+        if (activeStep === "finalizado") {
+            step.classList.add("active", "focus");
+        } else if (index < parseInt(activeStep.replace("step", ""))) {
+            step.classList.add("active", "focus");
+        }
+    });
+}
+
+function generateFinalStep(importType) {
+    const tableBody = document.getElementById(`finalTable_${importType}`);
+    tableBody.innerHTML = "";
+
+    if (!serverResponseData[importType]) {
+        console.error("Nenhum dado encontrado para este tipo de importação.");
+        return;
+    }
+
+    const { columns, preview } = serverResponseData[importType];
+    let finalColumns = [];
+    let finalPreview = [];
+
+    document.querySelectorAll(`#mappingTable_${importType} tr`).forEach(row => {
+        const colName = row.cells[0].innerText;
+        const leadField = row.cells[2].querySelector("select").value;
+
+        if (!ignoredFields.has(colName)) {
+            finalColumns.push({ original: colName, mapped: leadField });
+        }
+    });
+
+    const firstLead = preview[0] || {};
+
+    finalColumns.forEach(({ original, mapped }) => {
+        const row = document.createElement("tr");
+
+        const colNameCell = document.createElement("td");
+        colNameCell.innerText = original;
+        row.appendChild(colNameCell);
+
+        const previewCell = document.createElement("td");
+        previewCell.innerText = firstLead[original] || "";
+        row.appendChild(previewCell);
+
+        const leadFieldCell = document.createElement("td");
+        leadFieldCell.innerText = mapped;
+        row.appendChild(leadFieldCell);
+
+        tableBody.appendChild(row);
+    });
+
+    const finalJson = {
+        columns: finalColumns.map(item => item.mapped),
+        preview: preview.map(row => {
+            let filteredRow = {};
+            finalColumns.forEach(({ original, mapped }) => {
+                if (original in row) {
+                    filteredRow[mapped] = row[original];
+                }
+            });
+            return filteredRow;
+        })
+    };
+
+    console.log("JSON final após remoção de colunas ignoradas:", JSON.stringify(finalJson, null, 2));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".btn-voltar, .btn-proximo").forEach(button => {
+        button.addEventListener("click", function () {
+            const fromStep = this.getAttribute("data-from-step");
+            const toStep = this.getAttribute("data-to-step");
+            const importType = this.getAttribute("data-import-type");
+            
+            navigateStep(importType, fromStep, toStep);
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".btn-importar").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const importType = this.getAttribute("data-import-type");
+            sendImportData(importType, this);
+        });
+    });
+});
+
+function sendImportData(importType, button, callback = null) {
+    console.log(`Enviando dados de importação (${importType}) para o servidor...`);
+
+    if (!serverResponseData[importType]) {
+        console.error("Nenhum dado encontrado para envio.");
+        return;
+    }
+
+    button.disabled = true;
+    button.querySelector(".import-text").innerText = "Importando...";
+    button.querySelector(".spinner-border").classList.remove("d-none");
+
+    const { preview } = serverResponseData[importType];
+    let finalColumns = [];
+    document.querySelectorAll(`#mappingTable_${importType} tr`).forEach(row => {
+        const colName = row.cells[0].innerText;
+        const leadField = row.cells[2].querySelector("select").value;
+
+        if (!ignoredFields.has(colName) && leadField) {
+            finalColumns.push({ original: colName, mapped: leadField });
+        }
+    });
+
+    let finalPreview = preview.map(row => {
+        let filteredRow = {};
+        finalColumns.forEach(({ original, mapped }) => {
+            if (original in row) {
+                filteredRow[mapped] = row[original];
+            }
+        });
+        return filteredRow;
+    });
+
+    const payload = {
+        import_type: importType,
+        columns: finalColumns.map(item => item.mapped),
+        preview: finalPreview
+    };
+
+    fetch("/t/import/save/", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log("Importação realizada com sucesso!", data);
+            document.getElementById(`step3_${importType}`).style.display = "none";
+            document.getElementById(`importSuccessMessage_${importType}`).style.display = "block";
+            updateProgressIndicator(importType, "finalizado");
+            
+            if (callback) callback();
+        } else {
+            alert("Erro na importação!");
+            console.error("Erro:", data.error);
+            button.disabled = false;
+            button.querySelector(".import-text").innerText = "Importar";
+            button.querySelector(".spinner-border").classList.add("d-none");
+        }
+    })
+    .catch(error => {
+        console.error("Erro ao enviar os dados:", error);
+        button.disabled = false;
+        button.querySelector(".import-text").innerText = "Importar";
+        button.querySelector(".spinner-border").classList.add("d-none");
+    });
+}
+</script>
+{% endblock %}

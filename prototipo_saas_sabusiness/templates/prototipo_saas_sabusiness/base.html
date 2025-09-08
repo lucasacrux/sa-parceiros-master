@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>{% block title %}SaiuAcordo • Business{% endblock %}</title>
+  <meta name="description" content="Conta de cobrança whitelabel: boletos, Pix, cartão, SMS, e-mail e WhatsApp; portal de autoatendimento e API pública.">
+  <link rel="canonical" href="/" />
+
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0b3bff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#0f1222">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SaiuAcordo • Business">
+  <meta property="og:description" content="Cobrança 360 whitelabel com integrações e API.">
+  <meta property="og:url" content="/" />
+  <meta property="og:image" content="{% static 'prototipo_saas_sabusiness/img/og-default.png' %}">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Evitar flash trocando o tema antes do paint -->
+  <script>
+    (function(){try{var t=localStorage.getItem('ui.theme'); if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+  </script>
+
+  <link rel="stylesheet" href="{% static 'prototipo_saas_sabusiness/css/sa_business.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body {% block body_attrs %}{% endblock %}>
+
+  <header id="navbar" class="navbar">
+    <div class="nav-inner">
+      <a class="brand" href="{% url 'saas:home' %}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="logo" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>SaiuAcordo • Business</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primária">
+        <a href="{% url 'saas:solutions' %}">Soluções</a>
+        <a href="{% url 'saas:pricing' %}">Preços</a>
+        <a href="{% url 'saas:developers' %}">Desenvolvedores</a>
+        <a href="{% url 'saas:whitelabel' %}">Whitelabel</a>
+        <a href="https://blog.saiuacordo.com.br" target="_blank" rel="noopener">Blog</a>
+      </nav>
+
+      <div class="nav-cta">
+        <a class="btn pill ghost nav-ghost" href="{% url 'saas:login' %}">Acessar minha conta</a>
+        <a class="btn pill primary nav-primary" href="{% url 'saas:signup' %}?origin=TOP_BAR">Criar conta grátis</a>
+
+        <!-- Toggle tema -->
+        <button id="themeToggle" class="icon-button" aria-label="Alternar tema">
+          <svg class="icon sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l-1.4-1.4M20.4 19.4L19 18M19 6l1.4-1.4M4.6 19.4L6 18"></path>
+          </svg>
+          <svg class="icon moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+          </svg>
+        </button>
+
+        <!-- Menu mobile -->
+        <button id="menuToggle" class="icon-button hamburger" aria-expanded="false" aria-controls="mobileMenu" aria-label="Abrir menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 7h16M4 12h16M4 17h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Menu mobile -->
+    <div id="mobileMenu" class="mobile-menu" hidden>
+      <nav aria-label="Mobile">
+        <a href="{% url 'saas:solutions' %}">Soluções</a>
+        <a href="{% url 'saas:pricing' %}">Preços</a>
+        <a href="{% url 'saas:developers' %}">Desenvolvedores</a>
+        <a href="{% url 'saas:whitelabel' %}">Whitelabel</a>
+        <a href="https://blog.saiuacordo.com.br" target="_blank" rel="noopener">Blog</a>
+      </nav>
+      <div class="mobile-cta-stack">
+        <a class="btn" href="{% url 'saas:login' %}">Acessar minha conta</a>
+        <a class="btn primary" href="{% url 'saas:signup' %}?origin=MENU_MOBILE">Criar conta grátis</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="content" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer Pro -->
+  <footer class="footer-pro" role="contentinfo">
+    <div class="fp-wrap">
+      <div class="fp-cols">
+        <section class="fp-col">
+          <h4>Canais de atendimento</h4>
+          <ul class="fp-list">
+            <li><span class="ico">📞</span> 0800 000 0000 <small>(Pessoa Jurídica)</small></li>
+            <li><span class="ico">💬</span> WhatsApp: 0800 000 0000 <small>(mensagens)</small></li>
+            <li><span class="ico">✉️</span> contato@saiuacordo.com.br</li>
+          </ul>
+          <h5>Imprensa</h5>
+          <ul class="fp-list">
+            <li><span class="ico">📰</span> imprensa@saiuacordo.com.br</li>
+          </ul>
+        </section>
+
+        <section class="fp-col">
+          <h4>Soluções</h4>
+          <ul class="fp-links">
+            <li><a href="{% url 'saas:solutions' %}#comunicacao">Comunicação</a></li>
+            <li><a href="{% url 'saas:solutions' %}#cobranca">Cobrança</a></li>
+            <li><a href="{% url 'saas:solutions' %}#pagamentos">Pagamentos</a></li>
+            <li><a href="{% url 'saas:developers' %}">API &amp; Integrações</a></li>
+            <li><a href="{% url 'saas:whitelabel' %}">Portal whitelabel</a></li>
+          </ul>
+        </section>
+
+        <section class="fp-col">
+          <h4>Transparência</h4>
+          <ul class="fp-links">
+            <li><a href="#">Termos de uso</a></li>
+            <li><a href="#">Política de privacidade</a></li>
+            <li><a href="#">Segurança e compliance</a></li>
+            <li><a href="#">Status da plataforma</a></li>
+            <li><a href="#">Canal de denúncias</a></li>
+          </ul>
+        </section>
+
+        <section class="fp-col">
+          <h4>Empresa</h4>
+          <ul class="fp-links">
+            <li><a href="#">Sobre nós</a></li>
+            <li><a href="#">Parcerias</a></li>
+            <li><a href="#">Carreiras</a></li>
+            <li><a href="https://blog.saiuacordo.com.br" target="_blank" rel="noopener">Blog</a></li>
+            <li><a href="{% url 'saas:helpcenter' %}">Central de ajuda</a></li>
+          </ul>
+        </section>
+
+        <section class="fp-col">
+          <h4>Certificações</h4>
+          <div class="fp-badges">
+            <span class="badge">PCI DSS</span>
+            <span class="badge">LGPD</span>
+            <span class="badge">RA1000</span>
+          </div>
+        </section>
+      </div>
+
+      <hr class="fp-divider"/>
+
+      <div class="fp-bottom">
+        <div class="fp-brand">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span>SaiuAcordo • Business</span>
+        </div>
+        <div class="fp-legal">
+          © {% now "Y" %} SaiuAcordo. Todos os direitos reservados. Av. Exemplo, 123, Sala 45 — Cidade/UF — CEP 00000-000.
+        </div>
+        <div class="fp-social">
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="LinkedIn">IN</a>
+          <a href="#" aria-label="YouTube">YT</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS base do site (tema + menu) -->
+  <script defer src="{% static 'prototipo_saas_sabusiness/js/sa_business.js' %}?v=3"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

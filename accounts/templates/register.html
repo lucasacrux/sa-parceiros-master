@@ -1,0 +1,20 @@
+{% extends 'base_register.html' %}
+
+{% block title %}Registrar{% endblock %}
+
+{% block content %}
+{% load static %}
+<div class="bg-light" style="display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100vh;">
+    <div>
+        <img class="navbar-brand-logo" src="{% static 'core/svg/logos/logo.svg' %}"  alt="Logo" data-hs-theme-appearance="default">
+    </div>
+    <div class="mt-5 px-4 py-3 bg-white" style="width: 37rem; border-radius: 0.5rem; filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.07)) drop-shadow(0 2px 2px rgb(0 0 0 / 0.06)); ">
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-warning mt-3" type="submit">Registrar</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% block content %}
+<style>
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .select2-container .select2-selection--multiple {
+        min-height: 36px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        background-color: #FFFFFF !important;
+        border: .0625rem solid rgba(231, 234, 243, .7) !important;
+        border-radius: .3125rem !important;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border: solid #418AE9 1px !important;
+        outline: 0 !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+        padding-left: 20px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #FFFFFF !important;
+        border: 1px solid #1366ff !important;
+        margin-top: 9px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #1e2022 !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+        color: #1e2022 !important;
+    }
+
+    .select2-container .select2-container--default .select2-container--open {
+        top: 293px !important;
+    }
+
+    .select2-container .select2-search--inline {
+        margin-top: -16px !important;
+        margin-left: 8px !important;
+        width: 100%;
+    }
+</style>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Editar Ação</h4>
+        </div>
+        <div class="card-body">
+            <div id="alert" class="alert d-none" role="alert"></div>
+            <form id="acaoEditForm" method="POST">
+                {% csrf_token %}
+
+                <!-- Nome da Ação -->
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nome da Ação</label>
+                    <input type="text" id="name" name="name" class="form-control" value="{{ acao.name|default:'' }}" required>
+                </div>
+
+                <!-- Tipo de Ação -->
+                <div class="mb-3">
+                    <label for="tipo" class="form-label">Tipo de Ação</label>
+                    <select id="tipo" name="tipo" class="form-control" required>
+                        <option value="sms" {% if acao.acao == "sms" %}selected{% endif %}>SMS</option>
+                        <option value="whatsapp" {% if acao.acao == "whatsapp" %}selected{% endif %}>WhatsApp</option>
+                        <option value="lista" {% if acao.acao == "lista" %}selected{% endif %}>Lista</option>
+                    </select>
+                </div>
+
+                <!-- Select Lista -->
+                <div id="escolher-lista" class="mb-3" style="display: none;">
+                    <label for="lista" class="form-label">Selecionar Lista</label>
+                    <select id="lista" name="lista" class="form-control select2" multiple required>
+                        {% for lista in listas_disponiveis %}
+                            <option value="{{ lista.id }}" {% if lista.id in acao.lista %}selected{% endif %}>{{ lista.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Quer contato -->
+                <div id="quer-contato" class="mb-3" style="display: none;">
+                    <label for="contato" class="form-label">Quer Contato?</label>
+                    <select id="contato" name="contato" class="form-control">
+                        <option value="sim" {% if acao.contato == "sim" %}selected{% endif %}>Sim</option>
+                        <option value="nao" {% if acao.contato == "nao" %}selected{% endif %}>Não</option>
+                    </select>
+                </div>
+
+                <!-- Quantidade de operadores -->
+                <div id="quantidade-operadores" class="mb-3" style="display: none;">
+                    <label for="operadores" class="form-label">Quantidade de Operadores</label>
+                    <select id="operadores" name="operadores" class="form-control">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+
+                <!-- Quer ia -->
+                <div id="quer-ia" class="mb-3" style="display: none;">
+                    <label for="ia" class="form-label">Quer IA?</label>
+                    <select id="ia" name="ia" class="form-control">
+                        <option value="sim" {% if acao.ia == "sim" %}selected{% endif %}>Sim</option>
+                        <option value="nao" {% if acao.ia == "nao" %}selected{% endif %}>Não</option>
+                    </select>
+                </div>
+
+                <!-- Variáveis Disponíveis -->
+                <div class="mb-3 variaveis-disponiveis">
+                    <label class="form-label">Variáveis Disponíveis:</label>
+                    <div>
+                        <h6>Pessoas</h6>
+                        <div id="pessoa-slugs">
+                            {% for campo in campos_pessoas %}
+                            <button type="button" class="btn btn-sm btn-outline-primary campo-slug" style="margin: 5px;"
+                                    data-slug="pessoas.{{ campo.slug|default:'campo_nao_definido' }}">
+                                {{ campo.label }}
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6>Contratos</h6>
+                        <div id="contrato-slugs">
+                            {% for campo in campos_contratos %}
+                                <button type="button" class="btn btn-sm btn-outline-primary campo-slug" style="margin: 5px;"
+                                        data-slug="contratos.{{ campo.slug|default:'campo_nao_definido' }}">
+                                    {{ campo.label }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Texto -->
+                <div class="mb-3">
+                    <label for="text" class="form-label">Texto</label>
+                    <textarea id="text" name="text" class="form-control" required>{{ acao.text|default:'' }}</textarea>
+                </div>
+
+                <!-- Descrição -->
+                <div class="mb-3">
+                    <label for="description" class="form-label">Descrição</label>
+                    <textarea id="description" name="description" class="form-control">{{ acao.description|default:'' }}</textarea>
+                </div>
+
+                <!-- Botão de envio -->
+                <div class="mt-4 d-flex justify-content-between items-center">
+                    <a href="{% url 'business_listar_acoes' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Adicionando Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Selecione uma ou mais listas",
+            width: '100%',
+            allowClear: true
+        });
+
+        function toggleFields() {
+            let tipo = $('#tipo').val();
+            
+            if (tipo === 'lista') {
+                $('[for="text"], #text, [for="description"], #description, .variaveis-disponiveis').hide();
+                
+                $('#escolher-lista, #quer-contato, #quantidade-operadores, #quer-ia').show();
+            } else {
+                $('[for="text"], #text, [for="description"], #description, .variaveis-disponiveis').show();
+                
+                $('#escolher-lista, #quer-contato, #quantidade-operadores, #quer-ia').hide();
+            }
+        }
+
+        toggleFields();
+        $('#tipo').change(toggleFields);
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
+    document.querySelectorAll('.campo-slug').forEach(button => {
+        button.addEventListener('click', function() {
+            let slug = `{${this.dataset.slug}}`;
+            let input = document.getElementById('text');
+            let startPos = input.selectionStart;
+            let endPos = input.selectionEnd;
+            let textBefore = input.value.substring(0, startPos);
+            let textAfter = input.value.substring(endPos, input.value.length);
+            input.value = textBefore + slug + textAfter;
+            input.focus();
+            input.setSelectionRange(startPos + slug.length, startPos + slug.length);
+        });
+    });
+
+    document.getElementById('acaoEditForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let formData = new FormData(this);
+
+        fetch("{% url 'business_editar_acao' acao.id %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                document.getElementById('alert').classList.remove('d-none', 'alert-danger');
+                document.getElementById('alert').classList.add('alert-success');
+                document.getElementById('alert').textContent = data.message;
+            } else {
+                throw new Error(data.message);
+            }
+        })
+        .catch(error => {
+            document.getElementById('alert').classList.remove('d-none', 'alert-success');
+            document.getElementById('alert').classList.add('alert-danger');
+            document.getElementById('alert').textContent = "Erro ao editar a ação. " + error.message;
+        });
+    });
+</script>
+
+{% endblock %}

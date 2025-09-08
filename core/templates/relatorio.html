@@ -1,0 +1,227 @@
+
+{% extends "base.html" %}
+
+{% load static %}
+{% block content %}
+
+<main id="content" role="main" class="main">
+    <!-- Content -->
+    <div class="container content container-fluid">
+      <!-- Card -->
+      <div class="card">
+        <div class="card-header card-header-content-md-between">
+          <h3 class="card-header-title">Painel de informação</h3>
+        </div>
+        <div class="card-body">
+          <div class="card-body">
+            <!-- Row -->
+            <div class="row justify-content-center">
+              <div class="col-lg-3 col-sm-6 mb-5 mb-lg-0">
+                <div class="js-counter h1 mb-1"
+                      data-hs-counter-options='{
+                        "isCommaSeparated": true
+                      }'>52147</div>
+                <span>Bases Ativas</span>
+              </div>
+            
+              <div class="col-lg-3 col-sm-6 mb-5 mb-lg-0">
+                <div class="js-counter h1 mb-1"
+                      data-hs-counter-options='{
+                        "isCommaSeparated": true
+                      }'>24583</div>
+                <span>Ofertas Visualizadas</span>
+              </div>
+            
+              <div class="col-lg-3 col-sm-6 mb-5 mb-lg-0">
+                <div class="js-counter h1 mb-1"
+                      data-hs-counter-options='{
+                        "isCommaSeparated": true
+                      }'>7348</div>
+                <span>Ofertas Clicadas</span>
+              </div>
+            
+              <div class="col-lg-3 col-sm-6 mb-5 mb-lg-0">
+                <div class="js-counter h1 mb-1"
+                      data-hs-counter-options='{
+                        "isCommaSeparated": true
+                      }'>87904</div>
+                <span>Acordos Fechados</span>
+              </div>
+            </div>
+            <!-- End Row -->
+          </div>
+    
+          <!-- Chart -->
+          <div class="row align-items-sm-center mb-4">
+            <div class="col-sm mb-3 mb-sm-0">
+              <div class="d-flex align-items-center">
+                <span class="h1 mb-0">R$7.431,14 - Pagamentos Recebidos</span>
+              </div>
+            </div>
+          
+            <div class="col-sm-auto">
+              <!-- Nav -->
+              <ul class="nav nav-segment" id="projectsTab" role="tablist">
+                <li class="nav-item" data-toggle="chart" data-datasets="0" data-trigger="click" data-action="toggle">
+                  <a class="nav-link active" href="javascript:;" data-bs-toggle="tab">
+                    <span class="legend-indicator bg-primary"></span> Essa Semana
+                  </a>
+                </li>
+                <li class="nav-item" data-toggle="chart" data-datasets="1" data-trigger="click" data-action="toggle">
+                  <a class="nav-link" href="javascript:;" data-bs-toggle="tab">
+                    <span class="legend-indicator bg-info"></span> Última Semana
+                  </a>
+                </li>
+              </ul>
+              <!-- End Nav -->
+            </div>
+          </div>
+            
+          <!-- Line Chart -->
+          <div class="chartjs-custom" style="height: 18rem;">
+            <canvas id="updatingLineChart"
+                    data-hs-chartjs-options='{
+                            "type": "line",
+                            "data": {
+                                "labels": ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],
+                                "datasets": [{
+                                "backgroundColor": ["rgba(55, 125, 255, .5)", "rgba(255, 255, 255, .2)"],
+                                "borderColor": "#377dff",
+                                "borderWidth": 2,
+                                "pointRadius": 0,
+                                "hoverBorderColor": "#377dff",
+                                "pointBackgroundColor": "#377dff",
+                                "pointBorderColor": "#fff",
+                                "pointHoverRadius": 0,
+                                "tension": 0.4
+                              },
+                              {
+                                "backgroundColor": ["rgba(0, 201, 219, .5)", "rgba(255, 255, 255, .2)"],
+                                "borderColor": "#00c9db",
+                                "borderWidth": 2,
+                                "pointRadius": 0,
+                                "hoverBorderColor": "#00c9db",
+                                "pointBackgroundColor": "#00c9db",
+                                "pointBorderColor": "#fff",
+                                "pointHoverRadius": 0,
+                                "tension": 0.4
+                              }]
+                            },
+                            "options": {
+                              "gradientPosition": {"y1": 200},
+                                "scales": {
+                                  "y": {
+                                    "grid": {
+                                      "color": "#e7eaf3",
+                                      "drawBorder": false,
+                                      "zeroLineColor": "#e7eaf3"
+                                    },
+                                    "ticks": {
+                                      "min": 0,
+                                      "max": 100,
+                                      "stepSize": 20,
+                                      "color": "#97a4af",
+                                      "font": {
+                                        "family": "Open Sans, sans-serif"
+                                      },
+                                      "padding": 10,
+                                      "postfix": "k"
+                                    }
+                                  },
+                                  "x": {
+                                    "grid": {
+                                      "display": false,
+                                      "drawBorder": false
+                                    },
+                                    "ticks": {
+                                      "color": "#97a4af",
+                                      "font": {
+                                        "size": 12,
+                                        "family": "Open Sans, sans-serif"
+                                      },
+                                      "padding": 5
+                                    }
+                                  }
+                              },
+                              "plugins": {
+                                "tooltip": {
+                                  "prefix": "$",
+                                  "postfix": "k",
+                                  "hasIndicator": true,
+                                  "mode": "index",
+                                  "intersect": false,
+                                  "lineMode": true,
+                                  "lineWithLineColor": "rgba(19, 33, 68, 0.075)"
+                                }
+                              },
+                              "hover": {
+                                "mode": "nearest",
+                                "intersect": true
+                              }
+                            }
+                          }'>
+            </canvas>
+          </div>
+          <!-- End Line Chart -->
+    
+          <!-- Pie Chart -->
+          <div class="chartjs-custom mb-3 mb-sm-5" style="height: 14rem;">
+            <canvas id="doughnut-chart" class="js-chart"
+                    data-hs-chartjs-options='{
+                            "type": "doughnut",
+                            "data": {
+                              "labels": ["R$", "R$", "R$"],
+                              "datasets": [{
+                                "data": [45, 25, 30],
+                                "backgroundColor": ["#377dff", "#00c9db", "#e7eaf3"],
+                                "borderWidth": 5,
+                                "hoverBorderColor": "#fff"
+                              }]
+                            },
+                            "options": {
+                              "cutout": "80%",
+                              "plugins": {
+                                "tooltip": {
+                                  "postfix": "m",
+                                  "hasIndicator": true,
+                                  "mode": "index",
+                                  "intersect": false
+                                }
+                              },
+                              "hover": {
+                                "mode": "nearest",
+                                "intersect": true
+                              }
+                            }
+                          }'></canvas>
+          </div>
+          <!-- End Pie Chart -->
+    
+          <!-- Legend Indicators -->
+          <div class="row justify-content-center">
+            <div class="col-auto mb-3 mb-sm-0">
+              <span class="card-title h4">R$2.332,00</span>
+              <span class="legend-indicator bg-primary"></span> A vista
+            </div>
+  
+            <div class="col-auto mb-3 mb-sm-0">
+              <span class="card-title h4">R$10.452,00</span>
+              <span class="legend-indicator bg-info"></span> Parcelado
+            </div>
+  
+            <div class="col-auto">
+              <span class="card-title h4">R$56.856,00</span>
+              <span class="legend-indicator"></span> Outros
+            </div>
+          </div>
+          <!-- End Legend Indicators -->
+        </div>
+      </div>
+      <!-- End Card -->
+      
+      <!-- End Row -->
+    </div>
+    <!-- End Content -->
+  </main>
+  <!-- ========== END MAIN CONTENT ========== -->
+{% endblock %}

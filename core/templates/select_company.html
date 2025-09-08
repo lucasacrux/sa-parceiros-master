@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load static %}
+  <div class="container text-center mt-5">
+    <form action="{% url 'select_company' %}" method="post">
+      {% csrf_token %}
+      <!-- Modal -->
+      <div id="exampleModalCenter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalCenterTitle">Escolha sua empresa</h5>
+            </div>
+
+            <div class="modal-body">
+              <!-- Search -->
+              <div class="mb-2">
+                <div class="input-group input-group-merge">
+                  <input type="text" class="js-form-search form-control" placeholder="Procurar empresa..."
+                        data-hs-form-search-options='{
+                          "clearIcon": "#clearIcon2",
+                          "defaultIcon": "#defaultClearIconToggleEg"
+                        }'>
+                  <button type="button" class="input-group-append input-group-text">
+                    <i id="clearIcon2" class="bi-x-lg" style="display: none;"></i>
+                    <i id="defaultClearIconToggleEg" class="bi-search" style="display: none;"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- End Search -->
+              <!-- List Group -->
+              <div class="list-group">
+                <a class="list-group-item list-group-item-action" href="/home" style="display: flex;align-items: center;justify-content: space-evenly;">
+                  <img src="{% static 'core/svg/logos/acruxlogo.svg' %}" alt="Logo"> <span style="font-weight: bold;">ACRUX</span>
+                </a>
+                <a class="list-group-item list-group-item-action" href="/home" style="display: flex;align-items: center;justify-content: space-evenly;">
+                  <img src="{% static 'core/svg/logos/acruxlogo.svg' %}" alt="Logo"> <span style="font-weight: bold;">BETACRUX</span>
+                </a>
+              </div>
+              <!-- End List Group -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Modal -->
+
+      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+      <script>
+        $(document).ready(function(){
+          // Exibe o modal assim que a página for carregada
+          $('#exampleModalCenter').modal('show');
+        });
+      </script>
+    </form>
+  </div>
+{% endblock %}

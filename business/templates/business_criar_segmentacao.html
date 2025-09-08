@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% block content %}
+<style>
+    body {
+        background-color: #e8ebf1;
+    }
+
+    .lead-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .lead-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .lead-avatar {
+        width: 40px;
+        height: 40px;
+        background: #ccc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #fff;
+        font-size: 14px;
+    }
+
+    .lead-details p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .lead-details a {
+        font-weight: bold;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .lead-details a:hover {
+        text-decoration: underline;
+    }
+
+    .conversion-info {
+        text-align: right;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .conversion-info span {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .lead-sample {
+        background: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .lead-sample-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    #preview-container {
+        display: flex;
+        flex-direction: column;
+        height: 75%;
+    }
+
+    #leads-list {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+</style>
+<!-- Header -->
+<div class="container-fluid d-flex justify-content-between align-items-center p-3 border-bottom" style="background-color: #fff;">
+    <div class="d-flex align-items-center">
+        <a href="{% url 'business_criar_segmentacao' %}" class="btn btn-outline-secondary me-3">←</a>
+        <h2 id="segment-title">Nova Segmentação</h2>
+    </div>
+    <button class="btn btn-primary" id="salvar">Salvar</button>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid d-flex pt-4 pb-4" style="background-color: #E8EBF1; height: 100vh;">
+    <!-- Left Section (70%) -->
+    <div class="w-70 me-3 rounded border-end">
+        <div id="groups-container">
+            <div class="group card mb-2" id="group-template">
+                <div class="card-body" style="position: relative;">
+                    <button class="btn btn-danger btn-sm ms-auto remove-group" style="position: absolute; right: -10px; top: -15px; padding: 3px 5px !important;" onclick="removeGroup(this)"><i class="bi bi-trash"></i></button>
+                    <div class="mb-3 d-flex align-items-center gap-3">
+                        <label class="form-label fw-bold group-label" style="margin: 0;">Grupo 1</label>
+                        <p style="margin: 0;">Quero Leads que atendam</p>
+                        <select class="form-select w-50">
+                            <option value="todas">todas as condições</option>
+                            <option value="uma">uma das condições</option>
+                        </select>
+                    </div>
+                    <div class="conditions-container">
+                        <div class="mb-3 p-3 rounded condition-template" style="background-color: #FBFCFF; position: relative;">
+                            <button class="btn btn-danger btn-sm rounded-pill remove-condition" style="position: absolute; right: -10px; top: -15px; padding: 3px 5px !important;" onclick="removeCondition(this)"><i class="bi bi-trash"></i></button>
+                            <div class="d-flex w-100 gap-2 justify-content-between mb-3">
+                                <div class="w-100">
+                                    <select class="form-select" id="condition-select" onchange="handleConditionChange(this)">
+                                        <option selected disabled>Selecione a origem</option>
+                                        <optgroup label="Dados pessoas">
+                                            <option value="campo_pessoas">Campo</option>
+                                            <option value="tag_pessoas">Tag</option>
+                                        </optgroup>
+                                        <optgroup label="Dados contratos">
+                                            <option value="campo_contratos">Campo</option>
+                                            <option value="tag_contratos">Tag</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+            
+                                <div id="conversion-options" class="w-100 d-none">
+                                    <select class="form-select" id="conversion-type" onchange="handleConversionTypeChange(this)">
+
+                                    </select>
+                                </div>
+                        
+                                <div id="event-options" class="w-100 d-none">
+                                    <select class="form-select event-type" onchange="showPreview()">
+                                        
+                                    </select>
+                                </div>
+                            </div>
+        
+                            <div class="d-flex w-100 gap-2 mb-3" id="event-inputs">
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-primary add-condition" onclick="addCondition(this)">+ Criar outra condição</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-1">
+            <div class="card-body">
+                <button class="btn btn-outline-primary" onclick="addGroup()">+ Criar outro grupo</button>
+            </div>
+        </div>
+
+        <div class="card mb-1">
+            <div class="card-body">
+                <h4>Ordenar por:</h4>
+                <div id="order-container">
+                    
+                </div>
+                <button class="btn btn-outline-primary mt-2" onclick="addOrder()">+ Adicionar ordenação</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Section (30%) - Preview -->
+    <div class="w-30 p-3 rounded" style="background-color: #fff;">
+        <div style="display: flex;justify-content: space-between;align-items: center;width: 100%;margin-bottom: 25px;">
+            <div>
+                <label for="tamanho-lista" class="form-label">Definir tamanho da amostra:</label>
+                <select id="tamanho-lista" class="form-select">
+                    <option value="todos">Todos os leads</option>
+                    <option value="25">25 primeiros leads</option>
+                    <option value="50">50 primeiros leads</option>
+                    <option value="75">75 primeiros leads</option>
+                    <option value="100">100 primeiros leads</option>
+                    <option value="200">200 primeiros leads</option>
+                    <option value="300">300 primeiros leads</option>
+                    <option value="500">500 primeiros leads</option>
+                </select>
+            </div>
+            <button class="btn btn-outline-primary filter-leads">Filtrar</button>
+        </div>
+        <div class="d-flex justify-content-center text-center flex-column align-content-center">
+            <h5>Vamos criar uma segmentação?</h5>
+            <p>Utilize as condições ao lado para criar uma segmentação e visualizar uma amostra de Leads.</p>
+        </div>
+        
+        <div class="d-none" id="preview-container">
+            <!-- Lista de leads -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal para criar segmentação -->
+<div class="modal fade show" id="createSegmentModal" tabindex="-1" aria-labelledby="createSegmentLabel" aria-hidden="false" style="display: block;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createSegmentLabel">Nova Segmentação</h5>
+            </div>
+            <form method="POST" action="#" onsubmit="updateSegmentTitle(); return false;">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <label for="segment-name" class="form-label">Nome</label>
+                    <input type="text" class="form-control" id="segment-name" name="name" required>
+                </div>
+                <div class="modal-footer">
+                    <a href="{% url 'business_listar_segmentacoes' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Continuar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const myModal = new bootstrap.Modal(document.getElementById('createSegmentModal'));
+        myModal.show();
+        atualizarBotoesExclusao();
+    });
+
+    function updateSegmentTitle() {
+        const segmentName = document.getElementById('segment-name').value;
+        if (segmentName.trim() !== '') {
+            document.getElementById('segment-title').innerText = segmentName;
+        }
+        const myModalEl = document.getElementById('createSegmentModal');
+        const modal = bootstrap.Modal.getInstance(myModalEl);
+        modal.hide();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("#condition-select").forEach(select => {
+            select.addEventListener("change", function () {
+                handleConditionChange(this);
+            });
+        });
+    });
+
+    function handleConditionChange(select) {
+        const conditionTemplate = select.closest(".condition-template");
+        const conversionOptions = conditionTemplate.querySelector("#conversion-options");
+        const conversionSelect = conditionTemplate.querySelector("#conversion-type");
+
+        if (!conversionSelect) {
+            console.error("Elemento #conversion-type não encontrado.");
+            return;
+        }
+
+        conversionSelect.innerHTML = '<option selected disabled>Selecione um campo</option>';
+
+        if (select.value === "campo_pessoas") {
+            '{% for campo in campos_pessoas %}'
+                conversionSelect.innerHTML += `<option value='{{ campo.slug_db }}|{{ campo.tipo }}'>{{ campo.campo }}</option>`;
+            '{% endfor %}'
+        } else if (select.value === "campo_contratos") {
+            '{% for campo in campos_contratos %}'
+                conversionSelect.innerHTML += `<option value='{{ campo.slug_db }}|{{ campo.tipo }}'>{{ campo.campo }}</option>`;
+            '{% endfor %}'
+        }
+
+        conversionOptions.classList.remove("d-none");
+    }
+
+    function handleConversionTypeChange(select) {
+        const conditionTemplate = select.closest(".condition-template");
+        const eventOptions = conditionTemplate.querySelector("#event-options");
+        const inputFieldContainer = conditionTemplate.querySelector("#event-inputs");
+        const eventSelect = conditionTemplate.querySelector(".event-type");
+
+        if (!eventSelect) {
+            console.error("Elemento .event-type não encontrado.");
+            return;
+        }
+
+        eventSelect.innerHTML = `
+            <option selected disabled>Selecione uma condição</option>
+            <option value="LIKE">Contém</option>
+            <option value="NOT LIKE">Não contém</option>
+            <option value="=">Igual a</option>
+            <option value="<>">Diferente de</option>
+            <option value="NULL">É vazio</option>
+            <option value="NOT NULL">Não é vazio</option>
+            <option value=">">Maior que</option>
+            <option value="<">Menor que</option>
+            <option value=">=">Maior ou igual</option>
+            <option value="<=">Menor ou igual</option>
+        `;
+
+        const selectedField = select.value;
+        const [fieldName, fieldType] = selectedField.split("|");
+        
+        if (fieldType === "value") {
+            eventSelect.querySelector("option[value='LIKE']")?.remove();
+            eventSelect.querySelector("option[value='NOT LIKE']")?.remove();
+            eventSelect.querySelector("option[value='&quot;&quot;']")?.remove();
+            eventSelect.querySelector("option[value='&lt;&gt; &quot;&quot;']")?.remove();
+        } else if (fieldType === "text") {
+            eventSelect.querySelector("option[value='>']")?.remove();
+            eventSelect.querySelector("option[value='<']")?.remove();
+            eventSelect.querySelector("option[value='>=']")?.remove();
+            eventSelect.querySelector("option[value='<=']")?.remove();
+        }
+
+        eventOptions.classList.remove("d-none");
+    }
+
+    function showInputField(eventSelect) {
+        const conditionTemplate = eventSelect.closest(".condition-template");
+        const inputFieldContainer = conditionTemplate.querySelector("#event-inputs");
+
+        const selectedCondition = eventSelect.value;
+
+        inputFieldContainer.innerHTML = '';
+
+        if (selectedCondition === '""' || selectedCondition === '<> ""') {
+            return;
+        }
+
+        const conversionType = conditionTemplate.querySelector("#conversion-type").value;
+
+        if (conversionType === "data_nascimento") {
+            const datepickerInput = document.createElement("input");
+            datepickerInput.type = "text";
+            datepickerInput.className = "js-flatpickr form-control flatpickr-custom w-50";
+            datepickerInput.placeholder = "Selecione uma data";
+            datepickerInput.setAttribute("data-hs-flatpickr-options", '{"dateFormat": "d/m/Y"}');
+
+            inputFieldContainer.appendChild(datepickerInput);
+
+            if (typeof flatpickr !== "undefined") {
+                flatpickr(datepickerInput, {
+                    dateFormat: "d/m/Y",
+                    onChange: function (selectedDates, dateStr) {
+                        datepickerInput.setAttribute("data-sql-format", formatDateToSQL(dateStr));
+                    }
+                });
+            }
+        } else {
+            const textInput = document.createElement("input");
+            textInput.type = "text";
+            textInput.className = "form-control";
+            inputFieldContainer.appendChild(textInput);
+        }
+    }
+
+    document.addEventListener("change", function(event) {
+        if (event.target.classList.contains("event-type")) {
+            showInputField(event.target);
+        }
+    });
+
+    function showPreview() {
+        document.getElementById("preview-container").classList.remove("d-none");
+    }
+
+    function createLogicalOperatorSelect(type) {
+        const select = document.createElement("select");
+        select.className = `form-select w-auto ${type}-logical-operator mb-3`;
+        select.innerHTML = `
+            <option value="E">E</option>
+            <option value="OU">OU</option>
+        `;
+        return select;
+    }
+
+    document.addEventListener("change", function (event) {
+        if (event.target.classList.contains("condition-logical-operator")) {
+            const newValue = event.target.value;
+            const parentGroup = event.target.closest(".group");
+
+            parentGroup.querySelectorAll(".condition-logical-operator").forEach(conditionSelect => {
+                conditionSelect.value = newValue;
+            });
+        }
+    });
+
+    document.addEventListener("change", function (event) {
+        if (event.target.classList.contains("group-logical-operator")) {
+            const newValue = event.target.value;
+
+            document.querySelectorAll(".group-logical-operator").forEach(groupSelect => {
+                groupSelect.value = newValue;
+            });
+        }
+    });
+
+    function addGroup() {
+        const groupsContainer = document.getElementById("groups-container");
+        const template = document.getElementById("group-template");
+
+        if (!template) {
+            console.error("Template do grupo não encontrado!");
+            return;
+        }
+
+        const newGroup = template.cloneNode(true);
+        newGroup.removeAttribute("id");
+        newGroup.classList.remove("d-none");
+
+        const totalGroups = document.querySelectorAll(".group").length + 1;
+        newGroup.querySelector(".group-label").innerText = "Grupo " + totalGroups;
+
+        const conditionsContainer = newGroup.querySelector(".conditions-container");
+        const conditions = conditionsContainer.querySelectorAll(".condition-template");
+        conditions.forEach((condition, index) => {
+            if (index > 0) condition.remove();
+        });
+
+        const existingGroupOperator = document.querySelector(".group-logical-operator");
+        const groupOperatorValue = existingGroupOperator ? existingGroupOperator.value : "E";
+
+        const groupSelect = newGroup.querySelector(".group-logical-operator");
+        if (groupSelect) {
+            groupSelect.value = groupOperatorValue;
+        }
+
+        if (totalGroups > 1) {
+            const logicalOperator = createLogicalOperatorSelect("group");
+            logicalOperator.value = groupOperatorValue;
+            groupsContainer.appendChild(logicalOperator);
+        }
+
+        groupsContainer.appendChild(newGroup);
+        atualizarBotoesExclusao();
+    }
+
+    function removeGroup(button) {
+        const group = button.closest(".group");
+        const groupsContainer = document.getElementById("groups-container");
+
+        const prevElement = group.previousElementSibling;
+        if (prevElement && prevElement.classList.contains("group-logical-operator")) {
+            prevElement.remove();
+        }
+
+        group.remove();
+        atualizarBotoesExclusao();
+    }
+
+    function addCondition(button) {
+        const group = button.closest(".group");
+        const conditionsContainer = group.querySelector(".conditions-container");
+        const template = group.querySelector(".condition-template");
+
+        if (!template) {
+            console.error("Template de condição não encontrado!");
+            return;
+        }
+
+        const newCondition = template.cloneNode(true);
+        newCondition.classList.remove("d-none");
+
+        newCondition.querySelector("input").value = "";
+        newCondition.querySelector("#condition-select").selectedIndex = 0;
+        newCondition.querySelector("#conversion-type").selectedIndex = 0;
+        newCondition.querySelector(".event-type").selectedIndex = 0;
+
+        if (conditionsContainer.children.length > 0) {
+            const existingOperator = group.querySelector(".condition-logical-operator");
+            const operatorValue = existingOperator ? existingOperator.value : "E";
+
+            const logicalOperator = createLogicalOperatorSelect("condition");
+            logicalOperator.value = operatorValue;
+            conditionsContainer.appendChild(logicalOperator);
+        }
+
+        conditionsContainer.appendChild(newCondition);
+        atualizarBotoesExclusao();
+    }
+
+    function removeCondition(button) {
+        const condition = button.closest(".condition-template");
+        const conditionsContainer = condition.parentNode;
+
+        const prevElement = condition.previousElementSibling;
+        if (prevElement && prevElement.classList.contains("condition-logical-operator")) {
+            prevElement.remove();
+        }
+
+        if (conditionsContainer.children.length > 1) {
+            condition.remove();
+            atualizarBotoesExclusao();
+        } else {
+            alert("O grupo precisa ter pelo menos uma condição.");
+        }
+    }
+
+    function atualizarBotoesExclusao() {
+        const groups = document.querySelectorAll(".group");
+
+        groups.forEach((group, index) => {
+            const btnRemoveGroup = group.querySelector(".remove-group");
+            const conditions = group.querySelectorAll(".condition-template");
+
+            if (index === 0) {
+                btnRemoveGroup.style.display = "none";
+            } else {
+                btnRemoveGroup.style.display = "inline-block";
+            }
+
+            conditions.forEach((condition, condIndex) => {
+                const btnRemoveCondition = condition.querySelector(".remove-condition");
+                if (condIndex === 0) {
+                    btnRemoveCondition.style.display = "none";
+                } else {
+                    btnRemoveCondition.style.display = "inline-block";
+                }
+            });
+        });
+    }
+
+    function addOrder() {
+        const orderContainer = document.getElementById("order-container");
+
+        const orderBlock = document.createElement("div");
+        orderBlock.classList.add("d-flex", "align-items-center", "gap-2", "mb-2");
+
+        const originSelect = document.createElement("select");
+        originSelect.classList.add("form-select");
+        originSelect.innerHTML = `
+            <option selected disabled>Selecione a origem</option>
+            <optgroup label="Dados Pessoais">
+                <option value="campo_pessoas">Campo</option>
+            </optgroup>
+            <optgroup label="Dados Contratos">
+                <option value="campo_contratos">Campo</option>
+            </optgroup>
+        `;
+        originSelect.onchange = function () {
+            loadFieldsForOrder(this, fieldSelect);
+        };
+
+        const fieldSelect = document.createElement("select");
+        fieldSelect.classList.add("form-select");
+        fieldSelect.innerHTML = `<option selected disabled>Selecione um campo</option>`;
+
+        const directionSelect = document.createElement("select");
+        directionSelect.classList.add("form-select");
+        directionSelect.innerHTML = `
+            <option value="ASC">Crescente</option>
+            <option value="DESC">Decrescente</option>
+        `;
+
+        const removeButton = document.createElement("button");
+        removeButton.classList.add("btn", "btn-danger", "btn-sm");
+        removeButton.innerHTML = `<i class="bi bi-trash"></i>`;
+        removeButton.onclick = function () {
+            orderBlock.remove();
+        };
+
+        orderBlock.appendChild(originSelect);
+        orderBlock.appendChild(fieldSelect);
+        orderBlock.appendChild(directionSelect);
+        orderBlock.appendChild(removeButton);
+
+        orderContainer.appendChild(orderBlock);
+    }
+
+    function loadFieldsForOrder(originSelect, fieldSelect) {
+        fieldSelect.innerHTML = `<option selected disabled>Selecione um campo</option>`;
+
+        let optionsHTML = '';
+
+        if (originSelect.value === "campo_pessoas") {
+            optionsHTML = `
+                {% for campo in campos_pessoas %}
+                    <option value="{{ campo.slug_db }}|{{ campo.tipo }}">{{ campo.campo }}</option>
+                {% endfor %}
+            `;
+        } else if (originSelect.value === "campo_contratos") {
+            optionsHTML = `
+                {% for campo in campos_contratos %}
+                    <option value="{{ campo.slug_db }}|{{ campo.tipo }}">{{ campo.campo }}</option>
+                {% endfor %}
+            `;
+        }
+
+        fieldSelect.innerHTML += optionsHTML;
+    }
+
+    function getOrdering() {
+        const orderBlocks = document.querySelectorAll("#order-container > div");
+        const orderList = [];
+
+        orderBlocks.forEach(block => {
+            const origin = block.querySelector("select:nth-child(1)").value;
+            const field = block.querySelector("select:nth-child(2)").value;
+            const direction = block.querySelector("select:nth-child(3)").value;
+
+            if (origin && field) {
+                orderList.push({
+                    "origin": origin,
+                    "field": field.split('|')[0],
+                    "direction": direction
+                });
+            }
+        });
+
+        return orderList;
+    }
+
+    function formatDateToSQL(dateStr) {
+        const [day, month, year] = dateStr.split('/');
+        return `${year}-${month}-${day}`;
+    }
+
+    function getFilters() {
+        const dict_condicoes = {
+            "codition_group": "AND",
+            "groups": []
+        };
+
+        const conditionGroupSelect = document.querySelector(".group-logical-operator");
+        if (conditionGroupSelect) {
+            dict_condicoes["codition_group"] = conditionGroupSelect.value === "OU" ? "OR" : "AND";
+        }
+
+        document.querySelectorAll(".group").forEach((groupElement) => {
+            const groupConditions = [];
+            let tabela = "";
+
+            const operatorSelect = groupElement.querySelector(".condition-logical-operator");
+            const groupOperator = operatorSelect ? (operatorSelect.value === "OU" ? "OR" : "AND") : "AND";
+
+            groupElement.querySelectorAll(".condition-template").forEach((conditionElement) => {
+                const fieldSelect = conditionElement.querySelector("#condition-select");
+                const fieldValue = fieldSelect ? fieldSelect.value : null;
+                const conversionSelect = conditionElement.querySelector("#conversion-type");
+                const fieldName = conversionSelect ? conversionSelect.value : null;
+                const eventSelect = conditionElement.querySelector(".event-type");
+                const sintaxValue = eventSelect ? eventSelect.value : null;
+                const inputField = conditionElement.querySelector("input");
+                let inputValue = inputField ? inputField.value.trim() : "";
+                
+                if (fieldValue === "campo_pessoas") {
+                    tabela = "campos_lead";
+                } else if (fieldValue === "campo_contratos") {
+                    tabela = "campos_contrato";
+                }
+
+                if (sintaxValue === "NULL" || sintaxValue === "NOT NULL") {
+                    inputValue = "";
+                }
+
+                if (fieldName === "data_nascimento" && inputField.hasAttribute("data-sql-format")) {
+                    inputValue = inputField.getAttribute("data-sql-format");
+                }
+
+                if (sintaxValue === '""' || sintaxValue === '<> ""') {
+                    inputValue = "";
+                }
+
+                if (fieldValue && fieldName && sintaxValue && inputValue) {
+                    groupConditions.push({
+                        "value": inputValue,
+                        "sintax": getSintaxKey(sintaxValue),
+                        "field": fieldName,
+                        "table": tabela
+                    });
+                }
+            });
+
+            if (groupConditions.length > 0) {
+                dict_condicoes.groups.push({
+                    "operator": groupOperator,
+                    "conditions": groupConditions
+                });
+            }
+        });
+
+        return dict_condicoes;
+    }
+
+    function getSintaxKey(value) {
+        const dict_sql = {
+            'LIKE'    : 'contem',
+            'NOT LIKE': 'nao_contem',
+            '='       : 'equal',
+            '<>'      : 'not_equal',
+            'NULL'    : 'empty',
+            'NOT NULL': 'not_empty',
+            '>'       : 'more_than',
+            '<'       : 'less_than',
+            '>='      : 'more_or_equal',
+            '<='      : 'less_or_equal'
+        }; 
+        return dict_sql[value] || value;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const filterButton = document.querySelector(".filter-leads");
+        if (filterButton) {
+            filterButton.addEventListener("click", function() {
+                fetchLeads();
+            });
+        }
+    });
+
+    function fetchLeads(callback) {
+        showLoader();
+
+        const filters = getFilters();
+        const orderBy = getOrdering();
+        const tamanhoLista = document.getElementById("tamanho-lista").value;
+
+        console.log("Filtros enviados:", filters);
+        console.log("Ordenação enviada:", orderBy);
+        console.log("Tamanho da lista enviado:", tamanhoLista);
+
+        const requestData = {
+            filters: filters,
+            orderBy: orderBy,
+            limit: tamanhoLista
+        };
+
+        const queryParams = encodeURIComponent(JSON.stringify(requestData));
+        const apiUrl = `{% url 'business_criar_segmentacao' %}?data=${queryParams}`;
+
+        fetch(apiUrl, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Leads retornados:", data);
+            renderLeads(data);
+
+            if (callback) {
+                callback({
+                    query: data.query,
+                    filters: filters,
+                    orderBy: orderBy
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Erro ao buscar leads:", error);
+            document.getElementById("preview-container").innerHTML = `<p class="text-center">Nenhum lead carregado.</p>`;
+        });
+    }
+
+    function showLoader() {
+        const previewContainer = document.getElementById("preview-container");
+        previewContainer.innerHTML = `
+            <div class="d-flex justify-content-center align-items-center flex-column" style="height: 200px;font-size: 24px;">
+                <div class="spinner-border text-primary" role="status" style="width: 50px;height: 50px;">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+                <p class="text-primary" style="margin-top: 25px;font-size: 16px;">Carregando lista de leads</p>
+            </div>
+        `;
+    }
+
+    function renderLeads(data) {
+        const previewContainer = document.getElementById("preview-container");
+        previewContainer.innerHTML = "";
+
+        if (!data.leads || data.leads.length === 0) {
+            previewContainer.innerHTML = "<p class='text-center text-muted'>Nenhum lead encontrado.</p>";
+            return;
+        }
+
+        const header = document.createElement("div");
+        header.className = "d-flex justify-content-between align-items-center";
+        header.innerHTML = `
+            <h5>Amostra de Leads</h5>
+            <span class="badge bg-primary" id="total-leads">${data.leads.length} Leads</span>
+        `;
+
+        const hr = document.createElement("hr");
+
+        const leadsList = document.createElement("div");
+        leadsList.id = "leads-list";
+        leadsList.className = "border p-2 bg-light rounded";
+
+        data.leads.forEach((lead) => {
+            const leadElement = `
+            <div class="lead-card">
+                <div class="lead-info">
+                    <div class="lead-avatar" style="background-color: #377dff;">
+                        <i class="bi bi-person-fill text-light"></i>
+                    </div>
+                    <div class="lead-details">
+                        <p><strong>Nome:</strong> ${lead.nome || "Sem nome"}</p>
+                        <p><strong>CPF:</strong> ${lead.cpf || "Não informado"}</p>
+                        <p><strong>Email:</strong> ${lead.emails ? lead.emails.split(",")[0].trim() : "Não informado"}</p>
+                        <p><strong>Telefone:</strong> ${lead.telefones ? lead.telefones.split(",")[0].trim() : "Não informado"}</p>
+                        <p><strong>Contrato:</strong> ${lead.contrato || "Não informado"}</p>
+                        <p><strong>Saldo a pagar:</strong> ${lead.saldo_a_pagar ? Number(lead.saldo_a_pagar).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "Não informado"}</p>
+                        <p><strong>UF:</strong> ${lead.uf || "Não informado"}</p>
+                        <p><strong>Data Nascimento:</strong> ${lead.data_nascimento || "Não informado"}</p>
+                    </div>
+                </div>
+            </div>`;
+            leadsList.innerHTML += leadElement;
+        });
+
+        previewContainer.appendChild(header);
+        previewContainer.appendChild(hr);
+        previewContainer.appendChild(leadsList);
+
+        previewContainer.classList.remove("d-none");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("salvar").addEventListener("click", function () {
+            const urlBase = window.location.href.split("?")[0];
+            const segmentName = document.getElementById("segment-title").textContent.trim();
+
+            if (!segmentName) {
+                alert("Erro: Nome da segmentação é obrigatório!");
+                return;
+            }
+
+            fetchLeads((data) => {
+                if (!data.query) {
+                    alert("Erro ao obter a query da segmentação!");
+                    return;
+                }
+
+                console.log("Query gerada com sucesso:", data.query);
+                console.log("Preparando requisição POST...");
+
+                fetch(urlBase, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken()
+                    },
+                    body: JSON.stringify({
+                        segmentName: segmentName,
+                        segmentQuery: data.query,
+                        segmentConditions: data.filters,
+                        orderBy: data.orderBy
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Erro ao salvar a segmentação. Status: " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.success) {
+                        alert("Segmentação salva com sucesso!");
+                        window.location.href = result.redirect_url;
+                    } else {
+                        alert("Erro ao salvar a segmentação!");
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro na requisição:", error);
+                    alert("Erro ao tentar salvar.");
+                });
+            });
+        });
+
+        function getCSRFToken() {
+                let cookieValue = null;
+                if (document.cookie) {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {  // ALTERADO DE const para let
+                        const cookie = cookies[i].trim();
+                        if (cookie.startsWith("csrftoken=")) {
+                            cookieValue = cookie.substring("csrftoken=".length, cookie.length);
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "prototipo_saas_sabusiness/base.html" %}
+{% load static %}
+
+{% block title %}Entrar • SaiuAcordo Business{% endblock %}
+{% block body_attrs %}class="page-login"{% endblock %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'prototipo_saas_sabusiness/css/home_overrides.css' %}?v=16">
+
+  <!-- OVERRIDES FINAIS (vem por último, vence a cascata) -->
+  <style>
+    .auth-wrap{ padding-top: calc(var(--nav-h, 64px) + 12px) !important; }
+
+    .auth-wrap{
+      position:relative; min-height:calc(100dvh - var(--nav-h, 64px));
+      padding-left:16px; padding-right:16px; padding-bottom:24px;
+      display:grid; align-content:start; justify-items:center; box-sizing:border-box;
+    }
+    .auth-bg{ position:absolute; inset:0; pointer-events:none; }
+    .auth-bg::before{ content:""; position:absolute; inset:0;
+      background:
+        radial-gradient(800px 200px at 20% -120px, rgba(59,130,246,.10), transparent 60%),
+        radial-gradient(700px 200px at 82% -120px, rgba(99,102,241,.08), transparent 62%),
+        linear-gradient(180deg,#f6f9ff 0%, #ffffff 35%, #f4f7ff 100%); }
+    :root[data-theme="dark"] .auth-bg::before{ background:
+      radial-gradient(800px 220px at 20% -120px, rgba(118,145,255,.18), transparent 60%),
+      radial-gradient(700px 220px at 82% -120px, rgba(124,146,255,.14), transparent 62%),
+      linear-gradient(180deg,#0b0f19 0%, #0b0f19 70%, #0b0f19 100%); }
+
+    .auth-card{
+      position:relative; z-index:1;
+      width:min(520px,100%); /* desktop “bom” */
+      border:1px solid #e7ecff; background:#fff; border-radius:16px;
+      padding:18px 16px 14px;
+      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+      box-shadow:0 20px 40px rgba(11,59,255,.12), inset 0 1px 0 rgba(255,255,255,.55);
+    }
+    :root[data-theme="dark"] .auth-card{
+      background:#0f172a; border-color:#23315d;
+      box-shadow:0 22px 40px rgba(16,30,90,.42);
+    }
+    .auth-layer{ position:absolute; inset:auto 0 0 0; height:100%; border-radius:16px; pointer-events:none;
+      background:linear-gradient(180deg,#ffffff 0%,#f3f6ff 100%); border:1px solid #e7ecff; opacity:.95; }
+    .auth-layer.l2{ transform:translate(10px,8px); box-shadow:0 12px 24px rgba(32,73,210,.10); }
+    .auth-layer.l3{ transform:translate(20px,12px); box-shadow:0 14px 26px rgba(32,73,210,.10); opacity:.9; }
+    :root[data-theme="dark"] .auth-layer{ background:#0f172a; border-color:#23315d; opacity:.88; }
+
+    .auth-title{ font-size:clamp(22px,2.6vw,26px); margin:0 0 6px; font-weight:800; letter-spacing:-.01em; }
+    .auth-sub{ color:var(--muted); margin:0 0 12px }
+    .label{ font-weight:700; color:var(--text); font-size:.96rem }
+
+    .auth-form{ display:grid; gap:12px }
+
+    /* DESKTOP */
+    @media (min-width:961px){
+      .ui-input{
+        height:60px; border-radius:14px; border:1.5px solid #dfe6ff; background:#fff;
+        padding:0 14px; font-size:16px; box-sizing:border-box;
+      }
+      .btn.lg{ height:60px; border-radius:999px; padding:0 1.2rem; font-weight:700; }
+    }
+    .ui-input:focus{ outline:none; border-color:#98b0ff; box-shadow:0 0 0 3px rgba(59,130,246,.18) }
+    :root[data-theme="dark"] .ui-input{ background:#0f172a; color:#e6e9ff; border-color:#2a3765 }
+
+    .actions{ display:grid; gap:10px; margin-top:6px }
+
+    .pwd-wrap{ position:relative }
+    .pwd-toggle{
+      position:absolute; right:10px; top:50%; transform:translateY(-50%);
+      border:1px solid var(--border); background:var(--card); border-radius:10px;
+      height:34px; min-width:34px; display:grid; place-items:center; cursor:pointer
+    }
+    :root[data-theme="dark"] .pwd-toggle{ background:#0f172a; border-color:#2a3765; color:#cfe0ff }
+    .helper-row{ display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap }
+    .help{ font-size:.95rem; color:var(--muted) }
+
+    /* MOBILE (≤560px) — confortável, não gigante */
+    @media (max-width:560px){
+      .auth-card{ width:100% !important; padding:14px 12px 12px !important; border-radius:14px !important; }
+      .ui-input{ height:52px !important; font-size:16px !important; border-radius:12px !important; padding:0 12px !important; }
+      .btn.lg{  height:52px !important; padding:0 1rem !important; }
+      .pwd-toggle{ height:30px !important; min-width:30px !important; right:8px !important; }
+      .auth-title{ font-size:22px !important; }
+      .auth-sub{ font-size:1rem !important; margin-bottom:10px !important; }
+      .auth-wrap{ padding-top: calc(var(--nav-h, 64px) + 10px) !important; }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-bg" aria-hidden="true"></div>
+
+  <div class="auth-card">
+    <h1 class="auth-title">Acessar minha conta</h1>
+    <p class="auth-sub">Bem-vindo de volta 👋</p>
+
+    <form class="auth-form" method="post" action="{% url 'saas:login_post' %}">
+      {% csrf_token %}
+
+      {% if messages %}
+        <div class="form-messages" role="alert" aria-live="polite" style="margin-bottom:6px">
+          {% for m in messages %}
+            <div class="msg {{ m.tags }}" style="padding:.6rem .8rem;border-radius:12px;border:1px solid var(--border);background:var(--card);margin-bottom:6px">
+              {{ m }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="field">
+        <label class="label" for="lemail">E-mail</label>
+        <input id="lemail" name="email" type="email" class="ui-input"
+               value="{{ prefill_email|default:'' }}"
+               autocomplete="email" inputmode="email" placeholder="nome@empresa.com" required autofocus>
+      </div>
+
+      <div class="field pwd-wrap">
+        <label class="label" for="lpwd">Senha</label>
+        <input id="lpwd" name="password" type="password" class="ui-input"
+               autocomplete="current-password" minlength="8" required>
+        <button class="pwd-toggle" type="button" data-toggle="#lpwd">👁</button>
+      </div>
+
+      <div class="helper-row">
+        <label style="display:flex;align-items:center;gap:.45rem;font-size:.95rem;color:var(--muted)">
+          <input type="checkbox" name="remember" style="transform:scale(1.05)"> Manter conectado
+        </label>
+        <a href="#" class="help">Esqueci minha senha</a>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary lg" type="submit">Entrar</button>
+        <a class="btn ghost" href="{% url 'saas:signup' %}">Criar conta</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="auth-layer l2" aria-hidden="true"></div>
+  <div class="auth-layer l3" aria-hidden="true"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    document.querySelectorAll('.pwd-toggle').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const sel = btn.getAttribute('data-toggle');
+        const inp = sel ? document.querySelector(sel) : null;
+        if(!inp) return;
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+      });
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,43 @@
+/* ===== TRUST BAR PREMIUM =================================================== */
+.sa-home .trust-pro{
+  --tp-bg: rgba(255,255,255,.6);
+  --tp-br: #e7ecff;
+  --tp-sh: 0 18px 38px rgba(7,23,99,.10);
+  margin: clamp(12px,3vh,24px) auto;
+  max-width: 1200px;
+  padding: 0 16px;
+}
+:root[data-theme="dark"] .sa-home .trust-pro{ --tp-bg: rgba(15,23,42,.65); --tp-br:#23315d; --tp-sh:0 18px 38px rgba(20,30,85,.45) }
+
+.sa-home .trust-pro .tp-wrap{
+  border:1px solid var(--tp-br); border-radius:16px;
+  background: var(--tp-bg); backdrop-filter:saturate(160%) blur(8px);
+  box-shadow: var(--tp-sh);
+  padding:12px;
+  display:grid; gap:10px;
+}
+
+.sa-home .tp-logos{
+  display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap;
+  overflow:auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+}
+.sa-home .tp-logo{
+  scroll-snap-align:center;
+  height:36px; min-width:110px; border-radius:12px;
+  border:1px solid var(--tp-br);
+  display:grid; place-items:center; padding:0 10px;
+  font-weight:900; letter-spacing:.02em;
+  color:var(--text); background:rgba(255,255,255,.5);
+}
+:root[data-theme="dark"] .sa-home .tp-logo{ background:rgba(15,23,42,.5); color:#e8edff }
+
+.sa-home .tp-metrics{
+  display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap;
+}
+.sa-home .tp-metrics .metric{
+  display:flex; gap:8px; align-items:baseline;
+  background:var(--card); border:1px solid var(--tp-br); border-radius:999px;
+  padding:6px 10px; box-shadow: var(--shadow-soft, 0 2px 8px rgba(0,0,0,.04));
+}
+.sa-home .tp-metrics strong{ font-weight:900 }
+.sa-home .tp-metrics span{ color:var(--muted); font-size:.9rem }

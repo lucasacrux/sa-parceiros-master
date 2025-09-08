@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-primary">
+            <h4 class="mb-0 text-white">{{ empresa.nome }}</h4>
+        </div>
+
+        <div class="card-body">
+            <p><strong>Descrição:</strong> {{ empresa.descricao }}</p>
+            <p><strong>Razão Social:</strong> {{ empresa.razao_social }}</p>
+            <p><strong>CNPJ:</strong> {{ empresa.cnpj }}</p>
+            <p><strong>Telefone:</strong> {{ empresa.telefone }}</p>
+            <p><strong>Email:</strong> {{ empresa.email }}</p>
+            <p><strong>Site:</strong> <a href="{{ empresa.site }}" target="_blank">{{ empresa.site }}</a></p>
+            <p><strong>LinkedIn:</strong> <a href="{{ empresa.linkedin }}" target="_blank">{{ empresa.linkedin }}</a></p>
+            {% if empresa.facebook %}
+            <p><strong>Facebook:</strong> <a href="{{ empresa.facebook }}" target="_blank">{{ empresa.facebook }}</a></p>
+            {% endif %}
+            <hr>
+            <h5 class="mt-4">SFTP</h5>
+            <p><strong>Host:</strong> {{ empresa.sftp_host }}</p>
+            <p><strong>Porta:</strong> {{ empresa.sftp_port }}</p>
+            <p><strong>Usuário:</strong> {{ empresa.sftp_user }}</p>
+        </div>
+
+        <div class="card-footer text-end">
+            <a href="{% url 'business_editar_empresa' empresa.id %}" class="btn btn-warning">Editar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

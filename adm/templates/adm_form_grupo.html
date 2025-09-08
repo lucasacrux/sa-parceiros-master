@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+{% extends "t_base.html" %}
+{% block content %}
+
+<style>
+  .avatar-logo-circle {
+    border: 3px solid #0D6EFD !important;
+    position: relative;
+  }
+
+  .avatar-logo-circle input[type="file"] {
+    display: none;
+  }
+
+  .avatar-logo-circle .upload-icon {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #FFF;
+    border: 1px solid #0D6EFD;
+    border-radius: 50%;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+
+  .avatar-logo-circle .upload-icon i {
+    font-size: 1.2em;
+    color: #0D6EFD;
+  }
+
+  .autocomplete-suggestions {
+    border: 1px solid #d4d4d4;
+    max-height: 150px;
+    margin-top: 43px;
+    overflow-y: auto;
+    background-color: white;
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    display: none;
+  }
+
+  .autocomplete-suggestion {
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .autocomplete-suggestion:hover {
+    background-color: #e9e9e9;
+  }
+
+  .iti {
+    width: 100%;
+  }
+</style>
+<div class="content container-fluid mt-5">
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+  <div class="row">
+    <div class="col-lg-2">
+
+    </div>
+
+    <div class="col-lg-8">
+      <div class="d-grid gap-3 gap-lg-5">
+        <!-- Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title h4">{{titulo}} Empresa</h2>
+          </div>
+          <!-- Body -->
+          <div class="card-body">
+            <!-- Form -->
+
+                <!-- Form -->
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Logo</label>
+                  <div class="col-sm-9">
+                    <div class="" style="display: flex;justify-content: center;flex-direction: row;align-items: center;">
+                      <div class="avatar-container">
+                          <span class="avatar avatar-xxl avatar-circle avatar-logo-circle">
+                              <img id="avatarPreview" class="avatar-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png" alt="Image Description">
+                              <label class="upload-icon" for="fileUploader">
+                                  <i class="bi bi-camera"></i>
+                              </label>
+                              <input type="file" id="fileUploader" name="avatar" onchange="previewImage(event)">
+                          </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Nome</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="nome" id="nome" value="{{grupo.title}}">
+                    </div>
+                  </div>
+                </div>
+                <!-- End Form -->
+               <!-- Form -->
+               <div class="row mb-4">
+                <label for="nome" class="col-sm-3 col-form-label form-label">Descrição</label>
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm-vertical">
+                    <input type="text" class="form-control" name="descricao" id="descricao" value="{{grupo.description|default:''}}">
+                  </div>
+                </div>
+              </div>
+              <!-- End Form -->
+
+              {% if usuario_logado.gerente == 1 %}
+                <!-- Form -->
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">ID Resolve Contas</label>
+                  <div class="col-sm-4">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="id_resolvecontas" id="id_resolvecontas" value="{{grupo.id_resolvecontas}}">
+                    </div>
+                  </div>
+                </div>
+                <!-- End Form -->
+
+
+                <!-- Form -->
+                <div id="accountType" class="row mb-4">
+                  <label class="col-sm-3 col-form-label form-label"></label>
+
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+
+                      <!-- Checkbox Switch -->
+                      <div class="form-check form-switch mb-4">
+                        <input type="checkbox" class="form-check-input" id="ativo" {% if grupo.ativo == 1 %} checked {% endif %} name="ativo">
+                        <label class="form-check-label" for="ativo">Ativo</label>
+                      </div>
+                      <!-- End Checkbox Switch -->
+                    </div>
+                  </div>
+                </div>
+                <!-- End Form -->
+              {% endif %}
+          </div>
+        </div>
+        <!-- End Card -->
+
+        <!-- Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title h4">Perfil da Empresa</h2>
+          </div>
+
+          <!-- Body -->
+          <div class="card-body">
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Razão Social</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="razao_social" id="razao_social" value="{{grupo.razao_social|default:''}}">
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">CNPJ</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="cnpj" id="cnpj" value="{{grupo.cnpj|default:''}}">
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Nome Fantasia</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="nome_fantasia" id="nome_fantasia" value="{{grupo.nome_fantasia|default:''}}">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mb-4">
+                  <label for="telefone" class="col-sm-3 col-form-label form-label">Telefone</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="tel" class="form-control" id="telefone" name="telefone" value="{{grupo.telefone|default:''}}" placeholder="(00) 0 0000-0000" maxlength="15">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mb-4">
+                  <label for="email" class="col-sm-3 col-form-label form-label">Email</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="email" id="email" value="{{grupo.email|default:''}}">
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Site</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="site" id="site" value="{{grupo.site|default:''}}">
+                    </div>
+                  </div>
+                </div>
+          </div>
+        </div>
+        <!-- End Card -->
+
+        <!-- Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title h4">Redes Sociais</h2>
+          </div>
+
+          <!-- Body -->
+          <div class="card-body">
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Linkedin</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="linkedin" id="linkedin" value="{{grupo.linkedin|default:''}}">
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Facebook</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="facebook" id="facebook" value="{{grupo.facebook|default:''}}">
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Instagram</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="instagram" id="instagram" value="{{grupo.instagram|default:''}}">
+                    </div>
+                  </div>
+                </div>
+                <div class="row mb-4">
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Twitter</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+                      <input type="text" class="form-control" name="twitter" id="twitter" value="{{grupo.twitter|default:''}}">
+                    </div>
+                  </div>
+                </div>
+          </div>
+        </div>
+        <!-- End Card -->
+
+
+        <!-- Card -->
+        <div class="card mb-5">
+          <div class="card-header">
+            <h2 class="card-title h4">Arquivos</h2>
+          </div>
+
+          <!-- Body -->
+          <div class="card-body">
+                <div class="row mb-4">
+                  <!-- Dropzone -->
+                  <label for="nome" class="col-sm-3 col-form-label form-label">Importar contrato social</label>
+                  <div class="col-sm-9">
+                    <div id="contratoSocial" class="js-dropzone row dz-dropzone dz-dropzone-card">
+                      <div class="dz-message">
+                          <i class="bi-files"></i>
+                          <h5>Arraste e solte seu arquivo aqui</h5>
+                          <p class="mb-2">Ou</p>
+                          <span class="btn btn-white btn-sm" style="border: 1px solid #0D6EFD !important;">Navegar pelos arquivos locais</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End Dropzone -->
+                </div>
+
+              <div class="d-flex justify-content-end">
+                <a href="{% url 'adm_listar_grupos' %}" class="btn btn-secondary" style="margin-right: 10px;">Cancelar</a>
+                <input type="submit" class="btn btn-primary" value="Salvar">
+              </div>
+          </div>
+
+        </div>
+        <!-- End Card -->
+      </div>
+
+      <!-- Sticky Block End Point -->
+      <div id="stickyBlockEndPoint"></div>
+    </div>
+  </div>
+  <!-- End Row -->
+</form>
+</div>
+
+<script>
+  function previewImage(event) {
+      const reader = new FileReader();
+      reader.onload = function() {
+          const output = document.getElementById('avatarPreview');
+          output.src = reader.result;
+
+          document.getElementById('avatarPreviewDefault').src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+
+
+{% load static %}
+{% load extras %}
+
+{% block content %}
+
+<style>
+  .hero { 
+    background: linear-gradient(135deg, #4C8BF5, #0D47A1);
+    color: white;
+    padding: 80px 0;
+    text-align: center;
+  }
+
+  .features { 
+    padding: 60px 0;
+  }
+
+  .feature-card { 
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+  }
+
+  .feature-card:hover { 
+    transform: translateY(-10px);
+  }
+  
+  .testimonials { 
+    background: #F9FAFB;
+    padding: 60px 0;
+  }
+
+  .integrations img { 
+    max-width: 70px;
+    margin: 15px;
+    filter: grayscale(100%);
+    transition: 0.3s;
+  }
+  
+  .integrations img:hover { 
+    filter: grayscale(0%);
+    transform: scale(1.1);
+  }
+
+  footer { 
+    background: #0D47A1;
+    color: white;
+    padding: 25px;
+    text-align: center;
+  }
+</style>
+
+  <main id="content" role="main" class="main">
+    <section class="hero">
+      <h1 class="display-4 fw-bold" style="color: #ffffff;">Gere mais para seu negócio</h1>
+      <p class="lead">Automação de marketing líder no Brasil</p>
+      <button class="btn btn-light btn-lg">Teste Grátis</button>
+    </section>
+    
+    <section class="container features mt-3 mb-3">
+      <div class="row text-center d-flex justify-content-center gap-3 align-items-center">
+        <div class="col-md-3 feature-card">
+          <h3><i class="bi bi-gear"></i> Automação</h3>
+          <p>Crie campanhas automáticas para seu negócio.</p>
+        </div>
+        <div class="col-md-3 feature-card">
+          <h3><i class="bi bi-bar-chart"></i> CRM</h3>
+          <p>Gerencie e organize suas vendas com eficiência.</p>
+        </div>
+        <div class="col-md-3 feature-card">
+          <h3><i class="bi bi-chat-dots"></i> Conversas</h3>
+          <p>Automatize interações via WhatsApp e Chat.</p>
+        </div>
+        <div class="col-md-3 feature-card">
+          <h3><i class="bi bi-link"></i> Integração</h3>
+          <p>Conecte-se com diversas plataformas.</p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="testimonials text-center mt-3 mb-3">
+      <h2 class="fw-bold">Quem usa, aprova e comprova resultados</h2>
+      <blockquote class="blockquote">“O SaiuAcordo Parceiros nos ajudou a crescer 200% em um ano.”</blockquote>
+      <figcaption class="blockquote-footer">Cliente Satisfeito</figcaption>
+    </section>
+    
+    <section class="container text-center integrations mt-3 mb-3">
+      <h2 class="fw-bold">Integrações</h2>
+      <p>Em desenvolvimento</p>
+    </section>
+    
+    <footer>
+      <p>&copy; 2025 SaiuAcordo Parceiros - Todos os direitos reservados</p>
+    </footer>
+  </main>
+  <!-- ========== END MAIN CONTENT ========== -->
+  
+
+{% endblock %}

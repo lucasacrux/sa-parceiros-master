@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+{% extends "t_base.html" %}
+{% block content %}
+<div class="container">
+  <div class="card mt-5">
+    <div class="card-header">
+      <h4 class="card-header-title">Empresas</h4>
+    </div>
+  
+    <!-- Table -->
+    <div class="table-responsive datatable-custom">
+      {% if empresas %}
+      <table class="js-datatable table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
+             data-hs-datatables-options='{
+                     "order": [],
+                     "isResponsive": false,
+                     "isShowPaging": false,
+                     "pagination": "datatableWithPaginationPagination"
+                   }'>
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">Nome</th>
+            <th scope="col">Razão Social</th>
+            <th scope="col">CNPJ</th>
+            <th scope="col">Status</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+  
+        <tbody>
+          {% for empresa in empresas %}
+            <tr>
+              <td scope="row">{{ empresa.nome }}</td>
+              <td>{{ empresa.razao_social }}</td>
+              <td>{{ empresa.cnpj }}</td>
+              <td>
+                {% if empresa.ativo %}
+                  <span class="badge bg-success">Ativo</span>
+                {% else %}
+                  <span class="badge bg-danger">Inativo</span>
+                {% endif %}
+              </td>
+              <td>
+                <a class="btn btn-primary btn-info" href="{% url 'adm_detalhes_empresa' empresa.id %}">
+                  <i class="bi-eye"></i> Ver Detalhes
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p>Nenhuma empresa registrada ainda.</p>
+      {% endif %}
+    </div>
+    <!-- End Table -->
+  
+    <!-- Footer -->
+    <div class="card-footer">
+      <div class="d-flex justify-content-end">
+        <a class="btn btn-success" href="{% url 'adm_criar_empresa' %}">Adicionar Nova Empresa</a>
+      </div>
+    </div>
+    <!-- End Footer -->
+
+  </div>
+</div>
+{% endblock %}

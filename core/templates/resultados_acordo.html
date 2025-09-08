@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <div class="card mt-5">
+    <div class="card-header">
+      <h4 class="card-header-title">Acordos Encontrados para o CPF: {{ cpf_busca }}</h4>
+    </div>
+  
+    <!-- Table -->
+    <div class="table-responsive datatable-custom">
+      {% if acordos %}
+      <table class="js-datatable table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
+             data-hs-datatables-options='{
+                     "order": [],
+                     "isResponsive": false,
+                     "isShowPaging": false,
+                     "pagination": "datatableWithPaginationPagination"
+                   }'>
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">Id acordo</th>
+            <th scope="col">CPF</th>
+            <th scope="col">Contratos contemplados</th>
+            <th scope="col">Valor acordo</th>
+            <th scope="col">Nº parcelas</th>
+            <th scope="col">Status</th>
+            <th scope="col">Ativo</th>
+            <th scope="col">Data aceite</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+  
+        <tbody>
+          {% for acordo in acordos %}
+            <tr>
+              <td scope="row">{{ acordo.acordo_id }}</td>
+              <td>{{ acordo.cpf }}</td>
+              <td>{{ acordo.contratos }}</td>
+              <td>{{ acordo.valor_do_acordo }}</td>
+              <td>{{ acordo.num_parcelas_acordo }}</td>
+              <td>
+                <div>
+                  <span class="legend-indicator {% if acordo.status == 'Simulação' %} bg-warning {% elif acordo.status == 'Aceito' %} bg-success {% endif %}"></span>
+                  <span>{{ acordo.status }}</span>
+                </div>
+              </td>
+              <td>Sim</td>
+              <td>{{ acordo.data_aceite|date:"d/m/Y"|default:"-" }}</td>
+              <td>
+                <button type="button" class="btn btn-primary btn-info" data-bs-toggle="modal" data-bs-target="#exampleModalCenter" data-acordo-id="{{ acordo.acordo_id }}">
+                  <i class="bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>Nenhum acordo feito ainda.</p>
+      {% endif %}
+    </div>
+    <!-- End Table -->
+  
+    <!-- Footer -->
+    <div class="card-footer">
+      <!-- Pagination -->
+      <div class="d-flex justify-content-center justify-content-sm-end">
+        <nav id="datatableWithPaginationPagination" aria-label="Activity pagination"></nav>
+      </div>
+      <!-- End Pagination -->
+    </div>
+    <!-- End Footer -->
+
+    <!-- Modal -->
+    <div id="exampleModalCenter" class="modal modal-lg fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalCenterTitle">Detalhes do acordo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Table -->
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>CPF:</strong> <span id="acordoCpf"></span></div>
+                  </td>
+                  <td>
+                    
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Contratos contemplados:</strong> <span id="acordoContratos"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Valor acordo:</strong> <span id="acordoValorAcordo"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Nº parcelas:</strong> <span id="acordoNumParcelas"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Valor Parcela:</strong> <span id="acordoValorParcela"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Venc Primeira Parc:</strong> <span id="acordoVencimentoPrim"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Venc Próximas Parc:</strong> <span id="acordoVencimentoProx"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Status:</strong> <span id="acordoStatus"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Ativo:</strong> <span>Sim</span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Data aceite:</strong> <span id="acordoDataAceite"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Id acordo:</strong> <span id="acordoId"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Email:</strong> <span id="acordoEmail"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Telefone:</strong> <span id="acordoTelefone"></span></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- End Table -->
+            <!-- Accordion -->
+            <div class="accordion mt-4" id="accordionExample">
+              <div class="accordion-item">
+                <div class="accordion-header" id="headingTwo">
+                  <a class="accordion-button collapsed" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Parcelas
+                  </a>
+                </div>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <div>
+                      <table class="table">
+                        <thead class="thead-light">
+                          <tr>
+                            <th scope="col">Nº parcela</th>
+                            <th scope="col">Valor parcela</th>
+                            <th scope="col">Data de vencimento</th>
+                            <th scope="col">Data do pagamento</th>
+                            <th scope="col">Situação Parcela</th>
+                            <th scope="col">Boleto</th>
+                          </tr>
+                        </thead>
+                        <tbody id="parcelasBody">
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Accordion -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal -->
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-info').forEach(button => {
+      button.addEventListener('click', function() {
+        const acordoId = this.getAttribute('data-acordo-id');
+        fetch(`/detalhes-acordo/${acordoId}/`)
+            .then(response => response.json())
+            .then(acordo => {
+                document.getElementById('acordoId').textContent = acordo.acordo_id;
+                document.getElementById('acordoCpf').textContent = acordo.cpf;
+                document.getElementById('acordoContratos').textContent = acordo.contratos;
+                document.getElementById('acordoValorAcordo').textContent = acordo.valor_do_acordo;
+                document.getElementById('acordoValorParcela').textContent = acordo.valor_parcela;
+                document.getElementById('acordoNumParcelas').textContent = acordo.num_parcelas_acordo;
+                document.getElementById('acordoVencimentoPrim').textContent = acordo.dia_vencimento_primeira_parcela;
+                document.getElementById('acordoVencimentoProx').textContent = acordo.dia_vencimento_proxima_parcela;
+                document.getElementById('acordoEmail').textContent = acordo.email;
+                document.getElementById('acordoTelefone').textContent = acordo.telefone;
+                document.getElementById('acordoStatus').textContent = acordo.status;
+                document.getElementById('acordoDataAceite').textContent = acordo.data_aceite;
+                
+                const parcelasTableBody = document.getElementById('parcelasBody');
+                parcelasTableBody.innerHTML = '';
+                acordo.parcelas.forEach((parcela, index) => {
+                    const row = document.createElement('tr');
+                    let buttonHTML = '';
+                    if (index === 0) {
+                        buttonHTML = `<button type="button" class="btn btn-warning btn-sm" style="width:100%;"><i class="bi bi-clipboard-plus-fill"></i> ver boleto</button>`;
+                    } else {
+                        buttonHTML = `<button type="button" class="btn btn-success btn-sm" style="width:100%;"><i class="bi bi-clipboard-data-fill"></i> gerar boleto</button>`;
+                    }
+                    row.innerHTML = `
+                        <td>${parcela.numero}</td>
+                        <td>${parcela.valor}</td>
+                        <td>${parcela.dataVencimento}</td>
+                        <td>${parcela.dataPagamento || '-'}</td>
+                        <td>${parcela.situacao || 'REGULAR'}</td>
+                        <td>${buttonHTML}</td>
+                    `;
+                    parcelasTableBody.appendChild(row);
+                });
+            });
+      });
+    });
+  });
+</script>
+{% endblock %}

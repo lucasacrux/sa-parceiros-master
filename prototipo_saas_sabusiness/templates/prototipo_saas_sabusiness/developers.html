@@ -1,0 +1,119 @@
+{% extends "prototipo_saas_sabusiness/base.html" %}
+{% block title %}Desenvolvedores • API SaiuAcordo Business{% endblock %}
+{% block content %}
+<section class="maxw" style="padding:2rem 1rem 3rem">
+  <div class="ui-card" style="padding:1.25rem">
+    <h1 style="margin-top:0">API Pública • v1</h1>
+    <p class="muted">Documentação inicial inspirada em plataformas de cobrança como o Asaas.
+      Esta versão descreve autenticação por API-Key, versão v1, idempotência, paginação, limites de uso
+      e webhooks assinados.</p>
+
+    <h2>Base URLs</h2>
+    <ul>
+      <li><b>Produção</b>: <code>https://api.saiuacordo.com.br/api/v1/</code></li>
+      <li><b>Sandbox</b>: <code>https://sandbox.saiuacordo.com.br/api/v1/</code></li>
+    </ul>
+
+    <h2>Autenticação</h2>
+    <p>Envie sua chave no header <code>X-Api-Key</code>. Todas as requisições devem ser HTTPS.</p>
+<pre><code class="language-bash">curl -X GET "https://sandbox.saiuacordo.com.br/api/v1/customers?limit=10"   -H "X-Api-Key: &lt;SUA_CHAVE&gt;"
+</code></pre>
+
+    <h2>Versionamento</h2>
+    <p>Usamos prefixo de rota <code>/api/v1/</code>. Mudanças compatíveis podem ser anunciadas via cabeçalho
+       <code>X-SA-API-Warn</code>.</p>
+
+    <h2>Paginação</h2>
+    <p>Parâmetros: <code>limit</code> (1..100, padrão 25) e <code>offset</code>.
+       Resposta inclui <code>total</code>, <code>limit</code>, <code>offset</code>.</p>
+
+    <h2>Idempotência</h2>
+    <p>Use <code>Idempotency-Key</code> (UUID) em POST/PUT para evitar duplicidade.</p>
+
+    <h2>Erros</h2>
+<pre><code>{{"{"}}
+  "error": {{"{"}}
+    "code": "invalid_parameter",
+    "message": "Campo 'amount' é obrigatório",
+    "details": [{{"{"}}"field":"amount","issue":"required"{{"}"}}]
+  {{"}"}},
+  "requestId": "req_123"
+{{"}"}}
+</code></pre>
+    <p>Códigos HTTP: 400, 401, 403, 404, 409, 422, 429, 500.</p>
+
+    <h2>Rate limit</h2>
+    <p>Padrão: 60 req/min por API-Key. Headers: <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Reset</code>.</p>
+
+    <h2>Webhooks</h2>
+    <p>Cadastre sua URL em <code>POST /webhooks</code>. Assinamos eventos com
+       <code>X-SA-Signature</code> (HMAC-SHA256 do corpo usando seu <i>webhook secret</i>).</p>
+<pre><code class="language-python">import hmac, hashlib
+def valid(signature, payload, secret):
+    mac = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(signature, mac)
+</code></pre>
+    <p>Eventos iniciais:</p>
+    <ul>
+      <li><code>charge.created</code>, <code>charge.paid</code>, <code>charge.failed</code></li>
+      <li><code>customer.created</code>, <code>customer.updated</code></li>
+      <li><code>message.sent</code>, <code>message.failed</code></li>
+    </ul>
+
+    <h2>Endpoints principais</h2>
+    <h3>Clientes</h3>
+<pre><code class="language-bash"># Criar cliente
+curl -X POST "https://sandbox.saiuacordo.com.br/api/v1/customers"   -H "Content-Type: application/json" -H "X-Api-Key: &lt;SUA_CHAVE&gt;"   -d '{{"{"}}
+        "name":"Maria Silva",
+        "email":"maria@exemplo.com",
+        "cpfCnpj":"12345678900",
+        "phone":"55999999999"
+      {{"}"}}'</code></pre>
+
+<pre><code class="language-python">import requests
+API="https://sandbox.saiuacordo.com.br/api/v1"
+headers={{"X-Api-Key":"&lt;SUA_CHAVE&gt;","Content-Type":"application/json"}}
+r=requests.post(f"{API}/customers", json={{"name":"Maria Silva","email":"maria@exemplo.com"}}, headers=headers)
+print(r.status_code, r.json())</code></pre>
+
+    <h3>Cobranças</h3>
+    <p>Gera boleto, Pix ou cartão.</p>
+<pre><code class="language-bash">curl -X POST "https://sandbox.saiuacordo.com.br/api/v1/charges"   -H "Content-Type: application/json" -H "X-Api-Key: &lt;SUA_CHAVE&gt;"   -H "Idempotency-Key: 4b4a7e0a-6a47-4d8f-b4cc-1b2fc0989caa"   -d '{{"{"}}
+        "customerId":"cus_abc123",
+        "amount": 150.90,
+        "dueDate":"2025-09-10",
+        "paymentMethod":"PIX",  /* PIX | BOLETO | CARD */
+        "description":"Parcela 1/3",
+        "callbackUrl":"https://meusistema.com/pagamentos/callback"
+      {{"}"}}'</code></pre>
+
+    <p>Resposta (exemplo Pix):</p>
+<pre><code>{{"{"}}
+  "id":"ch_123",
+  "status":"pending",
+  "amount":150.9,
+  "pix": {{"{"}}"copyPaste":"00020126...","qrCodeImage":"data:image/png;base64,..."{{"}"}},
+  "boleto": null,
+  "card": null
+{{"}"}}
+</code></pre>
+
+    <h3>Mensageria</h3>
+    <p>Disparo transacional e campanhas omnichannel.</p>
+<pre><code class="language-bash">curl -X POST "https://sandbox.saiuacordo.com.br/api/v1/messages"   -H "Content-Type: application/json" -H "X-Api-Key: &lt;SUA_CHAVE&gt;"   -d '{{"{"}}
+        "to": {{"{"}}"email":"maria@exemplo.com","sms":"+55999999999","whatsapp":"+55999999999"{{"}"}},
+        "templateKey":"acordo_quebrado_oferta",
+        "params": {{"{"}}"nome":"Maria","valor":"R$ 350,00","vencimento":"10/09"{{"}"}}
+      {{"}"}}'</code></pre>
+
+    <h2>Exemplos adicionais</h2>
+    <ul>
+      <li><a href="#">Exemplo de verificação de webhook em Node.js</a></li>
+      <li><a href="#">Checkout de cartão com 3DS2 (esqueleto)</a></li>
+    </ul>
+
+    <h2>Suporte</h2>
+    <p>E-mail: <a href="mailto:dev@saiuacordo.com.br">dev@saiuacordo.com.br</a> • Ambiente de testes gratuito.</p>
+  </div>
+</section>
+{% endblock %}

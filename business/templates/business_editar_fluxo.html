@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% block content %}
+<style>
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .select2-container .select2-selection--multiple {
+        min-height: 36px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        background-color: #FFFFFF !important;
+        border: .0625rem solid rgba(231, 234, 243, .7) !important;
+        border-radius: .3125rem !important;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border: solid #418AE9 1px !important;
+        outline: 0 !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+        padding-left: 20px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #FFFFFF !important;
+        border: 1px solid #1366ff !important;
+        margin-top: 9px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #1e2022 !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+        color: #1e2022 !important;
+    }
+
+    .select2-container .select2-container--default .select2-container--open {
+        top: 293px !important;
+    }
+
+    .select2-container .select2-search--inline {
+        margin-top: -16px !important;
+        margin-left: 8px !important;
+    }
+</style>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Editar fluxo</h4>
+        </div>
+        <div class="card-body">
+            <div id="alert" class="alert d-none" role="alert"></div>
+            <form id="fluxoEditForm">
+                {% csrf_token %}
+                
+                <!-- Seleção de Grupos com Select2 -->
+                <div class="mb-3">
+                    <label for="grupos" class="form-label">Selecionar Grupos</label>
+                    <select id="grupos" name="grupos" class="form-control select2" multiple="multiple" required>
+                        {% for grupo in grupos_disponiveis %}
+                            <option value="{{ grupo.id }}" {% if grupo.id in fluxo_grupos %}selected{% endif %}>
+                                {{ grupo.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>                    
+                </div>                
+
+                <!-- Tipo de Ação -->
+                <div class="mb-3">
+                    <label for="acao" class="form-label">Ação Vinculada</label>
+                    <select id="acao" name="acao" class="form-control" required>
+                        {% for acao in acoes %}
+                            <option value="{{ acao.id }}" {% if fluxo.id_acao == acao.id %}selected{% endif %}>
+                                {{ acao.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Periodicidade -->
+                <div class="mb-3">
+                    <label for="periodicidade" class="form-label">Periodicidade</label>
+                    <div class="d-flex">
+                        <input type="number" id="periodicidade" name="periodicidade" class="form-control w-50 me-2" min="1" value="{{ fluxo.periodicidade }}" required>
+                        <select id="unidade_tempo" name="unidade_tempo" class="form-control w-50" required>
+                            <option value="minutos" {% if fluxo.unidade_tempo == "minutos" %}selected{% endif %}>Minutos</option>
+                            <option value="horas" {% if fluxo.unidade_tempo == "horas" %}selected{% endif %}>Horas</option>
+                            <option value="dias" {% if fluxo.unidade_tempo == "dias" %}selected{% endif %}>Dias</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Início da Ação -->
+                <div class="mb-3">
+                    <label for="data_inicio" class="form-label">Início da Ação</label>
+                    <input type="datetime-local" id="data_inicio" name="data_inicio" class="form-control" value="{{ fluxo.data_inicio|date:'Y-m-d\TH:i' }}" required>
+                </div>
+
+                <!-- Definir o término -->
+                <div class="mb-3">
+                    <label class="form-label">Terminar Ação</label>
+                    
+                    <div class="form-check" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+                        <input class="form-check-input" type="radio" name="termino" id="termino_ocorrencias" value="ocorrencias" 
+                            {% if fluxo.termino == "ocorrencias" %}checked{% endif %}>
+                        <label class="form-check-label" for="termino_ocorrencias">
+                            Após <input type="number" name="qtd_ocorrencias" class="form-control d-inline w-25 ms-1" min="1" 
+                                value="{{ fluxo.qtd_ocorrencias|default:3 }}"> ocorrências
+                        </label>
+                    </div>
+                
+                    <div class="form-check" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+                        <input class="form-check-input" type="radio" name="termino" id="termino_data" value="data" 
+                            {% if fluxo.termino == "data" %}checked{% endif %}>
+                        <label class="form-check-label" for="termino_data">
+                            No dia <input type="datetime-local" name="data_termino" class="form-control d-inline w-50 ms-1" 
+                                value="{{ fluxo.data_termino|date:'Y-m-d\TH:i' }}">
+                        </label>
+                    </div>
+                
+                    <div class="form-check" style="display: flex; flex-direction: row; align-items: center; gap: 10px;">
+                        <input class="form-check-input" type="radio" name="termino" id="termino_nunca" value="nunca" 
+                            {% if fluxo.termino == "nunca" %}checked{% endif %}>
+                        <label class="form-check-label" for="termino_nunca">
+                            Nunca terminar ação
+                        </label>
+                    </div>
+                </div>                
+                
+                <!-- Definir o status -->
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-control" required>
+                        <option value="ativo" {% if fluxo.ativo %}selected{% endif %}>Ativo</option>
+                        <option value="desativado" {% if not fluxo.ativo %}selected{% endif %}>Desativado</option>
+                    </select>
+                </div>
+
+                <!-- Botão de envio -->
+                <div class="mt-4 d-flex justify-content-between items-center">
+                    <a href="{% url 'business_listar_acoes' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Adicionando Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Selecione um ou mais grupos",
+            width: '100%',
+            allowClear: true
+        });
+
+        let gruposSelecionados = {{ fluxo_grupos|safe }};
+        $("#grupos").val(gruposSelecionados).trigger("change");
+
+        document.getElementById('fluxoEditForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+
+            fetch("{% url 'business_editar_fluxo' fluxo.id %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    document.getElementById('alert').classList.remove('d-none', 'alert-danger');
+                    document.getElementById('alert').classList.add('alert-success');
+                    document.getElementById('alert').textContent = data.message;
+                } else {
+                    throw new Error(data.message);
+                }
+            })
+            .catch(error => {
+                document.getElementById('alert').classList.remove('d-none', 'alert-success');
+                document.getElementById('alert').classList.add('alert-danger');
+                document.getElementById('alert').textContent = "Erro ao editar fluxo. " + error.message;
+            });
+        });
+    });
+</script>
+
+{% endblock %}

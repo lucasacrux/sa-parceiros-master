@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+{% extends "t_base.html" %}
+{% block content %}
+<div class="container">
+  <!-- 
+    <div class="row" style="margin-top: 30px;">
+      <form action="#">
+    
+        <div class="row" style="font-size: 10px;">
+
+          <div class="mb-2 col-lg-2">
+            <label for="formControlLightGenderSelect" class="form-label" style="font-size: 11px;">Mês</label>
+            <select id="formControlLightGenderSelect" class="form-select" name="mes" style="font-size: 11px;">
+              {% for mes in meses %}
+                {% if mes == mes_selecionado %}
+                  <option value="{{mes}}" selected="selected">{{mes}}</option>
+                {% else %}
+                  <option value="{{mes}}">{{mes}}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
+
+          <div class="mb-2 col-lg-2">
+            <label for="formControlLightGenderSelect" class="form-label" style="font-size: 11px;">Carteira</label>
+            <select id="formControlLightGenderSelect" class="form-select" name="carteira" style="font-size: 11px;">
+              <option value="Todas">Todas</option>
+              {% if '1' == carteira_selecionada %}
+                <option value="1" selected="selected">BMG Lendico/Provu</option>
+              {% else %}
+                <option value="1">BMG Lendico/Provu</option>
+              {% endif %}
+              {% if '2' == carteira_selecionada %}
+                <option value="2" selected="selected">BMG/Consignados</option>
+              {% else %}
+                <option value="2">BMG/Consignados</option>
+              {% endif %}
+              {% if '3' == carteira_selecionada %}
+                <option value="3" selected="selected">BMG/HELP - crédito em conta</option>
+              {% else %}
+                <option value="3">BMG/HELP - crédito em conta</option>
+              {% endif %}
+            </select>
+          </div>
+
+          <div class="mb-2 col-lg-2">
+            <label for="formControlLightGenderSelect" class="form-label" style="font-size: 11px;">Tipo Legal</label>
+            <select id="formControlLightGenderSelect" class="form-select" name="tipolegal" style="font-size: 11px;">
+                  <option value="Todos" selected="selected">Todos</option>
+                  {% if 'extra_judicial' == tipolegal_selecionado %}
+                    <option value="extra_judicial" selected="selected">Extra Judicial</option>
+                  {% else %}
+                    <option value="extra_judicial">Extra Judicial</option>
+                  {% endif %}
+                  {% if 'judicial' == tipolegal_selecionado %}
+                    <option value="judicial" selected="selected">Judicial</option>
+                  {% else %}
+                    <option value="judicial">Judicial</option>
+                  {% endif %}
+            </select>
+          </div>
+          <div class="mb-2 col-lg-2 mt-4">
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+              <input type="submit"  name="op" class="btn btn-primary" value="Filtrar">
+            </div>              
+          </div>
+        </div>
+    </form>
+  </div>
+  -->  
+  <div class="card mt-5">
+    <div class="card-header">
+      <h4 class="card-header-title">Leads Disponíveis</h4>
+    </div>
+  
+    <!-- Table -->  
+    <div class="table-responsive datatable-custom">
+      {% if pessoas %}
+      <table class="js-datatable table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
+             data-hs-datatables-options='{
+                     "order": [],
+                     "isResponsive": false,
+                     "isShowPaging": false,
+                     "pagination": "datatableWithPaginationPagination"
+                   }'>
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">CPF</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Telefone</th>
+            <th scope="col">WhatsApp</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+  
+        <tbody>
+          {% for pessoa in pessoas %}
+            <tr>
+              <td scope="row">{{ pessoa.cpf }}</td>
+              <td>{{ pessoa.nome }}</td>
+              <td>{{ pessoa.telefone }}</td>
+              <td>
+                <div>
+                  <span class="legend-indicator {% if pessoa.wpp == '0' %} bg-warning {% elif pessoa.wpp == '1' %} bg-success {% endif %}"></span>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>Nenhuma pessoa encontrada</p>
+      {% endif %}
+    </div>
+    <!-- End Table -->
+  
+    <!-- Footer -->
+    <div class="card-footer">
+      <!-- Pagination -->
+      <div class="d-flex justify-content-center justify-content-sm-end">
+        <nav id="datatableWithPaginationPagination" aria-label="Activity pagination"></nav>
+      </div>
+      <!-- End Pagination -->
+    </div>
+    <!-- End Footer -->
+
+    <!-- Modal -->
+    <div id="exampleModalCenter" class="modal modal-lg fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalCenterTitle">Detalhes do acordo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Table -->
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>CPF:</strong> <span id="acordoCpf"></span></div>
+                  </td>
+                  <td>
+                    
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Contratos contemplados:</strong> <span id="acordoContratos"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Valor acordo:</strong> <span id="acordoValorAcordo"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Nº parcelas:</strong> <span id="acordoNumParcelas"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Valor Parcela:</strong> <span id="acordoValorParcela"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Venc Primeira Parc:</strong> <span id="acordoVencimentoPrim"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Venc Próximas Parc:</strong> <span id="acordoVencimentoProx"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Status:</strong> <span id="acordoStatus"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Ativo:</strong> <span>Sim</span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Data aceite:</strong> <span id="acordoDataAceite"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Id acordo:</strong> <span id="acordoId"></span></div>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row"></th>
+                  <td>
+                    <div><strong>Email:</strong> <span id="acordoEmail"></span></div>
+                  </td>
+                  <td>
+                    <div><strong>Telefone:</strong> <span id="acordoTelefone"></span></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- End Table -->
+            <!-- Accordion -->
+            <div class="accordion mt-4" id="accordionExample">
+              <div class="accordion-item">
+                <div class="accordion-header" id="headingTwo">
+                  <a class="accordion-button collapsed" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Parcelas
+                  </a>
+                </div>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                  <div class="accordion-body">
+                    <div>
+                      <table class="table">
+                        <thead class="thead-light">
+                          <tr>
+                            <th scope="col">Nº parcela</th>
+                            <th scope="col">Valor parcela</th>
+                            <th scope="col">Data de vencimento</th>
+                            <th scope="col">Data do pagamento</th>
+                            <th scope="col">Situação Parcela</th>
+                            <th scope="col">Boleto</th>
+                          </tr>
+                        </thead>
+                        <tbody id="parcelasBody">
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- End Accordion -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal -->
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-info').forEach(button => {
+      button.addEventListener('click', function() {
+        const acordoId = this.getAttribute('data-acordo-id');
+        fetch(`/detalhes-acordo/${acordoId}/`)
+            .then(response => response.json())
+            .then(acordo => {
+                document.getElementById('acordoId').textContent = acordo.acordo_id;
+                document.getElementById('acordoCpf').textContent = acordo.cpf;
+                document.getElementById('acordoContratos').textContent = acordo.contratos;
+                document.getElementById('acordoValorAcordo').textContent = acordo.valor_do_acordo;
+                document.getElementById('acordoValorParcela').textContent = acordo.valor_parcela;
+                document.getElementById('acordoNumParcelas').textContent = acordo.num_parcelas_acordo;
+                document.getElementById('acordoVencimentoPrim').textContent = acordo.dia_vencimento_primeira_parcela;
+                document.getElementById('acordoVencimentoProx').textContent = acordo.dia_vencimento_proxima_parcela;
+                document.getElementById('acordoEmail').textContent = acordo.email;
+                document.getElementById('acordoTelefone').textContent = acordo.telefone;
+                document.getElementById('acordoStatus').textContent = acordo.status;
+                document.getElementById('acordoDataAceite').textContent = acordo.data_aceite;
+                
+                const parcelasTableBody = document.getElementById('parcelasBody');
+                parcelasTableBody.innerHTML = '';
+                acordo.parcelas.forEach((parcela, index) => {
+                    const row = document.createElement('tr');
+                    let buttonHTML = '';
+                    if (index === 0) {
+                        buttonHTML = `<button type="button" class="btn btn-warning btn-sm" style="width:100%;"><i class="bi bi-clipboard-plus-fill"></i> ver boleto</button>`;
+                    } else {
+                        buttonHTML = `<button type="button" class="btn btn-success btn-sm" style="width:100%;"><i class="bi bi-clipboard-data-fill"></i> gerar boleto</button>`;
+                    }
+                    row.innerHTML = `
+                        <td>${parcela.numero}</td>
+                        <td>${parcela.valor}</td>
+                        <td>${parcela.dataVencimento}</td>
+                        <td>${parcela.dataPagamento || '-'}</td>
+                        <td>${parcela.situacao || 'REGULAR'}</td>
+                        <td>${buttonHTML}</td>
+                    `;
+                    parcelasTableBody.appendChild(row);
+                });
+            });
+      });
+    });
+  });
+</script>
+{% endblock %}

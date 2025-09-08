@@ -1,0 +1,412 @@
+/* === SA • Home (escopo) ================================================ */
+
+/* HERO — degradê suave e legível (light/dark) */
+.sa-home .hero{
+    position:relative; overflow:hidden;
+    background:
+      radial-gradient(900px 360px at 20% -260px, rgba(59,130,246,.06), transparent 60%),
+      radial-gradient(760px 320px at 82% -260px, rgba(99,102,241,.05), transparent 62%),
+      linear-gradient(180deg, #ffffff, #f9fbff 58%, transparent 100%);
+  }
+  :root[data-theme="dark"] .sa-home .hero{
+    background:
+      radial-gradient(900px 380px at 20% -260px, rgba(118,145,255,.16), transparent 60%),
+      radial-gradient(760px 340px at 82% -260px, rgba(124,146,255,.12), transparent 62%),
+      linear-gradient(180deg, #0b0f19, #0b0f19 60%, transparent 100%);
+  }
+  
+  .sa-home .hero-inner{
+    max-width:1200px; margin:0 auto; padding:4rem 1rem 2.2rem;
+    display:grid; grid-template-columns:1.15fr 1fr; gap:2rem; align-items:center;
+  }
+  @media(max-width:960px){ .sa-home .hero-inner{ grid-template-columns:1fr; padding:2.6rem 1rem 1.2rem; } }
+  
+  .sa-home h1{ font-size:clamp(32px,5vw,56px); line-height:1.06; margin:.1rem 0 .5rem; color:var(--text); }
+  :root[data-theme="dark"] .sa-home h1{ color:#eef2ff; }
+  .sa-home .hero p{ font-size:1.12rem; color:var(--muted); margin:0 0 1rem; }
+  :root[data-theme="dark"] .sa-home .hero p{ color:#c8d1ff; }
+  
+  .sa-home .gradient-text{
+    background:linear-gradient(135deg,var(--brand-2),var(--brand));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  
+  /* Form hero */
+  .sa-home .hero-card{
+    background:var(--card); border:1px solid var(--border); border-radius:18px;
+    box-shadow:var(--shadow); padding:12px; display:grid; gap:10px;
+  }
+  .sa-home .hero-form{ display:flex; gap:8px; flex-wrap:wrap; }
+  .sa-home .hero-form .ui-input{
+    flex:1; min-width:260px; height:52px; padding:0 14px;
+    border-radius:14px; border:1px solid var(--border); background:#fff; color:inherit;
+  }
+  :root[data-theme="dark"] .sa-home .hero-form .ui-input{ background:#0f172a; color:#e6e9ff; border-color:#2a3765; }
+  .sa-home .hero-form .btn.lg{ height:52px; border-radius:14px; }
+  @media(max-width:560px){
+    .sa-home .hero-form{ flex-direction:column; }
+    .sa-home .hero-form .ui-input, .sa-home .hero-form .btn{ width:100%; }
+  }
+  .sa-home .hero-card .legal{ font-size:.8rem; color:var(--muted); }
+  
+  .sa-home .hero-visual .device{
+    height:360px; border-radius:22px; border:1px dashed var(--border);
+    background:var(--card); box-shadow:var(--shadow);
+  }
+  
+  /* Trust bar */
+  .sa-home .trust-bar{
+    max-width:1200px; margin:0 auto 1.2rem; display:flex; gap:24px;
+    flex-wrap:wrap; align-items:center; justify-content:center; opacity:.92;
+  }
+  .sa-home .logo-ghost{
+    height:34px; min-width:96px; border-radius:10px; border:1px dashed var(--border);
+    display:grid; place-items:center; color:var(--muted); font-weight:800;
+  }
+  
+  /* TÍTULOS DE SEÇÃO */
+  .sa-home .section-title{
+    text-align:center; font-size:clamp(22px,3.2vw,36px); margin:1rem 0 1.2rem;
+  }
+  
+  /* COMPARE — um layout, mesmo no web (toggle SEM/COM) */
+  .sa-home .compare{
+    padding:2.6rem 0; background:linear-gradient(180deg,#fafcff,transparent 60%);
+  }
+  :root[data-theme="dark"] .sa-home .compare{
+    background:linear-gradient(180deg,#0b0f19,transparent 60%);
+  }
+  
+  /* Toggle SEM/COM (web e mobile) */
+  .sa-home .toggle-tabs{
+    position:relative; display:flex; justify-content:center;
+    margin:0 auto 1.4rem; width:min(680px,100%);
+    background:#eef3ff; border:1px solid #dbe6ff; border-radius:999px; padding:.25rem;
+  }
+  :root[data-theme="dark"] .sa-home .toggle-tabs{ background:#17203d; border-color:#23315d; }
+  .sa-home .toggle-tabs input{ display:none; }
+  .sa-home .toggle-tabs label{
+    flex:1; text-align:center; padding:.72rem 1rem; font-weight:800; cursor:pointer;
+    border-radius:999px; position:relative; z-index:2; color:#1e2a55;
+  }
+  :root[data-theme="dark"] .sa-home .toggle-tabs label{ color:#c9d2ff; }
+  .sa-home .toggle-tabs .pill{
+    position:absolute; top:4px; bottom:4px; left:4px; width:calc(50% - 4px);
+    border-radius:999px; background:#1e40af; box-shadow:0 8px 22px rgba(30,64,175,.35);
+    transition:transform .22s ease;
+  }
+  .sa-home #tab-com:checked ~ .pill{ transform:translateX(100%); }
+  .sa-home #tab-sem:checked ~ label[for="tab-sem"],
+  .sa-home #tab-com:checked ~ label[for="tab-com"]{ color:#fff; }
+  
+  /* Conteúdo do comparativo: UMA coluna, alternando */
+  .sa-home .compare-grid{
+    display:grid; grid-template-columns:1fr; gap:1.2rem;
+    max-width:900px; margin:0 auto; padding:0 1rem;
+  }
+  .sa-home .col{
+    background:var(--card); border:1px solid var(--border); border-radius:16px;
+    box-shadow:var(--shadow); padding:18px;
+  }
+  .sa-home .flow{ display:grid; gap:.75rem; }
+  .sa-home .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:12px 14px; box-shadow:var(--shadow-soft); color:var(--text);
+  }
+  :root[data-theme="dark"] .sa-home .card{ background:#0f172a; border-color:#23315d; color:#e8ebff; }
+  .sa-home .flow .ok{ border-color:#b7f3d4; }
+  .sa-home .flow .warn{ border-color:#ffdcb2; }
+  
+  .sa-home .saas-core{
+    background:#0b3bff; color:#fff; font-weight:900; border-radius:12px;
+    padding:.7rem 1rem; display:inline-block; margin-top:1rem;
+  }
+  
+  /* Ações centralizadas sob o comparativo */
+  .sa-home .compare .actions{
+    margin-top:1.4rem; display:flex; gap:.6rem; justify-content:center;
+  }
+  
+  /* FEATURES — ícones monocromáticos em chip */
+  .sa-home .features{ padding:2rem 0 2.6rem; }
+  .sa-home .grid4{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1rem;
+    max-width:1200px; margin:0 auto; padding:0 1rem;
+  }
+  @media(max-width:960px){ .sa-home .grid4{ grid-template-columns:1fr 1fr; } }
+  .sa-home .feat{ display:grid; gap:.4rem; }
+  .sa-home .feat .icon{
+    width:40px; height:40px; border-radius:10px; display:grid; place-items:center;
+    background:rgba(30,64,175,.08); color:#1e40af; margin-bottom:.25rem;
+  }
+  :root[data-theme="dark"] .sa-home .feat .icon{ background:rgba(80,115,255,.12); color:#8da3ff; }
+  .sa-home .feat h3{ margin:.2rem 0 .3rem; }
+  
+  /* CLIENTES — inspirado no Asaas (grid limpo) */
+  .sa-home .clients{ max-width:1200px; margin:0 auto; padding:0 1rem; }
+  .sa-home .logos-grid{
+    display:grid; grid-template-columns:repeat(6,1fr); gap:12px;
+  }
+  @media(max-width:960px){ .sa-home .logos-grid{ grid-template-columns:repeat(3,1fr); } }
+  .sa-home .logo-tile{
+    height:58px; border:1px solid var(--border); border-radius:12px;
+    background:var(--card); display:grid; place-items:center;
+    color:var(--muted); font-weight:800; box-shadow:var(--shadow);
+  }
+  
+  /* INVESTIDORES/PARCEIROS — cartões com “avatar” circular */
+  .sa-home .partner-grid{
+    max-width:1000px; margin:0 auto; padding:0 1rem;
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+  }
+  @media(max-width:960px){ .sa-home .partner-grid{ grid-template-columns:1fr; } }
+  .sa-home .partner-card{
+    display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto auto; grid-column-gap:12px;
+    align-items:center; padding:14px; border:1px solid var(--border); border-radius:14px; background:var(--card); box-shadow:var(--shadow);
+  }
+  .sa-home .p-logo{
+    width:42px; height:42px; border-radius:50%; display:grid; place-items:center;
+    background:rgba(30,64,175,.12); color:#1e40af; font-weight:900;
+  }
+  :root[data-theme="dark"] .sa-home .p-logo{ background:rgba(120,140,255,.18); color:#cfe0ff; }
+  .sa-home .p-meta{ display:flex; flex-direction:column; }
+  .sa-home .p-meta span{ color:var(--muted); font-size:.86rem; }
+  .sa-home .p-desc{ grid-column:1 / -1; margin:.3rem 0 0; color:var(--muted); }
+  
+  /* FAQ + Help Center */
+  .sa-home .faq{ max-width:1000px; margin:0 auto; padding:0 1rem; }
+  .sa-home .accordion{
+    border-radius:14px; border:1px solid var(--border); background:var(--card);
+    overflow:hidden; box-shadow:var(--shadow);
+  }
+  .sa-home .acc-item + .acc-item{ border-top:1px solid var(--border); }
+  .sa-home .acc-head{
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    padding:1rem 1.1rem; cursor:pointer; font-weight:800; color:var(--text);
+  }
+  :root[data-theme="dark"] .sa-home .acc-head{ color:#e9edff; }
+  .sa-home .acc-body{ display:none; padding:0 1.1rem 1rem; color:var(--muted); }
+  .sa-home .acc-item.open .acc-body{ display:block; }
+  .sa-home .help-cta{ display:flex; justify-content:center; margin-top:24px; }
+  
+  /* FINAL CTA */
+  .sa-home .final-cta .section-title{ margin-bottom:0.3rem; }
+  
+  /* STICKY CTA (mobile) */
+  .sa-home .mobile-bottom-cta{
+    position:fixed; left:12px; right:12px;
+    bottom:calc(env(safe-area-inset-bottom) + 12px);
+    z-index:55; display:none;
+  }
+  @media(max-width:960px){ .sa-home .mobile-bottom-cta{ display:block; } }
+  .sa-home .mobile-bottom-cta .bar{
+    background:#0b3bff; color:#fff; border-radius:14px; padding:.65rem .8rem;
+    box-shadow:0 16px 40px rgba(11,59,255,.35);
+    display:flex; gap:.8rem; align-items:center; justify-content:space-between;
+  }
+  .sa-home .mobile-bottom-cta .label{ font-weight:800; }
+  
+  /* Redução de movimento */
+  @media (prefers-reduced-motion: reduce){
+    .sa-home .toggle-tabs .pill{ transition:none; }
+  }
+  
+  /* ================= HERO v2 (inspirado no Asaas) ===================== */
+  /* Use <section class="hero hero-v2"> com:
+     <div class="hero-bg"><div class="hero-gradient"></div><div class="shape-a"></div><div class="shape-b"></div></div>
+     …(hero-inner)… e <img class="ui-mock"> dentro do .hero-visual          */
+  
+  /* anula o bg padrão do .hero quando for v2; a pintura vem da camada .hero-gradient */
+  .sa-home .hero.hero-v2{ background:none; }
+  .sa-home .hero.hero-v2 .hero-inner{ position:relative; z-index:1; }
+  
+  /* camadas de fundo 
+     (ajustes de suavidade e contraste – mais claros no light, sólidos no dark) */
+  .hero-v2 .hero-bg{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+  .hero-v2 .hero-gradient{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(900px 280px at 20% -160px, rgba(59,130,246,.10), transparent 60%),
+      radial-gradient(760px 260px at 82% -160px, rgba(99,102,241,.08), transparent 62%),
+      linear-gradient(180deg,#f6f9ff 0%, #ffffff 35%, #f4f7ff 100%);
+  }
+  :root[data-theme="dark"] .hero-v2 .hero-gradient{
+    background:
+      radial-gradient(900px 300px at 20% -160px, rgba(118,145,255,.18), transparent 60%),
+      radial-gradient(760px 280px at 82% -160px, rgba(124,146,255,.14), transparent 62%),
+      linear-gradient(180deg, #0b0f19 0%, #0b0f19 70%, #0b0f19 100%);
+  }
+  
+  /* shapes decorativos suaves (opcionais) */
+  .hero-v2 .shape-a, .hero-v2 .shape-b{
+    position:absolute; border-radius:24px; filter:blur(16px); opacity:.25;
+  }
+  .hero-v2 .shape-a{ width:420px; height:220px; right:3%; top:10%; background:linear-gradient(135deg,#7aa2ff,#b1c3ff);}
+  .hero-v2 .shape-b{ width:320px; height:160px; right:10%; top:36%; background:linear-gradient(135deg,#9fd1ff,#c9ddff);}
+  
+  /* HERO “full screen” e foco no form */
+  .sa-home .hero.hero-v2.full{min-height:calc(100dvh - var(--nav-h,72px))}
+  .sa-home .hero-inner.only-copy{max-width:1200px;margin:0 auto;padding:3.2rem 1rem 2rem;display:grid;align-content:center}
+  @media(max-width:960px){.sa-home .hero-inner.only-copy{padding:2.4rem 1rem 1.4rem}}
+  /* se quiser ocultar completamente a imagem do hero sem mexer no HTML */
+  .sa-home .hero-inner.only-copy .hero-visual{display:none}
+  
+  /* CTA “camadas” (cartão + layers atrás) */
+  .hero-v2 .cta-stack{ position:relative; width:min(560px,100%); display:inline-block; }
+  .hero-v2 .cta-card{
+    position:relative; z-index:3;
+    background:#fff; border:1px solid var(--border); border-radius:22px; padding:16px;
+    box-shadow:0 18px 38px rgba(7, 23, 99, .18);
+  }
+  :root[data-theme="dark"] .hero-v2 .cta-card{
+    background:#0f172a; border-color:#23315d; box-shadow:0 18px 38px rgba(20,30,85,.55);
+  }
+  .hero-v2 .cta-title{ font-weight:900; margin:2px 2px 10px; color:#1d2b6b; }
+  :root[data-theme="dark"] .hero-v2 .cta-title{ color:#dbe3ff; }
+  
+  /* layers atrás do cartão */
+  .hero-v2 .cta-layer{
+    position:absolute; inset:auto 0 0 0; height:100%; border-radius:22px; pointer-events:none;
+    background:#fff; border:1px solid var(--border); opacity:.9;
+  }
+  .hero-v2 .cta-layer.l2{ transform:translate(12px, 10px); z-index:2; }
+  .hero-v2 .cta-layer.l3{ transform:translate(24px, 18px); z-index:1; opacity:.85; }
+  :root[data-theme="dark"] .hero-v2 .cta-layer{ background:#0f172a; border-color:#23315d; }
+  
+  /* formulário do hero (refinamentos) */
+  .hero-v2 .hero-form{ display:flex; gap:10px; flex-wrap:wrap; }
+  .hero-v2 .hero-form .ui-input{
+    flex:1; min-width:260px; height:56px; padding:0 16px;
+    border-radius:14px; border:1px solid var(--border); background:#fff;
+  }
+  :root[data-theme="dark"] .hero-v2 .hero-form .ui-input{ background:#0c1326; color:#e7ebff; border-color:#2a3765; }
+  .hero-v2 .hero-form .btn.lg{ height:56px; border-radius:14px; font-weight:800; }
+  @media(max-width:560px){
+    .hero-v2 .hero-form{ flex-direction:column; }
+    .hero-v2 .hero-form .ui-input, .hero-v2 .hero-form .btn{ width:100%; }
+  }
+  .hero-v2 .legal{ font-size:.8rem; color:var(--muted); margin-top:6px; }
+  
+  /* badges do hero com contraste ok no dark */
+  .hero-v2 .hero-badges{ margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; }
+  .hero-v2 .tag{
+    background:#eef3ff; color:#1e40af; border:1px solid #dbe6ff;
+    padding:6px 10px; border-radius:999px; font-weight:700; font-size:.86rem;
+  }
+  :root[data-theme="dark"] .hero-v2 .tag{ background:#17203d; color:#cfe0ff; border-color:#23315d; }
+  
+  /* visual (imagem) à direita com fallback elegante */
+  .hero-v2 .hero-visual{ display:flex; align-items:center; justify-content:center; }
+  .hero-v2 .ui-mock{
+    display:block; width:100%; max-width:520px; border-radius:24px;
+    box-shadow:0 22px 60px rgba(5, 24, 95, .25);
+    background:linear-gradient(180deg,#ffffff, #f5f8ff);
+  }
+  :root[data-theme="dark"] .hero-v2 .ui-mock{
+    background:linear-gradient(180deg,#0d1326, #121a33);
+    box-shadow:0 24px 64px rgba(12,18,45,.75);
+  }
+  /* quando a imagem não carrega: */
+  .hero-v2 .ui-mock.is-placeholder{
+    content:""; min-height:320px; border:1px dashed var(--border);
+    background:
+      radial-gradient(600px 220px at 50% -120px, rgba(120,150,255,.18), transparent 65%),
+      linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.02));
+  }
+  
+  /* Ajustes finos de contraste e centralização */
+  :root[data-theme="dark"] .sa-home .section-title{ color:#e9edff; }
+  .sa-home .compare .actions{ justify-content:center; }
+  .sa-home .help-cta{ justify-content:center; margin-top:24px; }
+  
+  /* === UI GLOBAL (botões & ícones topo) ================================ */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+    padding:.6rem 1rem;border-radius:12px;border:1px solid transparent;
+    font-weight:800;line-height:1;cursor:pointer;transition:.18s ease;text-decoration:none}
+  .btn.pill{border-radius:999px}
+  .btn.lg{height:52px;padding:0 1.2rem}
+  .btn.xl{height:56px;padding:0 1.35rem;font-size:1.05rem}
+  
+  .btn.primary{
+    color:#fff;border-color:transparent;
+    background:linear-gradient(180deg,#3b82f6 0%,#1d4ed8 100%);
+    box-shadow:0 8px 28px rgba(29,78,216,.32), inset 0 1px 0 rgba(255,255,255,.25);
+  }
+  .btn.primary:hover{filter:brightness(1.06)}
+  .btn.primary:active{transform:translateY(1px)}
+  
+  .btn.ghost{color:var(--text);background:var(--card);border-color:var(--border);box-shadow:var(--shadow-soft)}
+  :root[data-theme="dark"] .btn.ghost{color:#eaf0ff;background:#0f172a;border-color:#2a3765}
+  
+  .navbar .nav-ghost{padding:.55rem .9rem}
+  .navbar .nav-primary{padding:.55rem 1rem}
+  
+  /* Theme toggle icônico (corrige avisos do linter adicionando 'mask' + '-webkit-mask') */
+
+/* 1) Variáveis com os SVGs (em data-URI) – pode ficar perto do topo do arquivo também */
+:root{
+    --icon-sun: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
+  <path fill='%23000' d='M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zm10.48 0l1.79-1.79 1.79 1.79-1.79 1.79-1.79-1.79zM12 4c.55 0 1-.45 1-1V1h-2v2c0 .55.45 1 1 1zm0 16c-.55 0-1 .45-1 1v2h2v-2c0-.55-.45-1-1-1zM4 13H1v-2h3v2zm19 0h-3v-2h3v2zM6.76 19.16l-1.8 1.79-1.79-1.79 1.79-1.79 1.8 1.79zM20.83 19.16l-1.79 1.79-1.79-1.79 1.79-1.79 1.79 1.79zM12 8a4 4 0 100 8 4 4 0 000-8z'/>\
+  </svg>");
+  
+    --icon-moon: url("data:image/svg+xml;utf8,\
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>\
+  <path fill='%23000' d='M21.64 13a9 9 0 11-10.63-10 7 7 0 1011 10z'/>\
+  </svg>");
+  }
+  
+  /* 2) Estilos do botão */
+  .theme-toggle{
+    width:42px;height:42px;border-radius:12px;border:1px solid var(--border);
+    background:var(--card);position:relative;display:inline-grid;place-items:center
+  }
+  
+  /* 3) Ícone (sol no light) — usa 'mask' padrão + '-webkit-mask' */
+  .theme-toggle::before{
+    content:""; width:18px; height:18px; display:block;
+    background-color: currentColor;
+    mask: var(--icon-sun) center / contain no-repeat;          /* padrão */
+    -webkit-mask: var(--icon-sun) center / contain no-repeat;  /* webkit */
+    color:#f39c12;
+  }
+  
+  /* 4) Troca para lua no dark */
+  :root[data-theme="dark"] .theme-toggle{background:#0f172a;border-color:#2a3765}
+  :root[data-theme="dark"] .theme-toggle::before{
+    background-color: currentColor;
+    mask: var(--icon-moon) center / contain no-repeat;
+    -webkit-mask: var(--icon-moon) center / contain no-repeat;
+    color:#cdd6ff;
+  }
+  
+  
+  /* === BLOCO “Automatize” (tabs + cards) =============================== */
+  .sa-home .automate{padding:2.2rem 0 2.6rem;background:linear-gradient(180deg,#f9fbff,transparent 70%)}
+  :root[data-theme="dark"] .sa-home .automate{background:linear-gradient(180deg,#0b0f19,transparent 70%)}
+  
+  .sa-home .auto-tabs{position:relative;display:flex;justify-content:center;margin:0 auto 1.2rem;width:min(820px,100%);
+    background:#eef3ff;border:1px solid #dbe6ff;border-radius:999px;padding:.25rem}
+  :root[data-theme="dark"] .sa-home .auto-tabs{background:#17203d;border-color:#23315d}
+  .sa-home .auto-tabs input{display:none}
+  .sa-home .auto-tabs label{flex:1;text-align:center;padding:.72rem 1rem;font-weight:800;cursor:pointer;border-radius:999px;position:relative;z-index:2;color:#1e2a55}
+  :root[data-theme="dark"] .sa-home .auto-tabs label{color:#c9d2ff}
+  .sa-home .auto-tabs .pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc(33.33% - 4px);border-radius:999px;background:#1e40af;
+    box-shadow:0 8px 22px rgba(30,64,175,.35);transition:transform .22s ease}
+  .sa-home .auto-tabs #t2:checked ~ .pill{transform:translateX(100%)}
+  .sa-home .auto-tabs #t3:checked ~ .pill{transform:translateX(200%)}
+  .sa-home .auto-tabs #t1:checked ~ label[for="t1"],
+  .sa-home .auto-tabs #t2:checked ~ label[for="t2"],
+  .sa-home .auto-tabs #t3:checked ~ label[for="t3"]{color:#fff}
+  
+  .sa-home .auto-panels{max-width:1100px;margin:0 auto;padding:0 1rem}
+  .sa-home .auto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:960px){.sa-home .auto-grid{grid-template-columns:1fr}}
+  .sa-home .auto-card{padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--card);box-shadow:var(--shadow);display:grid;gap:.35rem}
+  .sa-home .aicon{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:rgba(30,64,175,.10);color:#1e40af}
+  :root[data-theme="dark"] .sa-home .aicon{background:rgba(120,140,255,.18);color:#cfe0ff}
+  
+  /* === FINAL CTA: um único botão destacado ============================= */
+  .sa-home .final-cta .section-title{margin-bottom:.5rem}
+  .sa-home .final-cta .btn{box-shadow:0 12px 32px rgba(29,78,216,.28)}
+  

@@ -1,0 +1,487 @@
+{% extends "t_base.html" %}
+
+
+{% load static %}
+{% load extras %}
+
+{% block content %}
+
+  <main id="content" role="main" class="main">
+    <!-- Content -->
+    <div class="content container-fluid">
+        <div class="page-header">
+            <div class="row align-items-center">
+              <div class="col-sm mb-2 mb-sm-0">
+                <h1 class="page-header-title">{{saudacao}}</h1>
+                <p class="page-header-text">Aqui estão algumas informações importantes.</p>
+              </div>
+              <!-- End Col -->
+            </div>
+          </div>
+            <!-- Nav -->
+            <form action="{% url 't_listar_parcelas' %}">
+ 
+              <div class="row" style="font-size: 10px;">
+
+                <div class="mb-2 col-lg-2">
+                  <label for="formControlLightGenderSelect" class="form-label" style="font-size: 11px;">Mês</label>
+                  <select id="formControlLightGenderSelect" class="form-select" name="mes" style="font-size: 11px;">
+                    {% for mes in meses %}
+                      {% if mes == mes_selecionado %}
+                        <option value="{{mes}}" selected="selected">{{mes}}</option>
+                      {% else %}
+                        <option value="{{mes}}">{{mes}}</option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+            
+                <div class="mb-2 col-lg-1 mt-4">
+                  <div class="btn-group" role="group">
+                    <input type="submit"  name="op" class="btn btn-primary" value="Filtrar">
+                  </div>              
+                </div>
+
+                <div class="mb-2 col-lg-2 mt-4">
+                    <div class="btn-group" role="group">
+                        <input type="submit"  name="op" class="btn btn-secondary" value="Exportar">
+                    </div>              
+                  </div>
+
+
+
+
+              </div>
+           </form>
+          
+          <div class="card mb-3 mb-lg-5">
+            {% if not judicial %}
+            <!-- Header -->
+            <div class="card-header card-header-content-sm-between">
+              <h4 class="card-header-title mb-2 mb-sm-0">Dia a Dia<i class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Seus Agendamentos e Acordos do mês." data-bs-original-title="Seus Agendamentos e Acordos do mês."></i></h4>
+    
+              <div class="d-grid d-sm-flex gap-2">
+              </div>
+            </div>
+            <!-- End Header -->
+    
+            <!-- Body -->
+            <div class="card-body">
+              <div class="row col-lg-divider">
+                
+                {% if usuario_logado.tipo == 'sdr' %}
+                  <div class="col-lg-5 mb-5 mb-lg-0">
+                      <!-- Chartjs -->
+                      <div class="chartjs-custom" style="height: 300px;">
+                        <canvas id="line-chart-with-grid" class="js-chart"
+                                data-hs-chartjs-options='{
+                                    "type": "line",
+                                    "data": {
+                                      "labels": [{{labels_dia_dia_agendamentos}}],
+                                      "datasets": [{
+                                        "data": [{{agendamentos_dia_dia}}],
+                                        "backgroundColor": "transparent",
+                                        "borderColor": "#eeeef1",
+                                        "borderWidth": 2,
+                                        "pointRadius": 0,
+                                        "pointHoverRadius": 1,
+                                        "tension": 0,
+                                        "borderDash": [10,5]
+                                      },
+                                      {
+                                        "data": [{{agendamentos_dia_dia_individual}}],
+                                        "backgroundColor": "transparent",
+                                        "borderColor": "#377dff",
+                                        "borderWidth": 2,
+                                        "pointRadius": 0,
+                                        "pointHoverRadius": 1,
+                                        "tension": 0
+                                      }]
+                                    },
+                                    "options": {
+                                      "scales": {
+                                        "y": {
+                                          "grid": {
+                                            "drawBorder": false,
+                                            "color": "#eeeef1"
+                                          },
+                                          "min": 5,
+                                          "max": 150,
+                                          "ticks": {
+                                            "stepSize": 5,
+                                            "color": "rgba(0, 0, 0, 0.4)",
+                                            "padding": 10
+                                          }
+                                        },
+                                        "x": {
+                                          "grid": {
+                                            "display": false,
+                                            "drawBorder": false
+                                          },
+                                          "ticks": {
+                                            "labelOffset": 20,
+                                            "maxTicksLimit": 11,
+                                            "padding": 20,
+                                            "maxRotation": 0,
+                                            "minRotation": 0,
+                                            "font": {
+                                              "size": 12
+                                            },
+                                            "color": "rgba(0, 0, 0, 0.4)"
+                                          }
+                                        }
+                                      },
+                                      "hover": {
+                                        "mode": "nearest",
+                                        "intersect": false
+                                      },
+                                      "plugins": {
+                                        "tooltip": {
+                                          "prefix": "",
+                                          "intersect": false
+                                        }
+                                      }
+                                    }
+                                  }'>
+                        </canvas>
+                      </div>
+      
+                    <div class="row justify-content-center">
+                      <div class="col-auto">
+                        <span class="legend-indicator"></span> Agendamentos da Equipe
+                      </div>
+                      <!-- End Col -->
+      
+                      <div class="col-auto">
+                        <span class="legend-indicator bg-primary"></span> Seus Agendamentos
+                      </div>
+                      <!-- End Col -->
+                    </div>
+                    <!-- End Row -->
+                  </div>
+
+                  <div class="col-lg-4 mb-5 mb-lg-0">
+                  {% else %}
+                  <div class="col-lg-8 mb-5 mb-lg-0">
+                  {% endif %}
+                  <!-- Bar Chart -->
+                  <div class="chartjs-custom">
+                    <canvas id="ecommerce-sales" class="js-chart" style="height: 20rem;"
+                            data-hs-chartjs-options='{
+                                    "type": "bar",
+                                    "data": {
+                                      "labels": [{{labels_dia_dia}}],
+                                      "datasets": [{
+                                        "data": [{{acordos_dia_dia}}],
+                                        "backgroundColor": "#377dff",
+                                        "hoverBackgroundColor": "#377dff",
+                                        "borderColor": "#377dff",
+                                        "maxBarThickness": "10"
+                                      }]
+                                    },
+                                    "options": {
+                                      "scales": {
+                                        "y": {
+                                          "grid": {
+                                            "color": "#e7eaf3",
+                                            "drawBorder": false,
+                                            "zeroLineColor": "#e7eaf3"
+                                          },
+                                          "ticks": {
+                                            "beginAtZero": true,
+                                            "stepSize": 5,
+                                            "fontSize": 12,
+                                            "fontColor": "#97a4af",
+                                            "fontFamily": "Open Sans, sans-serif",
+                                            "padding": 5,
+                                            "postfix": ""
+                                          }
+                                        },
+                                        "x": {
+                                          "grid": {
+                                            "display": false,
+                                            "drawBorder": false
+                                          },
+                                          "ticks": {
+                                            "font": {
+                                              "size": 12,
+                                              "family": "Open Sans, sans-serif"
+                                            },
+                                            "color": "#97a4af",
+                                            "padding": 5
+                                          },
+                                          "categoryPercentage": 0.2
+                                        }
+                                      },
+                                      "cornerRadius": 2,
+                                      "plugins": {
+                                        "tooltip": {
+                                        "prefix": "",
+                                        "hasIndicator": false,
+                                        "mode": "index",
+                                        "intersect": false
+                                        }
+                                      },
+                                      "hover": {
+                                        "mode": "nearest"
+                                      }
+                                    }
+                                  }'></canvas>
+                  </div>
+                  <!-- End Bar Chart -->
+                  <div class="row justify-content-center">
+                    <div class="col-auto">
+                      <span class="legend-indicator bg-primary"></span> Acordos
+                    </div>
+                    <!-- End Col -->
+                  </div>
+                  <!-- End Row -->
+                </div>
+    
+                <div class="col-lg-3">
+                  <div class="row">
+                    <div class="col-sm-6 col-lg-12">
+                      <!-- Stats -->
+                      <div class="d-flex justify-content-center flex-column" style="min-height: 5rem;">
+                        <h6 class="card-subtitle">Comissionamento Total</h6>
+                        <span class="d-block display-4 text-dark mb-1 me-3">R${{comissionamento_total}}</span>
+              
+                      </div>
+                      <!-- End Stats -->
+    
+                      <hr class="d-none d-lg-block my-0">
+                    </div>
+                    <!-- End Col -->
+
+                    <div class="col-sm-4 col-lg-12">
+                      <!-- Stats -->
+                      <div class="d-flex justify-content-center flex-column" style="min-height: 5rem;">
+                        <h6 class="card-subtitle" style="color: #42a925">Comissão Confirmada</h6>
+                        <span class="d-block display-4 me-3" style="color: #42a925">R${{total_comissao_paga}}</span>
+              
+                      </div>
+                      <!-- End Stats -->
+    
+                      <hr class="d-none d-lg-block my-0">
+                    </div>
+                    <!-- End Col -->
+    
+                    <div class="col-sm-4 col-lg-12">
+                      <!-- Stats -->
+                      <div class="d-flex justify-content-center flex-column" style="min-height: 4rem;">
+                        <h6 class="card-subtitle">Comissão Pendente</h6>
+                        <span class="d-block display-4 text-dark  me-3">R${{total_comissao_pendente}}</span>
+              
+                      </div>
+                      <hr class="d-none d-lg-block my-0">
+                    </div>
+
+                    <div class="col-sm-4 col-lg-12">
+                      <!-- Stats -->
+                      <div class="d-flex justify-content-center flex-column" style="min-height: 5rem;">
+                        <h6 class="card-subtitle">Comissão Prevista</h6>
+                        <span class="d-block display-4 text-dark  me-3">R${{total_comissao_previsto}}</span>
+              
+                      </div>
+
+                    </div>
+                    <!-- End Col -->
+
+                  </div>
+                  <!-- End Row -->
+                </div>
+              </div>
+              <!-- End Row -->
+            </div>
+            <!-- End Body -->
+            </div>
+            {% endif %}
+
+      <div class="row justify-content-lg-center">
+    
+        <div class="col-lg-12">
+          <div class="row">
+
+          <div class="card">
+                   <!-- Header -->
+            <div class="card-header card-header-content-sm-between">
+              <h4 class="card-header-title mb-2 mb-sm-0">Comissões <i class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="A Receber: parcelas já foram pagas. Pendentes: aguardando pagamento das parcelas. Previstas: esperadas no próximo mês." data-bs-original-title="A Receber: parcelas já foram pagas. Pendentes: aguardando pagamento das parcelas. Previstas: esperadas no próximo mês."></i></h4>
+            </div>
+            <!-- End Header -->
+            <!-- Nav -->
+            <div class="text-left">
+              <ul class="nav nav-pills mb-0" role="tablist">
+                <li class="nav-item">
+                  <a class="nav-link active" id="nav-one-eg1-tab" href="#nav-one-eg1" data-bs-toggle="pill" data-bs-target="#nav-one-eg1" role="tab" aria-controls="nav-one-eg1" aria-selected="true">Comissões Confirmadas</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="nav-two-eg1-tab" href="#nav-two-eg1" data-bs-toggle="pill" data-bs-target="#nav-two-eg1" role="tab" aria-controls="nav-two-eg1" aria-selected="false">Comissões Pendentes</a>
+                </li>
+                {% if usuario_logado.supergerente == 1 %}
+                  <li class="nav-item">
+                    <a class="nav-link" id="nav-three-eg1-tab" href="#nav-three-eg1" data-bs-toggle="pill" data-bs-target="#nav-three-eg1" role="tab" aria-controls="nav-three-eg1" aria-selected="false">Aguardando Aprovação  {% if total_acordos_pendentes > 0 %}<span class="badge bg-primary rounded-pill ms-auto">{{total_acordos_pendentes}}</span>{% endif %}</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+            <!-- End Nav -->
+    
+            <!-- Tab Content -->
+            <div class="tab-content" id="navTabContent3">
+              <div class="tab-pane fade show active" id="nav-one-eg1" role="tabpanel" aria-labelledby="nav-one-eg1-tab">
+                <!-- Table -->
+                <table class="table">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">ACORDO</th>
+                      <th scope="col">CPF</th>
+                      <th scope="col">Parcela</th>
+                      <th scope="col">Qtd Parcelas</th>
+                      <th scope="col">Valor Pago</th>
+                      <th scope="col">Data Vencimento</th>
+                      <th scope="col">Data Pagamento</th>
+                      <th scope="col">% Comissão</th>
+                      <th scope="col">Valor Comissão</th>
+                      <th scope="col">Situação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for acordo in dict_acordos_pagos %}
+                      <tr style="font-size: 12px;" role="row" class="even">
+                        <td style="font-size: 12px;">
+                          <a class="badge bg-soft-primary text-primary p-2" href="#">{{dict_acordos_pagos|get_item:acordo|get_item:'idAcordo'}}</a>
+                        </td>
+                        <td style="font-size: 12px;">
+                          <a class="badge bg-soft-primary text-primary p-2" href="/t/busca?cpf={{dict_acordos_pagos|get_item:acordo|get_item:'cpfDevedor'}}">{{dict_acordos_pagos|get_item:acordo|get_item:'cpfDevedor'}}</a>
+                        </td>
+
+                        <td style="font-size: 12px;">{{dict_acordos_pagos|get_item:acordo|get_item:'numeroParcela'}}</td>
+
+                        <td style="font-size: 12px;">{{dict_acordos_pagos|get_item:acordo|get_item:'qtdParcelas'}}</td>
+
+                        <td style="font-size: 12px;">R${{dict_acordos_pagos|get_item:acordo|get_item:'valor_pago'}}</td>
+
+                        <td style="font-size: 12px;">{{dict_acordos_pagos|get_item:acordo|get_item:'dataVencimento'|date:"d/m/Y"}}</td>
+
+                        <td style="font-size: 12px;">{{dict_acordos_pagos|get_item:acordo|get_item:'data_pagamento'|date:"d/m/Y"}}</td>
+                        <td style="font-size: 12px;">{{dict_acordos_pagos|get_item:acordo|get_item:'pct_ter'}}</td>
+                        <td style="font-size: 12px;">R${{dict_acordos_pagos|get_item:acordo|get_item:'valor_ter'}}</td>
+
+    
+                        <td style="font-size: 12px;">
+                          <span class="badge bg-soft-success text-success p-2" style="width: 100%;">{{dict_acordos_pagos|get_item:acordo|get_item:'situacaoPagamento'}}</span>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <!-- End Table -->
+              </div>
+              <div class="tab-pane fade" id="nav-two-eg1" role="tabpanel" aria-labelledby="nav-two-eg1-tab">
+                <table class="table">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">ACORDO</th>
+                      <th scope="col">CPF</th>
+                      <th scope="col">Parcela</th>
+                      <th scope="col">Qtd Parcelas</th>
+                      <th scope="col">Valor</th>
+                      <th scope="col">Data Vencimento</th>
+                      <th scope="col">% Comissão</th>
+                      <th scope="col">Valor Comissão</th>
+                      <th scope="col">Situação</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for acordo in dict_pendentes %}
+                      <tr style="font-size: 12px;" role="row" class="even">
+                        <td style="font-size: 12px;">
+                          <a class="badge bg-soft-primary text-primary p-2" href="#">{{dict_pendentes|get_item:acordo|get_item:'idAcordo'}}</a>
+                        </td>
+                        <td style="font-size: 12px;">
+                          <a class="badge bg-soft-primary text-primary p-2" href="#">{{dict_pendentes|get_item:acordo|get_item:'cpfDevedor'}}</a>
+                        </td>
+
+                        <td style="font-size: 12px;">{{dict_pendentes|get_item:acordo|get_item:'numeroParcela'}}</td>
+
+                        <td style="font-size: 12px;">{{dict_pendentes|get_item:acordo|get_item:'qtdParcelas'}}</td>
+                        <td style="font-size: 12px;">R${{dict_pendentes|get_item:acordo|get_item:'valor'}}</td>
+                        <td style="font-size: 12px;">{{dict_pendentes|get_item:acordo|get_item:'dataVencimento'|date:"d/m/Y"}}</td>
+                        <td style="font-size: 12px;">{{dict_pendentes|get_item:acordo|get_item:'pct_ter'}}</td>
+                        <td style="font-size: 12px;">R${{dict_pendentes|get_item:acordo|get_item:'valor_ter'}}</td>
+
+                        
+                        <td style="font-size: 12px;">                        
+                          {%if dict_pendentes|get_item:acordo|get_item:'situacaoParcela' == 'REGULAR' %}
+                              <span class="badge bg-soft-warning text-warning p-2" style="width: 100%;">ABERTO</span>
+                          {% else %}
+                            <span class="badge bg-soft-danger text-danger p-2" style="width: 100%;">{{dict_pendentes|get_item:acordo|get_item:'situacaoParcela'}}</span>
+                          {% endif %}
+                        </td>
+                        <td style="font-size: 12px;">
+                            <a href="https://www.resolvecontas.com.br/api/1.0/boletos/bb/public/{{dict_pendentes|get_item:acordo|get_item:'identificador'}}" target="_blank" class="btn btn-warning btn-sm" style="width:100%;"><i class="bi bi-clipboard-plus-fill"></i> Ver Boleto</a>                            
+                        </td>
+                      </tr>
+                    {% endfor %}
+                    
+                  </tbody>
+                </table>
+              </div>
+              <div class="tab-pane fade" id="nav-three-eg1" role="tabpanel" aria-labelledby="nav-three-eg1-tab">
+                <table class="table">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">ID ACORDO</th>
+                      <th scope="col">PARCEIRO</th>
+                      <th scope="col">CPF</th>
+                      <th scope="col">CONTRATOS CONTEMPLADOS</th>
+                      <th scope="col">VALOR LIMITE</th>
+                      <th scope="col">VALOR ACORDO</th>
+                      <th scope="col">Nº PARCELAS</th>
+                      <th scope="col">DATA CRIAÇÃO</th>
+                      <th scope="col">Situação</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for acordo in acordos_pendentes %}
+                      <tr style="font-size: 12px;" role="row" class="even">
+                        <td style="font-size: 12px;">
+                          <a class="badge bg-soft-primary text-primary p-2" href="#">{{acordo.id}}</a>
+                        </td>
+                        <td style="font-size: 12px;">{{acordo.grupo_owner.title}}</td>
+                        <td style="font-size: 12px;">
+                          <a class="badge bg-soft-primary text-primary p-2" href="#">{{acordo.cpf}}</a>
+                        </td>
+                        <td style="font-size: 12px;">{{acordo.contratos}}</td>
+                        <td style="font-size: 12px;">R${{acordo.maior_desconto_valor}}</td>
+                        <td style="font-size: 12px;">R${{acordo.valor_do_acordo}}</td>
+                        <td style="font-size: 12px;">{{acordo.num_parcelas_acordo}}</td>
+                        <td style="font-size: 12px;">{{acordo.data_criacao|date:"d/m/Y"|default:"-" }}</td>                        
+                        <td style="font-size: 12px;"><span style="width: 100%;" class="badge bg-soft-secondary text-secondary">Em Análise</span></td>
+                        <td style="font-size: 12px;">
+                            <a href="{% url 't_aprovar_acordo' acordo.id %}" class="btn btn-success btn-sm" style="width:50%;"><i class="bi bi-check-all"></i> Aprovar</a>  
+                            <a href="{% url 't_rejeitar_acordo' acordo.id %}" class="btn btn-danger btn-sm" style="width:50%;"><i class="bi bi-check-all"></i> Rejeitar</a>                            
+                        </td>
+                      </tr>
+                    {% endfor %}
+                    
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+
+        <!-- End Col -->
+      </div>
+      <!-- End Row -->
+    </div>
+    <!-- End Content -->
+
+  </main>
+  <!-- ========== END MAIN CONTENT ========== -->
+  
+
+{% endblock %}

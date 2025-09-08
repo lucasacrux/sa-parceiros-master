@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <!-- Required Meta Tags Always Come First -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Title -->
+  <title>SA Parceiros - Home</title>
+	<link rel="canonical" href="rcdatahub" />
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="preview/front-dashboard-v2.1.1/favicon.ico" >
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <!-- CSS Implementing Plugins -->
+  <link rel="stylesheet" href="{% static 'core/css/vendor.min.css' %}" >
+  <!-- CSS Front Template -->
+  <link rel="stylesheet" href="{% static 'core/css/theme.min.css' %}" >
+  <link rel="preload" href="{% static 'core/css/theme.min.css' %}"  data-hs-appearance="default" as="style">
+  <link rel="preload" href="{% static 'core/css/theme-dark.min.css' %}"  data-hs-appearance="dark" as="style">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css" />
+  <style data-hs-appearance-onload-styles>
+    *
+    {
+      transition: unset !important;
+    }
+    body
+    {
+      opacity: 0;
+    }
+  </style>
+  <script>
+    window.hs_config = {"autopath":"@@autopath","deleteLine":"hs-builder:delete","deleteLine:build":"hs-builder:build-delete","deleteLine:dist":"hs-builder:dist-delete","previewMode":false,"startPath":"index_html.html","vars":{"themeFont":"https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap","version":"?v=1.0"},"layoutBuilder":{"extend":{"switcherSupport":true},"header":{"layoutMode":"default","containerMode":"container-fluid"},"sidebarLayout":"default"},"themeAppearance":{"layoutSkin":"default","sidebarSkin":"default","styles":{"colors":{"primary":"#377dff","transparent":"transparent","white":"#fff","dark":"132144","gray":{"100":"#f9fafc","900":"#1e2022"}},"font":"Inter"}},"languageDirection":{"lang":"en"},"skipFilesFromBundle":{"dist":["{% static 'core/js/hs.theme-appearance.js' %}" ,"{% static 'core/js/hs.theme-appearance-charts.js' %}" ,"{% static 'core/js/demo.js' %}" ],"build":["{% static 'core/css/theme.css' %}" ,"{% static 'core/vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside-mini-cache.js' %}" ,"{% static 'core/js/demo.js' %}" ,"{% static 'core/css/theme-dark.css' %}" ,"{% static 'core/css/docs.css' %}" ,"{% static 'core/vendor/icon-set/style.css' %}" ,"{% static 'core/js/hs.theme-appearance.js' %}" ,"{% static 'core/js/hs.theme-appearance-charts.js' %}" ,"node_modules/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js' %}" ,"{% static 'core/js/demo.js' %}" ]},"minifyCSSFiles":["{% static 'core/css/theme.css' %}" ,"{% static 'core/css/theme-dark.css' %}" ],"copyDependencies":{"dist":{"{% static 'core/js/theme-custom.js' %}" :""},"build":{"{% static 'core/js/theme-custom.js' %}" :"","node_modules/bootstrap-icons/font/*fonts/**":"{% static 'core/css"}},"buildFolder":"","replacePathsToCDN":{},"directoryNames":{"src":"./src","dist":"./dist","build":"./build"},"fileNames":{"dist":{"js":"theme.min.js' %}" ,"css":"theme.min.css' %}" },"build":{"css":"theme.min.css' %}" ,"js":"theme.min.js' %}" ,"vendorCSS":"vendor.min.css' %}" ,"vendorJS":"vendor.min.js' %}" }},"fileTypes":"jpg|png|svg|mp4|webm|ogv|json"}
+    window.hs_config.gulpRGBA = (p1) => {
+  const options = p1.split(',')
+  const hex = options[0].toString()
+  const transparent = options[1].toString()
+  var c;
+  if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+  c= hex.substring(1).split('');
+  if(c.length== 3){
+  c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+  }
+  c= '0x'+c.join('');
+  return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+',' + transparent + ')';
+  }
+  throw new Error('Bad Hex');
+  }
+    window.hs_config.gulpDarken = (p1) => {
+  const options = p1.split(',')
+  let col = options[0].toString()
+  let amt = -parseInt(options[1])
+  var usePound = false
+  if (col[0] == "#") {
+  col = col.slice(1)
+  usePound = true
+  }
+  var num = parseInt(col, 16)
+  var r = (num >> 16) + amt
+  if (r > 255) {
+  r = 255
+  } else if (r < 0) {
+  r = 0
+  }
+  var b = ((num >> 8) & 0x00FF) + amt
+  if (b > 255) {
+  b = 255
+  } else if (b < 0) {
+  b = 0
+  }
+  var g = (num & 0x0000FF) + amt
+  if (g > 255) {
+  g = 255
+  } else if (g < 0) {
+  g = 0
+  }
+  return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16)
+  }
+    window.hs_config.gulpLighten = (p1) => {
+const options = p1.split(',')
+let col = options[0].toString()
+let amt = parseInt(options[1])
+var usePound = false
+if (col[0] == "#") {
+col = col.slice(1)
+usePound = true
+}
+var num = parseInt(col, 16)
+var r = (num >> 16) + amt
+if (r > 255) {
+r = 255
+} else if (r < 0) {
+r = 0
+}
+var b = ((num >> 8) & 0x00FF) + amt
+if (b > 255) {
+b = 255
+} else if (b < 0) {
+b = 0
+}
+var g = (num & 0x0000FF) + amt
+if (g > 255) {
+g = 255
+} else if (g < 0) {
+g = 0
+}
+return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16)
+}
+  </script>
+</head>
+<body>
+  <script src="{% static 'core/js/hs.theme-appearance.js' %}" ></script>
+  <!-- ========== HEADER ========== -->
+  <header id="header" class="navbar navbar-expand-lg navbar-bordered bg-white">
+    <div class="container">
+      <nav class="js-mega-menu navbar-nav-wrap">
+        <!-- Logo -->
+        <a class="navbar-brand" href="{% url 't_home' %}" aria-label="Front">
+          <img class="navbar-brand-logo" style="min-width:7rem!important;max-width:9rem!important;margin-right:15px!important;" src="{% static 'core/svg/logos/logo.svg' %}" alt="Logo" data-hs-theme-appearance="default">
+          <img class="navbar-brand-logo" style="min-width:7rem!important;max-width:9rem!important;margin-right:15px!important;" src="{% static 'core/svg/logos-light/logo.svg' %}" alt="Logo" data-hs-theme-appearance="dark">
+        </a>
+        <!-- End Logo -->
+        <!-- Secondary Content -->
+        <div class="navbar-nav-wrap-secondary-content">
+          <!-- Navbar -->
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <!-- Style Switcher -->
+              <div class="dropdown ">
+                <button type="button" class="btn btn-ghost-secondary btn-icon rounded-circle" id="selectThemeDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-dropdown-animation>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end navbar-dropdown-menu navbar-dropdown-menu-borderless" style="z-index: 9999" aria-labelledby="selectThemeDropdown">
+                  <a class="dropdown-item" href="#" data-icon="bi-moon-stars" data-value="auto">
+                    <i class="bi-moon-stars me-2"></i>
+                    <span class="text-truncate" title="Auto (system default)">Auto</span>
+                  </a>
+                  <a class="dropdown-item" href="#" data-icon="bi-brightness-high" data-value="default">
+                    <i class="bi-brightness-high me-2"></i>
+                    <span class="text-truncate" title="Default (light mode)">Light Mode</span>
+                  </a>
+                  <a class="dropdown-item active" href="#" data-icon="bi-moon" data-value="dark">
+                    <i class="bi-moon me-2"></i>
+                    <span class="text-truncate" title="Dark">Dark Mode</span>
+                  </a>
+                </div>
+              </div>
+              <!-- End Style Switcher -->
+            </li>
+            <li class="nav-item">
+              <!-- Account -->
+              <div class="dropdown">
+                <a class="navbar-dropdown-account-wrapper" href="javascript:;" id="accountNavbarDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside" data-bs-dropdown-animation>
+                  <div class="avatar avatar-sm avatar-circle">
+                    <img class="avatar-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"  alt="Image Description">
+                    <span class="avatar-status avatar-sm-status avatar-status-success"></span>
+                  </div>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end navbar-dropdown-menu navbar-dropdown-menu-borderless navbar-dropdown-account" style="z-index: 9999" aria-labelledby="accountNavbarDropdown" style="width: 16rem;">
+                  <div class="dropdown-item-text">
+                    <div class="d-flex align-items-center">
+                      <div class="avatar avatar-sm avatar-circle">
+                        <img class="avatar-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/User-avatar.svg/2048px-User-avatar.svg.png"  alt="Image Description">
+                      </div>
+                      <div class="flex-grow-1 ms-3">
+                        <h5 class="mb-0">{{request.user}}</h5>
+                        <p class="card-text text-body">{{request.user}}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{% url 'logout' %}">Sair</a>
+                </div>
+              </div>
+              <!-- End Account -->
+            </li>
+          </ul>
+          <!-- End Navbar -->
+        </div>
+        <!-- End Secondary Content -->
+        <!-- Toggler -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContainerNavDropdown" aria-controls="navbarContainerNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-default">
+            <i class="bi-list"></i>
+          </span>
+          <span class="navbar-toggler-toggled">
+            <i class="bi-x"></i>
+          </span>
+        </button>
+        <!-- End Toggler -->
+        <!-- Collapse -->
+        <div class="collapse navbar-collapse" id="navbarContainerNavDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+ 
+              <a class="nav-link " href="{% url 't_home' %}"> 
+                Parcelas
+              </a>
+            </li>
+            
+            <li class="hs-has-sub-menu nav-item">
+              <a id="acordosMegaMenu" class="hs-mega-menu-invoker nav-link dropdown-toggle" href="#" role="button">Base de clientes</a>
+              <div class="hs-sub-menu dropdown-menu navbar-dropdown-menu-borderless" aria-labelledby="acordosMegaMenu" style="min-width: 14rem;">
+                  <a class="dropdown-item" href="{% url 't_listar_leads' %}">Listar clientes</a>
+                  <a class="dropdown-item" href="{% url 't_consultar_cpf' %}">Consultar cliente</a>
+              </div>
+            </li>
+
+            <!-- <li class="hs-has-sub-menu nav-item">
+              <a id="serasaPefinMegaMenu" class="hs-mega-menu-invoker nav-link dropdown-toggle" href="#" role="button">Serasa Pefin</a>
+              <div class="hs-sub-menu dropdown-menu navbar-dropdown-menu-borderless" aria-labelledby="acordosMegaMenu" style="min-width: 14rem;">
+                <a class="dropdown-item" href="#">A</a>
+                <a class="dropdown-item" href="#">B</a>
+              </div>
+            </li>
+            
+            <li class="hs-has-sub-menu nav-item">
+              <a id="serasaLnMegaMenu" class="hs-mega-menu-invoker nav-link dropdown-toggle" href="#" role="button">Serasa LN</a>
+              <div class="hs-sub-menu dropdown-menu navbar-dropdown-menu-borderless" aria-labelledby="acordosMegaMenu" style="min-width: 14rem;">
+                <a class="dropdown-item" href="#">A</a>
+                <a class="dropdown-item" href="#">B</a>
+              </div>
+            </li> -->
+ 
+            <li class="nav-item">
+              <a class="nav-link " href="{% url 't_listar_acordos' %}"> 
+                Acordos
+              </a>
+            </li>
+
+            <li class="hs-has-sub-menu nav-item">
+              <a id="acordosMegaMenu" class="hs-mega-menu-invoker nav-link dropdown-toggle" href="#" role="button">Propostas</a>
+              <div class="hs-sub-menu dropdown-menu navbar-dropdown-menu-borderless" aria-labelledby="acordosMegaMenu" style="min-width: 14rem;">
+                  <a class="dropdown-item" href="{% url 't_listar_propostas' %}">Listar Propostas</a>
+                  <a class="dropdown-item" href="{% url 't_criar_acordo' %}">Criar Proposta</a>
+              </div>
+            </li>
+
+            {% if usuario_logado.adm == 1 %}
+              <li class="hs-has-sub-menu nav-item">
+                <a id="acordosMegaMenu" class="hs-mega-menu-invoker nav-link dropdown-toggle" href="#" role="button">Usuários</a>
+                <div class="hs-sub-menu dropdown-menu navbar-dropdown-menu-borderless" aria-labelledby="acordosMegaMenu" style="min-width: 14rem;">
+                    <a class="dropdown-item" href="{% url 'adm_listar_usuarios' %}">Listar Usuários</a>
+                    <a class="dropdown-item" href="{% url 'adm_criar_usuario' %}">Criar Usuário</a>
+                </div>
+              </li>
+            {% endif %}
+
+
+            {% if usuario_logado.gerente == 1 %}
+              <li class="hs-has-sub-menu nav-item">
+                <a id="acordosMegaMenu" class="hs-mega-menu-invoker nav-link dropdown-toggle" href="#" role="button">Grupos</a>
+                <div class="hs-sub-menu dropdown-menu navbar-dropdown-menu-borderless" aria-labelledby="acordosMegaMenu" style="min-width: 14rem;">
+                    <a class="dropdown-item" href="{% url 'adm_listar_grupos' %}">Listar Grupos</a>
+                    <a class="dropdown-item" href="{% url 'adm_criar_grupo' %}">Criar Grupo</a>
+                </div>
+              </li>
+            {% endif %}    
+              
+
+            <!-- {% if usuario_logado.gerente == 1 %}
+              <li class="hs-has-sub-menu nav-item">
+                <a id="acordosMegaMenu" class="hs-mega-menu-invoker nav-link dropdown-toggle" href="#" role="button">Grupos</a>
+                <div class="hs-sub-menu dropdown-menu navbar-dropdown-menu-borderless" aria-labelledby="acordosMegaMenu" style="min-width: 14rem;">
+                    <a class="dropdown-item" href="{% url 'adm_listar_grupos' %}">Listar Grupos</a>
+                    <a class="dropdown-item" href="{% url 'adm_criar_grupo' %}">Criar Grupo</a>
+                </div>
+              </li>
+            {% else %}
+              {% if usuario_logado.adm == 1 %}
+                <li class="nav-item">
+                  <a class="nav-link " href="{% url 'adm_detalhes_grupo' usuario_logado.grupo.id %}"> 
+                    Empresa
+                  </a>
+                </li>
+              {% endif %}
+            {% endif %} -->
+            
+
+          </ul>
+        </div>
+        <!-- End Collapse -->
+      </nav>
+    </div>
+  </header>
+  <!-- ========== END HEADER ========== -->
+
+  {% block content %}
+
+  {% endblock %}
+  
+  <!-- ========== SECONDARY CONTENTS ========== -->
+  <!-- ========== END SECONDARY CONTENTS ========== -->
+  <!-- JS Implementing Plugins -->
+  <script src="{% static 'core/js/vendor.min.js' %}" ></script>
+  <!-- JS Front -->
+  <script src="{% static 'core/js/theme.min.js' %}" ></script>
+  <!-- Código JavaScript para a troca de empresa -->
+<script>
+  document.getElementById("trocarEmpresa").addEventListener("click", function(event) {
+   
+  });
+</script>
+<!-- Fim do Código JavaScript -->
+  <!-- JS Plugins Init. -->
+  <script src="./node_modules/chart.js/dist/Chart.min.js"></script>
+  <script src="./assets/js/hs.chartjs.js"></script>
+  <script src="../node_modules/appear/dist/appear.min.js"></script>
+  <script src="../assets/vendor/hs-counter/dist/hs-counter.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="./node_modules/imask/dist/imask.min.js"></script>
+  <script src="./assets/js/hs.imask.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.full.min.js"></script>
+  <script src="./assets/js/hs.dropzone.js"></script>
+  <script src="./node_modules/dropzone/dist/min/dropzone.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput.min.js"></script>
+
+
+  <script>
+    (function() {
+      // INITIALIZATION OF DROPZONE
+      // =======================================================
+      HSCore.components.HSDropzone.init('.js-dropzone')
+    })();
+  </script>
+
+  <script>
+    (function() {
+      HSCore.components.HSMask.init('.js-input-mask')
+    })();
+  </script>
+
+  <script>
+    (function() {
+      // INITIALIZATION OF INPUT MASK
+      // =======================================================
+      HSCore.components.HSMask.init('.js-input-mask')
+    })();
+  </script>
+
+  <script>
+    (function() {
+      // INITIALIZATION OF SELECT
+      // =======================================================
+      HSCore.components.HSTomSelect.init('.js-select')
+    })();
+  </script>
+
+  <script>
+    (function() {
+      // INITIALIZATION OF CHARTJS
+      // =======================================================
+      document.querySelectorAll('.js-chart').forEach(item => {
+        HSCore.components.HSChartJS.init(item)
+      })
+    })();
+  </script>
+
+  <script>
+    (function() {
+      // INITIALIZATION OF COUNTER
+      // =======================================================
+      new HSCounter('.js-counter')
+    })();
+  </script>
+
+  <script>
+    (function () {
+      // INITIALIZATION OF UPDATING CHARTJS
+      // =======================================================
+      const updatingChartDatasets = [
+        [
+          [18,51,60,38,88,50,40,52,88,80,60,70],
+          [27,38,60,77,40,50,49,29,42,27,42,50]
+        ],
+        [
+          [77,40,50,49,27,38,60,42,50,29,42,27],
+          [60,38,18,51,88,50,40,52,60,70,88,80]
+        ]
+      ]
+  
+      HSCore.components.HSChartJS.init(document.querySelector('#updatingLineChart'), {
+        data: {
+          datasets: [
+            {
+              data: updatingChartDatasets[0][0]
+            },
+            {
+              data: updatingChartDatasets[0][1]
+            }
+          ]
+        }
+      });
+  
+      const updatingLineChart = HSCore.components.HSChartJS.getItem('updatingLineChart')
+  
+      // Call when tab is clicked
+      document.querySelectorAll('[data-toggle="chart"]').forEach(item => {
+        item.addEventListener('click', e => {
+          let keyDataset = e.currentTarget.getAttribute('data-datasets')
+  
+          // Update datasets for chart
+          updatingLineChart.data.datasets.forEach(function(dataset, key) {
+            dataset.data = updatingChartDatasets[keyDataset][key];
+          })
+          updatingLineChart.update()
+        })
+      })
+    })()
+  </script>
+
+  <script>
+    (function() {
+      // INITIALIZATION OF BOOTSTRAP DROPDOWN
+      // =======================================================
+      HSBsDropdown.init()
+      // INITIALIZATION OF MEGA MENU
+      // =======================================================
+      new HSMegaMenu('.js-mega-menu', {
+        desktop: {
+          position: 'left'
+        }
+      })
+    })()
+  </script>
+
+  <script>
+    (function() {
+      window.onload = function () {
+        
+
+        // INITIALIZATION OF NAVBAR VERTICAL ASIDE
+        // =======================================================
+        new HSSideNav('.js-navbar-vertical-aside').init()
+
+
+        // INITIALIZATION OF FORM SEARCH
+        // =======================================================
+        new HSFormSearch('.js-form-search')
+
+
+        // INITIALIZATION OF BOOTSTRAP DROPDOWN
+        // =======================================================
+        HSBsDropdown.init()
+
+
+        // INITIALIZATION OF FILE ATTACH
+        // =======================================================
+        new HSFileAttach('.js-file-attach')
+
+          // INITIALIZATION OF CIRCLES
+      // =======================================================
+      const colors = () => {
+        return [HSThemeAppearance.getAppearance() === 'dark' ? '#34383b' : '#e7eaf3', '#377dff']
+      }
+
+      setTimeout(() => {
+        document.querySelectorAll('.js-circle').forEach(item => {
+          HSCore.components.HSCircles.init(item, {
+            colors: colors()
+          })
+        })
+
+        window.addEventListener('on-hs-appearance-change', () => {
+          HSCore.components.HSCircles.getItems().forEach(circle => {
+            circle.updateColors(colors())
+          })
+        })
+      })
+
+
+        // INITIALIZATION OF STEP FORM
+        // =======================================================
+        new HSStepForm('.js-step-form', {
+          finish: () => {
+            document.getElementById("addUserStepFormProgress").style.display = 'none'
+            document.getElementById("addUserStepProfile").style.display = 'none'
+            document.getElementById("addUserStepBillingAddress").style.display = 'none'
+            document.getElementById("addUserStepConfirmation").style.display = 'none'
+            document.getElementById("successMessageContent").style.display = 'block'
+            scrollToTop('#header');
+            const formContainer = document.getElementById('formContainer')
+          },
+          onNextStep: function () {
+            scrollToTop()
+          },
+          onPrevStep: function () {
+            scrollToTop()
+          }
+        })
+
+        function scrollToTop(el = '.js-step-form') {
+          el = document.querySelector(el)
+          window.scrollTo({
+            top: (el.getBoundingClientRect().top + window.scrollY) - 30,
+            left: 0,
+            behavior: 'smooth'
+          })
+        }
+
+
+        // INITIALIZATION OF ADD FIELD
+        // =======================================================
+        new HSAddField('.js-add-field', {
+          addedField: field => {
+            HSCore.components.HSTomSelect.init(field.querySelector('.js-select-dynamic'))
+            HSCore.components.HSMask.init(field.querySelector('.js-input-mask'))
+          }
+        })
+
+
+        // INITIALIZATION OF SELECT
+        // =======================================================
+        HSCore.components.HSTomSelect.init('.js-select', {
+          render: {
+            'option': function (data, escape) {
+              return data.optionTemplate || `<div>${data.text}</div>>`
+            },
+            'item': function (data, escape) {
+              return data.optionTemplate || `<div>${data.text}</div>>`
+            }
+          }
+        })
+
+
+        // INITIALIZATION OF INPUT MASK
+        // =======================================================
+        HSCore.components.HSMask.init('.js-input-mask')
+      }
+    })()
+  </script>
+
+  <script>
+    (function() {
+      // INITIALIZATION OF FLATPICKR
+      // =======================================================
+      HSCore.components.HSFlatpickr.init('.js-flatpickr')
+    })();
+  </script>
+
+  <script>
+    (function () {
+      // STYLE SWITCHER
+      // =======================================================
+      const $dropdownBtn = document.getElementById('selectThemeDropdown') // Dropdowon trigger
+      const $variants = document.querySelectorAll(`[aria-labelledby="selectThemeDropdown"] [data-icon]`) // All items of the dropdown
+      // Function to set active style in the dorpdown menu and set icon for dropdown trigger
+      const setActiveStyle = function () {
+        $variants.forEach($item => {
+          if ($item.getAttribute('data-value') === HSThemeAppearance.getOriginalAppearance()) {
+            $dropdownBtn.innerHTML = `<i class="${$item.getAttribute('data-icon')}" />`
+            return $item.classList.add('active')
+          }
+          $item.classList.remove('active')
+        })
+      }
+      // Add a click event to all items of the dropdown to set the style
+      $variants.forEach(function ($item) {
+        $item.addEventListener('click', function () {
+          HSThemeAppearance.setAppearance($item.getAttribute('data-value'))
+        })
+      })
+      // Call the setActiveStyle on load page
+      setActiveStyle()
+      // Add event listener on change style to call the setActiveStyle function
+      window.addEventListener('on-hs-appearance-change', function () {
+        setActiveStyle()
+      })
+    })()
+  </script>
+  <!-- End Style Switcher JS -->
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const emailInput = document.getElementById('email');
+      const suggestionsBox = document.createElement('div');
+      suggestionsBox.className = 'autocomplete-suggestions';
+      emailInput.parentNode.appendChild(suggestionsBox);
+
+      const domains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com', 'icloud.com'];
+
+      emailInput.addEventListener('input', function () {
+        const value = this.value;
+        suggestionsBox.innerHTML = '';
+
+        if (value === '' || value.includes('@')) {
+          suggestionsBox.style.display = 'none';
+          return;
+        }
+
+        const suggestions = domains.map(domain => `${value}@${domain}`);
+
+        suggestions.forEach(suggestion => {
+          const suggestionDiv = document.createElement('div');
+          suggestionDiv.className = 'autocomplete-suggestion';
+          suggestionDiv.textContent = suggestion;
+          suggestionDiv.addEventListener('click', function () {
+            emailInput.value = suggestion;
+            suggestionsBox.innerHTML = '';
+            suggestionsBox.style.display = 'none';
+          });
+          suggestionsBox.appendChild(suggestionDiv);
+        });
+
+        suggestionsBox.style.display = 'block';
+        suggestionsBox.style.width = emailInput.offsetWidth + 'px';
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const input = document.querySelector("#telefone");
+
+      const iti = window.intlTelInput(input, {
+        initialCountry: "br",
+        separateDialCode: true,
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/utils.js"
+      });
+
+      function applyPhoneMask(value) {
+        value = value.replace(/\D/g, '');
+        value = value.replace(/^(\d{2})(\d)/g, '($1) $2');
+        value = value.replace(/(\d)(\d{4})$/, '$1-$2');
+        return value;
+      }
+
+      input.addEventListener('input', function () {
+        let currentValue = input.value;
+        input.value = applyPhoneMask(currentValue);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+{% extends "business_base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h4>Lista de Fluxos</h4>
+        <a href="{% url 'business_fluxos' %}" class="btn btn-primary">Criar Novo Fluxo</a>
+    </div>
+
+    <!-- Alerta Bootstrap oculto -->
+    <div id="alertaSucesso" class="alert alert-success d-flex align-items-center d-none mt-3" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <div>Fluxo deletado com sucesso!</div>
+    </div>
+    
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <div class="card mt-3">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Grupos</th>
+                        <th>Ação</th>
+                        <th>Periodicidade</th>
+                        <th>Início</th>
+                        <th>Termino</th>
+                        <th>Última Ação</th>
+                        <th>Ações</th>
+                    </tr> 
+                </thead>
+                <tbody>
+                    {% for fluxo in fluxos %}
+                    <tr id="fluxo-{{ fluxo.id }}">
+                        <td>{{ fluxo.id }}</td>
+                        <td>{{ fluxo.grupos }}</td>
+                        <td>{{ fluxo.acao.action_type }}: {{ fluxo.acao.name }}</td>
+                        <td>Cada {{ fluxo.periodicidade }} {{ fluxo.unidade_tempo }}</td>
+                        <td>{{ fluxo.data_inicio|date:"d/m/Y H:i:s"|default:"-" }}</td>
+                        <td>
+                            {% if fluxo.termino == "ocorrencias" %}
+                                Após {{ fluxo.qtd_ocorrencias }} ocorrências
+                            {% else %}
+                                {{ fluxo.data_termino|date:"d/m/Y H:i:s"|default:"-" }}
+                            {% endif %}
+                        </td>
+                        <td>{{ fluxo.ultima_acao|date:"d/m/Y H:i:s"|default:"Nunca executada" }}</td>
+                        <td>
+                            <a href="{% url 'business_executar_fluxo' fluxo.id %}" class="btn btn-success btn-sm">
+                                <i class="bi bi-play-fill"></i> Executar
+                            </a>
+                            <a href="{% url 'business_editar_fluxo' fluxo.id %}" class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a onclick="deleteCampo('{{ fluxo.id }}')" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash-fill"></i> Excluir
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">Nenhum fluxo cadastrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>                
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Você tem certeza que deseja excluir? Esse fluxo pode estar em funcionamento. <br><br>
+                    Caso você tenha certeza disso, digite abaixo "DELETAR":</p>
+                <input type="text" id="confirmationInput" class="form-control" placeholder="Digite 'DELETAR' para confirmar">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton" onclick="confirmDelete()">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function deleteCampo(id) {
+        // Armazena o ID no modal
+        document.getElementById('deleteModal').dataset.fluxoId = id;
+
+        // Abrir modal
+        var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        modal.show();
+    }
+
+    // Habilita o botão de confirmação se o texto "DELETAR" for digitado corretamente
+    document.getElementById('confirmationInput').addEventListener('input', function() {
+        const confirmButton = document.getElementById('confirmDeleteButton');
+        confirmButton.disabled = this.value !== 'DELETAR';
+    });
+
+    // Função para excluir o fluxo
+    function confirmDelete() {
+        const fluxoId = document.getElementById('deleteModal').dataset.fluxoId; // Recuperar ID do fluxo
+        console.log(fluxoId)
+        fetch(`excluir/${fluxoId}/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Falha ao excluir');
+            }
+            return response.json();
+        }).then(data => {
+            // Fechar modal
+            var modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+            modal.hide();
+
+            // Exibir alerta de sucesso
+            const alerta = document.getElementById("alertaSucesso");
+            alerta.classList.remove("d-none");
+            // Esconder alerta após 3 segundos
+            setTimeout(() => {
+                alerta.classList.add("d-none");
+            }, 3000);
+            location.reload();
+        }).catch(error => {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao tentar excluir o fluxo.');
+        });
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% block content %}
+
+<div class="content container-fluid mt-5">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-lg-6 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Editar Carteira: {{ carteira.nome }}</h4>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Nome -->
+                        <div class="row mb-4">
+                            <label for="nome" class="col-sm-3 col-form-label form-label">Nome</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" name="nome" id="nome" value="{{ carteira.nome }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Descrição do Produto -->
+                        <div class="row mb-4">
+                            <label for="descricao_produto" class="col-sm-3 col-form-label form-label">Descrição do Produto</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" name="descricao_produto" id="descricao_produto" rows="3">{{ carteira.descricao_produto }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Características Principais -->
+                        <div class="row mb-4">
+                            <label for="caracteristicas" class="col-sm-3 col-form-label form-label">Características Principais</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" name="caracteristicas" id="caracteristicas" rows="3">{{ carteira.caracteristicas }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Descrição da Cessão -->
+                        <div class="row mb-4">
+                            <label for="descricao_cessao" class="col-sm-3 col-form-label form-label">Descrição da Cessão</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" name="descricao_cessao" id="descricao_cessao" rows="3">{{ carteira.descricao_cessao }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Descrição da Dívida -->
+                        <div class="row mb-4">
+                            <label for="descricao_divida" class="col-sm-3 col-form-label form-label">Descrição da Dívida</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" name="descricao_divida" id="descricao_divida" rows="3">{{ carteira.descricao_divida }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Fontes de Dados -->
+                        <div class="row mb-4">
+                            <label for="fontes" class="col-sm-3 col-form-label form-label">Fontes de Dados (URLs)</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" name="fontes" id="fontes" rows="3">{{ carteira.fontes }}</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Upload de Arquivos -->
+                        <div class="row mb-4">
+                            <label for="arquivos" class="col-sm-3 col-form-label form-label">Importar Arquivos</label>
+                            <div class="col-sm-9">
+                                <input type="file" class="form-control" name="arquivos" id="arquivos" multiple>
+                                <small class="text-muted">Os arquivos enviados não serão salvos neste momento.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer text-end">
+                        <a href="{% url 'business_listar_carteiras' %}" class="btn btn-secondary me-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Atualizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% load static %}
+{% block content %}
+<style>
+.card-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1280px) {
+    .card-wrapper {
+        max-width: 1024px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .card-wrapper {
+        max-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-wrapper {
+        max-width: 700px;
+    }
+}
+</style>
+
+<main id="content" role="main" class="main">
+<!-- Content -->
+<div class="content container-fluid">
+    <div class="card-wrapper">
+    <!-- Card -->
+    <div class="card card-lg" style="margin-bottom: 15px;">
+        <div class="card-body">
+            <!-- Tabs de Seleção -->
+            <ul class="nav nav-tabs mb-4" id="importTabs" style="display: flex;align-items: center;justify-content: center;">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#tabPessoas">Importação de Pessoas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#tabContratos">Importação de Contratos</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- Card -->
+    <card class="card card-lg card-message-container pt-4 pb-4" style="margin-bottom: 15px; display: none;">
+        <!-- Mensagem de Sucesso -->
+        <div id="importSuccessMessage" class="js-success-message" style="display:none;">
+            <!-- Livre para o retorno do backend -->
+        </div>
+        <div id="importErrorMessage" class="js-error-message" style="display:block;">
+            <!-- Livre para o retorno do backend -->
+        </div>
+    </card>
+    <!-- Card -->
+    <div class="card card-lg">
+        <div class="card-body">
+            <div class="tab-content">
+                <!-- Importação de Pessoas -->
+                <div id="tabPessoas" class="tab-pane fade show active">
+                    {% include "partials/business_importar_form.html" with import_type="pessoas" import_url="business_importar_dados_pessoas" required_fields=pessoas_required %}
+                </div>
+                <!-- Importação de Contratos -->
+                <div id="tabContratos" class="tab-pane fade">
+                    {% include "partials/business_importar_form.html" with import_type="contratos" import_url="business_importar_dados_contratos" required_fields=contratos_required %}
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="importNameModal" tabindex="-1" aria-labelledby="importNameModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importNameModalLabel">Iniciar Importação</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="importName" class="form-label">Nome da Importação</label>
+                        <input type="text" id="importName" class="form-control" placeholder="Digite o nome da importação">
+                        <small class="text-muted">Este nome vai identificar a importação, o evento de conversão e a segmentação.</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="continueImport">Continuar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="newFieldModal" tabindex="-1" aria-labelledby="newFieldModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newFieldModalLabel">Novo Campo Personalizado</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="newFieldName" class="form-label">Nome do Campo</label>
+                        <input type="text" id="newFieldName" class="form-control" placeholder="Digite o nome do campo">
+        
+                        <label for="newFieldType" class="form-label mt-3">Tipo do Campo</label>
+                        <select id="newFieldType" class="form-select">
+                            <option value="text">Texto</option>
+                            <option value="textarea">Texto Longo</option>
+                            <option value="url">URL</option>
+                            <option value="number">Número</option>
+                            <option value="date">Data</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="saveNewField">Adicionar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Card -->
+    </div>
+</div>
+<!-- End Content -->
+</main>
+<!-- ========== END MAIN CONTENT ========== -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const contratosTab = document.querySelector("a[href='#tabContratos']");
+    contratosTab.classList.add("disabled");
+    contratosTab.style.pointerEvents = "none";
+    contratosTab.style.opacity = "0.5";
+
+    document.querySelectorAll(".btn-importar").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const importType = this.getAttribute("data-import-type");
+
+            if (importType === "pessoas") {
+                sendImportData(importType, this, enableContractsTab);
+            } else {
+                sendImportData(importType, this);
+            }
+        });
+    });
+
+    function enableContractsTab() {
+        contratosTab.classList.remove("disabled");
+        contratosTab.style.pointerEvents = "auto";
+        contratosTab.style.opacity = "1";
+    }
+
+    document.querySelectorAll(".nav-link").forEach(tab => {
+        tab.addEventListener("click", function () {
+            document.querySelectorAll(".tab-pane").forEach(pane => {
+                pane.querySelector("form").reset();
+                pane.querySelector(".step-item.active").classList.remove("active");
+                pane.querySelector(".step-item:first-child").classList.add("active");
+                pane.querySelector(".text-muted").innerText = "";
+                pane.querySelector("#mappingTable").innerHTML = "";
+            });
+        });
+    });
+
+    document.querySelectorAll("input[type='file']").forEach(fileInput => {
+        fileInput.addEventListener("click", function (event) {
+            event.stopPropagation();
+        });
+
+        fileInput.addEventListener("change", function () {
+            const importType = this.id.replace("fileInput_", "");
+            const fileNameDisplay = document.getElementById(`selectedFile_${importType}`);
+            const dropzone = document.getElementById(`dropzone_${importType}`);
+
+            if (this.files.length > 0) {
+                const file = this.files[0];
+
+                console.log(`Arquivo detectado (${importType}): ${file.name}`);
+
+                fileNameDisplay.innerText = `Arquivo selecionado: ${file.name}`;
+                
+                updateDropzonePreview(importType, file);
+            } else {
+                console.log(`Nenhum arquivo detectado (${importType})`);
+                fileNameDisplay.innerText = "";
+            }
+        });
+    });
+
+    document.querySelectorAll(".dz-message").forEach(dropzone => {
+        dropzone.addEventListener("click", function (event) {
+            event.stopPropagation();
+            const importType = this.closest(".js-dropzone").id.replace("dropzone_", "");
+            const fileInput = document.getElementById(`fileInput_${importType}`);
+
+            if (fileInput) {
+                fileInput.click();
+            }
+        });
+    });
+
+    document.querySelectorAll(".js-dropzone").forEach(dropzone => {
+        dropzone.addEventListener("dragover", function (event) {
+            event.preventDefault();
+        });
+
+        dropzone.addEventListener("drop", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const importType = this.id.replace("dropzone_", "");
+            const fileInput = document.getElementById(`fileInput_${importType}`);
+
+            if (event.dataTransfer.files.length > 0) {
+                const file = event.dataTransfer.files[0];
+
+                fileInput.files = event.dataTransfer.files;
+                console.log(`Arquivo solto no Dropzone (${importType}): ${file.name}`);
+                
+                fileInput.dispatchEvent(new Event("change"));
+            }
+        });
+    });
+
+    function updateDropzonePreview(importType, file) {
+        const dropzone = document.getElementById(`dropzone_${importType}`);
+
+        dropzone.querySelectorAll(".dz-preview").forEach(preview => preview.remove());
+
+        const previewElement = document.createElement("div");
+        previewElement.classList.add("dz-preview", "dz-file-preview");
+        previewElement.style.position = "relative";
+        previewElement.style.padding = "15px";
+        previewElement.style.borderRadius = "8px";
+        previewElement.style.marginTop = "10px";
+        previewElement.style.backgroundColor = "#fff";
+
+        previewElement.innerHTML = `
+            <div class="dz-remove" style="position: absolute; top: 5px; right: 5px;">
+                <button type="button" class="btn btn-sm btn-danger">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            <div class="dz-details">
+                <div class="dz-filename"><span>${file.name}</span></div>
+                <div class="dz-size">${(file.size / 1024).toFixed(2)} KB</div>
+            </div>
+            <div class="dz-progress" style="width: 100%; height: 5px; background-color: #ddd; border-radius: 3px; overflow: hidden; margin-top: 5px;">
+                <div class="dz-upload progress-bar" style="width: 0%; height: 100%; background-color: #00C9A7; transition: width 1s;"></div>
+            </div>
+            <div class="dz-success-mark" style="display: none; font-size: color: #00C9A7; 20px; text-align: center; margin-top: 5px;">
+                <i class="bi bi-check"></i>
+            </div>
+        `;
+
+        dropzone.appendChild(previewElement);
+
+        const progressBar = previewElement.querySelector(".dz-upload");
+        setTimeout(() => {
+            progressBar.style.width = "100%";
+            setTimeout(() => {
+                previewElement.querySelector(".dz-success-mark").style.display = "flex";
+            }, 500);
+        }, 1000);
+
+        previewElement.querySelector(".dz-remove button").addEventListener("click", function () {
+            dropzone.querySelectorAll(".dz-preview").forEach(preview => preview.remove());
+            document.getElementById(`fileInput_${importType}`).value = "";
+            document.getElementById(`selectedFile_${importType}`).innerText = "";
+        });
+    }
+});
+
+let ignoredFields = new Set();
+let customFields = new Set();
+let lastSelectedSelect = null;
+let importName = "";
+
+document.getElementById("continueImport").addEventListener("click", function () {
+    importName = document.getElementById("importName").value.trim();
+    const importType = this.getAttribute("data-import-type");
+    if (!importName) {
+        alert("Por favor, insira um nome para a importação.");
+        return;
+    }
+    document.activeElement.blur();
+    validateFile(importType);
+    bootstrap.Modal.getInstance(document.getElementById('importNameModal')).hide();
+});
+
+
+function refreshRowStatus(row) {
+    let columnName = row.dataset.column;
+    let selectField = row.querySelector("select").value;
+    let icon = row.querySelector(".status-icon");
+
+    if (ignoredFields.has(columnName) || selectField) {
+        icon.className = "bi bi-check-circle text-success status-icon";
+    } else {
+        icon.className = "bi bi-x-circle text-danger status-icon";
+    }
+
+    updateNextButtonState();
+}
+
+function updateNextButtonState() {
+    let checkCircleCount = document.querySelectorAll(".bi-check-circle").length;
+    let xCircleCount = document.querySelectorAll(".bi-x-circle").length;
+    let totalRows = document.querySelectorAll("#mappingTable_pessoas tr, #mappingTable_contratos tr").length;
+
+    const nextButton = document.querySelector(`.btn-proximo[data-from-step="step2"][data-to-step="step3"]`);
+
+    if (checkCircleCount === totalRows) {
+        nextButton.disabled = false;
+    } else {
+        nextButton.disabled = true;
+    }
+
+    console.log(`Total de linhas: ${totalRows}`);
+    console.log(`Linhas com ícone bi-check-circle: ${checkCircleCount}`);
+    console.log(`Linhas com ícone bi-x-circle: ${xCircleCount}`);
+}
+
+
+function toggleIgnore(button, columnName, event) {
+    event.preventDefault();
+
+    if (ignoredFields.has(columnName)) {
+        ignoredFields.delete(columnName);
+        button.classList.remove("btn-danger");
+        button.classList.add("btn-light");
+        button.innerText = "Ignorar";
+    } else {
+        ignoredFields.add(columnName);
+        button.classList.remove("btn-light");
+        button.classList.add("btn-danger");
+        button.innerText = "Ignorado";
+    }
+
+    refreshRowStatus(button.closest("tr"));
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    $(document).on('select2:open', function(e) {
+        lastSelectedSelect = $(e.target);
+    });
+
+    $('#saveNewField').on('click', function() {
+        const newFieldName = $('#newFieldName').val().trim();
+        const newFieldType = $('#newFieldType').val();
+
+        if (newFieldName && !customFields.has(newFieldName)) {
+            customFields.add(newFieldName);
+
+            $('.select-lead-type').each(function() {
+                if ($(this).find(`option[value="${newFieldName}"]`).length === 0) {
+                    let newOption = new Option(newFieldName, newFieldName, false, false);
+                    $(this).append(newOption);
+                }
+            });
+
+            if (lastSelectedSelect) {
+                if (lastSelectedSelect.find(`option[value="${newFieldName}"]`).length === 0) {
+                    let newOption = new Option(newFieldName, newFieldName, true, true);
+                    lastSelectedSelect.append(newOption).trigger('change'); 
+                } else {
+                    lastSelectedSelect.val(newFieldName).trigger('change');
+                }
+            }
+
+            customFields[newFieldName] = newFieldType;
+
+            $('#newFieldModal').modal('hide');
+            $('#newFieldName').val('');
+            $('#newFieldType').val('');
+        }
+    });
+});
+
+let serverResponseData = {};
+
+function validateFile(importType) {
+    const fileInput = document.getElementById(`fileInput_${importType}`);
+    const file = fileInput.files.length > 0 ? fileInput.files[0] : null;
+    const errorDiv = document.getElementById(`errorMessages_${importType}`);
+    const errorList = document.getElementById(`errorList_${importType}`);
+    const nextButton = document.querySelector(`.btn-proximo[data-import-type="${importType}"]`);
+    const spinner = document.createElement("span");
+
+    console.log(importName);
+
+    console.log(`Validando arquivo para ${importType}:`, file ? file.name : "Nenhum arquivo selecionado");
+
+    if (!file) {
+        alert("Por favor, selecione um arquivo antes de prosseguir.");
+        return;
+    }
+
+    nextButton.disabled = true;
+    nextButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Validando...`;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("import_type", importType);
+
+    let importUrl = `/business/importar/novo/`;
+
+    fetch(importUrl, {
+        method: "POST",
+        body: formData,
+        headers: { "X-CSRFToken": "{{ csrf_token }}" },
+    })
+    .then(response => {
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            console.error("Resposta não está no formato JSON!");
+            return response.text().then(text => { throw new Error(text); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Resposta do servidor:", data);
+        const errorDiv = document.getElementById(`errorMessages_${importType}`);
+        const errorList = document.getElementById(`errorList_${importType}`);
+        errorDiv.style.display = "none";
+        errorList.innerHTML = "";
+        nextButton.disabled = false;
+
+        if (data.error) {
+            errorDiv.style.display = "block";
+            errorList.innerHTML = `<li>${data.error}</li>`;
+            nextButton.disabled = true;
+
+            setTimeout(() => {
+                    nextButton.disabled = false;
+                    nextButton.innerHTML = `Próximo <i class="bi-chevron-right small"></i>`;
+                }, 2000);
+
+            return;
+        }
+
+        serverResponseData[importType] = data;
+        navigateStep(importType, "step1", "step2");
+        renderTable(importType, data);
+    })
+    .catch(err => console.error("Erro na requisição:", err));
+    nextButton.disabled = true;
+
+    setTimeout(() => {
+        nextButton.disabled = false;
+        nextButton.innerHTML = `Próximo <i class="bi-chevron-right small"></i>`;
+    }, 2000);
+}
+
+function renderTable(importType, data) {
+    const tableBody = document.getElementById(`mappingTable_${importType}`);
+    tableBody.innerHTML = "";
+    ignoredFields.clear();
+
+    if (!data || !data.columns || !Array.isArray(data.columns)) {
+        console.error("Erro: Dados inválidos recebidos da API", data);
+        return;
+    }
+
+    if (!data.fields || !Array.isArray(data.fields)) {
+        console.warn("Aviso: 'fields' não foi encontrado ou não é um array. Criando um array vazio.");
+        data.fields = [];
+    }
+
+    const defaultFields = {
+        "pessoas": {{pessoas_default|safe}},
+        "contratos": {{contratos_default|safe}}
+    };
+
+    data.columns.forEach((col) => {
+        let mapped_value = data.mapped_fields && data.mapped_fields[col] ? data.mapped_fields[col] : "";
+        let defaultMappedValue = defaultFields[importType]?.find(field => field.value === col)?.value || "";
+        let selectedValue = mapped_value || defaultMappedValue;
+        let col_mapped = !!selectedValue || ignoredFields.has(col);
+
+        let options = `
+            <option value="">Combine ou crie campos</option>
+            ${defaultFields[importType]?.map(field => `
+                <option value="${field.value}" ${selectedValue === field.value ? "selected" : ""}>${field.label}</option>
+            `).join('')}
+            ${data.fields.map(field => `
+                <option value="${field}" ${selectedValue === field ? "selected" : ""}>${field}</option>
+            `).join('')}
+        `;
+
+        const row = document.createElement("tr");
+        row.dataset.column = col;
+
+        row.innerHTML = `
+            <td><i class="bi ${col_mapped ? 'bi-check-circle text-success' : 'bi-x-circle text-danger'} status-icon"></i></td>
+            <td>${col}</td>
+            <td>${data.preview[0][col] || ""}</td>
+            <td>
+                <select class="form-select select2 select-lead-type" style="width: 100%;">
+                    ${options}
+                </select>
+            </td>
+            <td><button class="btn btn-light btn-sm" onclick="toggleIgnore(this, '${col}', event)">Ignorar</button></td>
+        `;
+
+        tableBody.appendChild(row);
+
+        refreshRowStatus(row);
+    });
+
+    $('.select2').select2({
+        width: '100%',
+        placeholder: "Pesquise ou selecione um campo",
+        allowClear: true,
+        dropdownCssClass: "custom-select-dropdown"
+    }).on('select2:open', function() {
+        let dropdown = $('.select2-dropdown');
+        if (dropdown.find('.select2-add-field').length === 0) {
+            dropdown.append('<div class="select2-add-field p-2 text-center"><button class="btn btn-link select2-close" data-bs-toggle="modal" data-bs-target="#newFieldModal"><i class="bi bi-plus-circle"></i> Adicionar novo campo</button></div>');
+        }
+    }).on('change', function() {
+        refreshRowStatus($(this).closest("tr")[0]);
+    });
+
+    updateNextButtonState();
+}
+
+function navigateStep(importType, fromStep, toStep) {
+    let currentStep = document.getElementById(`${fromStep}_${importType}`);
+    let nextStep = document.getElementById(`${toStep}_${importType}`);
+    if (!currentStep || !nextStep) {
+        console.error("Passo não encontrado:", { fromStep, toStep });
+        return;
+    }
+    currentStep.style.display = "none";
+    nextStep.style.display = "block";
+    updateProgressIndicator(importType, toStep);
+}
+
+function updateProgressIndicator(importType, activeStep) {
+    const progressSteps = document.querySelectorAll(`#progress_${importType} .step-item`);
+    const stepNumber = parseInt(activeStep.replace("step", ""));
+
+    progressSteps.forEach((step, index) => {
+        step.classList.remove("active", "focus");
+
+        if (activeStep === "finalizado") {
+            step.classList.add("active", "focus");
+        } else if (index === stepNumber) {
+            step.classList.add("active");
+        } else if (index < stepNumber) {
+            step.classList.add("active", "focus");
+        }
+    });
+}
+
+function generateFinalStep(importType) {
+    const tableBody = document.getElementById(`finalTable_${importType}`);
+    tableBody.innerHTML = "";
+
+    if (!serverResponseData[importType]) {
+        console.error("Nenhum dado encontrado para este tipo de importação.");
+        return;
+    }
+
+    const { columns, preview, filename } = serverResponseData[importType];
+    let finalColumns = [];
+    let finalPreview = [];
+
+
+    console.log("aqui");
+    console.log(serverResponseData[importType]);
+    console.log(columns);
+    console.log(preview);
+    console.log(filename);
+    document.querySelectorAll(`#mappingTable_${importType} tr`).forEach(row => {
+        const colName = row.cells[1].innerText;
+        const selectField = row.cells[3].querySelector("select");
+
+        if (selectField && selectField.value) {
+            let fieldType = "text";
+
+            if (customFields.has(selectField.value)) {
+                fieldType = customFields[selectField.value];
+            }
+
+            finalColumns.push({ 
+                name: selectField.value,
+                coluna: colName,
+                type: fieldType
+            });
+        }
+    });
+
+    const firstLead = preview[0] || {};
+
+    finalColumns.forEach(({ name, coluna, type }) => {
+        const row = document.createElement("tr");
+
+        const colNameCell = document.createElement("td");
+        colNameCell.innerText = name;
+        row.appendChild(colNameCell);
+
+        const colOriginalCell = document.createElement("td");
+        colOriginalCell.innerText = coluna;
+        row.appendChild(colOriginalCell);
+
+        const previewCell = document.createElement("td");
+        previewCell.innerText = firstLead[coluna] || "";
+        row.appendChild(previewCell);
+
+        const leadFieldCell = document.createElement("td");
+        leadFieldCell.innerText = type;
+        row.appendChild(leadFieldCell);
+
+        tableBody.appendChild(row);
+    });
+
+    const finalJson = {
+        columns: finalColumns,
+        preview: preview.map(row => {
+            let filteredRow = {};
+            finalColumns.forEach(({ name }) => {
+                filteredRow[name] = row[name] || "";
+            });
+            return filteredRow;
+        })
+    };
+
+    console.log("JSON final após remoção de colunas ignoradas:", JSON.stringify(finalJson, null, 2));
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".btn-proximo").forEach(button => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const importType = this.getAttribute("data-import-type");
+            const fromStep = this.getAttribute("data-from-step");
+            const toStep = this.getAttribute("data-to-step");
+
+            console.log(`Botão "Próximo" clicado: ${fromStep} -> ${toStep}`);
+
+            if (fromStep === "step1" && toStep === "step2") {
+                console.log("Indo do passo 1 para o passo 2 - limpando mensagens de sucesso");
+
+                const successMessageDiv = document.getElementById("importSuccessMessage");
+                const cardDivs = document.querySelectorAll(".card-message-container");
+
+                cardDivs.forEach(div => {
+                    div.style.display = "none";
+                });
+
+                if (successMessageDiv) {
+                    successMessageDiv.style.display = "none";
+                    successMessageDiv.innerHTML = "";
+                }
+            }
+
+            if (fromStep === "step1") {
+                const modal = new bootstrap.Modal(document.getElementById('importNameModal'));
+                modal.show();
+                document.getElementById("continueImport").setAttribute("data-import-type", importType);
+            } else if (fromStep === "step2" && toStep === "step3") {
+                generateFinalStep(importType);
+                navigateStep(importType, fromStep, toStep);
+            } else {
+                navigateStep(importType, fromStep, toStep);
+            }
+        });
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".btn-voltar").forEach(button => {
+        button.addEventListener("click", function () {
+            const fromStep = this.getAttribute("data-from-step");
+            const toStep = this.getAttribute("data-to-step");
+            const importType = this.getAttribute("data-import-type");
+
+            if ((fromStep === "step3" && toStep === "step2") || (fromStep === "step2" && toStep === "step1")) {
+                console.log(`Voltando do ${fromStep} para o ${toStep} - limpando mensagens`);
+
+                const cardDivs = document.querySelectorAll(".card-message-container");
+                const successMessageDiv = document.getElementById("importSuccessMessage");
+                const errorMessageDiv = document.getElementById("importErrorMessage");
+
+                cardDivs.forEach(div => {
+                    div.style.display = "none";
+                });
+
+                if (successMessageDiv) {
+                    successMessageDiv.style.display = "none";
+                    successMessageDiv.innerHTML = "";
+                }
+
+                if (errorMessageDiv) {
+                    errorMessageDiv.style.display = "none";
+                    errorMessageDiv.innerHTML = "";
+                }
+            }
+
+            if (fromStep === "step1" && toStep === "step0" && importType === "pessoas") {
+                console.log("Voltando do step1 para step0 em pessoas — limpando arquivo selecionado");
+
+                resetDropzone(importType);
+                const fileInput = document.getElementById(`fileInput_${importType}`);
+                if (fileInput) fileInput.value = "";
+
+                const selectedFile = document.getElementById(`selectedFile_${importType}`);
+                if (selectedFile) selectedFile.innerText = "";
+
+                const dropzone = document.getElementById(`dropzone_${importType}`);
+                if (dropzone) {
+                    dropzone.querySelectorAll(".dz-preview").forEach(preview => preview.remove());
+                }
+
+                serverResponseData[importType] = null;
+            }
+
+            navigateStep(importType, fromStep, toStep);
+
+            const nextButton = document.querySelector(`.btn-proximo[data-import-type="${importType}"]`);
+            if (nextButton) {
+                nextButton.disabled = false;
+                nextButton.innerHTML = `Próximo <i class="bi-chevron-right small"></i>`;
+            }
+        });
+    });
+});
+
+function sendImportData(importType, button, callback = null) {
+    console.log(`Enviando dados de importação (${importType}) para o servidor...`);
+
+    if (!serverResponseData[importType]) {
+        console.error("Nenhum dado encontrado para envio.");
+        return;
+    }
+
+    button.disabled = true;
+    button.querySelector(".import-text").innerText = "Importando...";
+    button.querySelector(".spinner-border").classList.remove("d-none");
+
+    const { preview, filename, import_name } = serverResponseData[importType];
+    const fileInput = document.getElementById(`fileInput_${importType}`);
+    const carteiraSelect = document.getElementById(`carteiraSelect_${importType}`);
+    const carteira_id = carteiraSelect ? carteiraSelect.value : null;
+
+    let finalColumns = [];
+    document.querySelectorAll(`#mappingTable_${importType} tr`).forEach(row => {
+        const colName = row.cells[1].innerText;
+        const selectField = row.cells[3].querySelector("select");
+
+        if (selectField && selectField.value) {
+            let fieldType = "text";
+
+            if (customFields.has(selectField.value)) {
+                fieldType = customFields[selectField.value];
+            }
+
+            finalColumns.push({ 
+                name: selectField.value,
+                coluna: colName,
+                type: fieldType
+            });
+        }
+    });
+
+    let finalPreview = preview.map(row => {
+        let filteredRow = {};
+        finalColumns.forEach(({ name }) => {
+            if (name in row) {
+                filteredRow[name] = row[name];
+            }
+        });
+        return filteredRow;
+    });
+
+    const payload = {
+        import_type: importType,
+        import_name  : importName,
+        file_name  : filename,
+        carteira_id: carteira_id,
+        columns: finalColumns,
+        preview    : finalPreview
+    };
+    
+    console.log(payload);
+
+    fetch("/business/importar/save/", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const successMessageDiv = document.getElementById("importSuccessMessage");
+        const errorMessageDiv = document.getElementById("importErrorMessage");
+        const cardDivs = document.querySelectorAll(".card-message-container");
+
+        // Ocultar mensagens antigas
+        cardDivs.forEach(div => div.style.display = "none");
+
+        if (data.success) {
+            console.log("Importação realizada com sucesso!", data);
+
+            let successMessage = "";
+            let additionalButtons = "";
+
+            if (importType === "pessoas") {
+                successMessage = `<h3>Os Leads foram importados com sucesso. <strong>Agora, faça o upload do arquivo de contratos.</strong></h3>`;
+            } else if (importType === "contratos") {
+                successMessage = `<h3>Os Contratos foram importados com sucesso. <strong>Visualize a sua lista de importações ou seus leads.</strong></h3>`;
+
+                additionalButtons = `
+                    <div class="d-flex justify-content-center">
+                        <a class="btn btn-dark me-2" href="{% url 'business_listar_importacao' %}">
+                            <i class="bi bi-file-earmark-fill"></i> Lista de Importações
+                        </a>
+                        <a class="btn btn-info" href="{% url 'business_listar_leads' %}">
+                            <i class="bi bi-person-fill"></i> Ver Leads
+                        </a>
+                    </div>
+                `;
+            }
+
+            successMessageDiv.innerHTML = `
+                <div class="text-center">
+                    <img class="img-fluid mb-3" src="{% static 'core/svg/illustrations/oc-megaphone.svg' %}" 
+                        alt="Importação Concluída" style="max-width: 5rem;">
+                    <div class="mb-4">
+                        <h2>Importação Concluída!</h2>
+                        <p class="mb-4"><strong>Total de Leads:</strong> ${data.total} | <strong>Leads Atualizados:</strong> ${data.total_atualizar}</p>
+                        ${successMessage}
+                    </div>
+                    ${additionalButtons}
+                </div>
+            `;
+
+            successMessageDiv.style.display = "block";
+            successMessageDiv.closest(".card-message-container").style.display = "block";
+
+            if (importType === "pessoas") {
+                const contratosTab = document.querySelector("a[href='#tabContratos']");
+                if (contratosTab) {
+                    contratosTab.classList.remove("disabled");
+                    contratosTab.style.pointerEvents = "auto";
+                    contratosTab.style.opacity = "1";
+                    contratosTab.click();
+                }
+            }
+
+            updateProgressIndicator(importType, "finalizado");
+
+        } else {
+            console.log("Erro na importação:", data);
+
+            let errorMessages = data.list_erros?.length ? data.list_erros.join("<br>") : "Ocorreu um erro. Tente importar novamente após verificar os erros.";
+
+            if (!errorMessageDiv.innerHTML.includes(errorMessages)) {
+                errorMessageDiv.innerHTML = `
+                    <div class="text-center">
+                        <img class="img-fluid mb-3" src="{% static 'core/svg/illustrations/oc-looking-for-answers.svg' %}" 
+                                alt="Erro na Importação" style="max-width: 15rem;">
+                        <div class="mb-4">
+                            <h2>Erro na Importação!</h2>
+                            <p>${errorMessages}</p>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            ${importType === "pessoas" ? `
+                                <a class="btn btn-danger" href="{% url 'business_nova_importacao' %}">
+                                    <i class="bi bi-arrow-clockwise"></i> Tentar novamente
+                                </a>
+                            ` : `
+                                <button class="btn btn-danger btn-retry-contracts">
+                                    <i class="bi bi-arrow-clockwise"></i> Tentar novamente
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }
+
+            errorMessageDiv.style.display = "block";
+            errorMessageDiv.closest(".card-message-container").style.display = "block";
+
+            if (importType === "contratos") {
+                document.querySelector(".btn-retry-contracts").addEventListener("click", function () {
+                    navigateStep("contratos", "step3", "step1");
+                    resetDropzone("contratos");
+                });
+            }
+        }
+
+        button.disabled = false;
+        button.querySelector(".import-text").innerText = "Importar";
+        button.querySelector(".spinner-border").classList.add("d-none");
+    })
+    .catch(error => {
+        console.error("Erro na requisição:", error);
+        console.log(error);
+        const successMessageDiv = document.getElementById(`importSuccessMessage`);
+        const successCardDiv = successMessageDiv?.closest(".card-message-container");
+
+        if (successMessageDiv && successCardDiv) {
+            successMessageDiv.style.display = "none";
+            successCardDiv.style.display = "none";
+        }
+
+        const errorMessageDiv = document.getElementById(`importErrorMessage`);
+        const cardDiv = errorMessageDiv?.closest(".card-message-container");
+        const errorMessages = data.list_erros?.length ? data.list_erros.join("<br>") : "Ocorreu um erro. Tente importar novamente após verificar os erros.";
+
+        errorMessageDiv.innerHTML = `
+            <div class="text-center">
+                <img class="img-fluid mb-3" src="{% static 'core/svg/illustrations/oc-looking-for-answers.svg' %}" 
+                        alt="Erro na Importação" style="max-width: 15rem;">
+                <div class="mb-4">
+                    <h2>Erro na Importação!</h2>
+                    <p>Ocorreu um erro inesperado. Tente novamente mais tarde.</p>
+                </div>
+                <div class="d-flex justify-content-center">
+                    ${importType === "pessoas" ? `
+                        <a class="btn btn-danger" href="{% url 'business_nova_importacao' %}">
+                            <i class="bi bi-arrow-clockwise"></i> Tentar novamente
+                        </a>
+                    ` : `
+                        <button class="btn btn-danger btn-retry-contracts">
+                            <i class="bi bi-arrow-clockwise"></i> Tentar novamente
+                        </button>
+                    `}
+                </div>
+            </div>
+            `
+        ;
+        errorMessageDiv.style.display = "block";
+        cardDiv.style.display = "block";
+
+        button.disabled = false;
+        button.querySelector(".import-text").innerText = "Importar";
+        button.querySelector(".spinner-border").classList.add("d-none");
+    });
+}
+
+function resetDropzone(importType) {
+    const fileInput = document.getElementById(`fileInput_${importType}`);
+    const dropzone = document.getElementById(`dropzone_${importType}`);
+    const cardDivs = document.querySelectorAll(".card-message-container");
+    const successMessageDiv = document.getElementById("importSuccessMessage");
+    const errorMessageDiv = document.getElementById("importErrorMessage");
+
+    cardDivs.forEach(div => {
+        div.style.display = "none";
+    });
+
+    if (successMessageDiv) {
+        successMessageDiv.style.display = "none";
+        successMessageDiv.innerHTML = "";
+    }
+
+    if (errorMessageDiv) {
+        errorMessageDiv.style.display = "none";
+        errorMessageDiv.innerHTML = "";
+    }
+
+    if (fileInput) {
+        fileInput.value = "";
+    }
+
+    if (dropzone) {
+        dropzone.querySelectorAll(".dz-preview").forEach(preview => preview.remove());
+        document.getElementById(`selectedFile_${importType}`).innerText = "";
+    }
+}
+</script>
+{% endblock %}

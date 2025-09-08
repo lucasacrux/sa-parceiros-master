@@ -1,0 +1,9 @@
+{***REMOVED***,
+  "project_id": "mythical-runner-350501",***REMOVED***,
+  "private_key": "***REMOVED***\n",***REMOVED***,***REMOVED***,
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/1090668157335-compute%40developer.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

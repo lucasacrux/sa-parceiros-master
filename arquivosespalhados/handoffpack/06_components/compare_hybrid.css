@@ -1,0 +1,66 @@
+/* ===== COMPARE HÍBRIDO ==================================================== */
+.sa-home .compare.hybrid{
+  padding:2.6rem 0; background:linear-gradient(180deg,#fafcff,transparent 60%);
+}
+:root[data-theme="dark"] .sa-home .compare.hybrid{
+  background:linear-gradient(180deg,#0b0f19,transparent 60%);
+}
+
+/* Tabs - impedir overflow no mobile */
+.sa-home .compare.hybrid .toggle-tabs{
+  position:relative; display:flex; justify-content:center;
+  margin:0 auto 1.4rem; width:min(900px,100%);
+  background:#eef3ff; border:1px solid #dbe6ff; border-radius:999px; padding:.25rem;
+  overflow:hidden;
+}
+:root[data-theme="dark"] .sa-home .compare.hybrid .toggle-tabs{ background:#17203d; border-color:#23315d; }
+.sa-home .compare.hybrid .toggle-tabs input{ display:none; }
+.sa-home .compare.hybrid .toggle-tabs label{
+  flex:1; text-align:center; padding:.72rem 1rem; font-weight:800; cursor:pointer;
+  border-radius:999px; position:relative; z-index:2; color:#1e2a55;
+  white-space:nowrap;
+}
+:root[data-theme="dark"] .sa-home .compare.hybrid .toggle-tabs label{ color:#c9d2ff; }
+.sa-home .compare.hybrid .toggle-tabs .pill{
+  position:absolute; top:4px; bottom:4px; left:4px; width:calc(50% - 4px);
+  border-radius:999px; background:#1e40af; box-shadow:0 8px 22px rgba(30,64,175,.35);
+  transition:transform .22s ease;
+}
+.sa-home .compare.hybrid #tab-com:checked ~ .pill{ transform:translateX(100%); }
+.sa-home .compare.hybrid #tab-sem:checked ~ label[for="tab-sem"],
+.sa-home .compare.hybrid #tab-com:checked ~ label[for="tab-com"]{ color:#fff; }
+
+/* Painéis */
+.sa-home .compare.hybrid .compare-panels{ max-width:1100px; margin:0 auto; padding:0 1rem; }
+.sa-home .compare.hybrid .panel[hidden]{ display:none !important; }
+
+/* “Mapa negativo” — centralizado, visual de scatter leve */
+.sa-home .ecosystem-map{
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
+  padding:10px; margin:0 auto 10px;
+}
+.sa-home .ecosystem-map .bubble{
+  padding:10px 12px; border-radius:999px;
+  background:#f3f4f6; border:1px dashed #e5e7eb; color:#6b7280; font-weight:700;
+  box-shadow:0 2px 8px rgba(0,0,0,.03);
+}
+:root[data-theme="dark"] .sa-home .ecosystem-map .bubble{
+  background:#121a2d; border-color:#1f2945; color:#98a2b3;
+}
+.sa-home .map-note{ text-align:center; color:var(--muted); margin:6px 0 0; }
+
+/* “Solução positiva” — 4 pilares */
+.sa-home .pillars{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:12px;
+}
+@media (max-width:960px){ .sa-home .pillars{ grid-template-columns:1fr; } }
+.sa-home .pillar{
+  background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px;
+  box-shadow:var(--shadow, 0 6px 24px rgba(0,0,0,.06));
+}
+.sa-home .pillar h4{ margin:.2rem 0 .4rem; font-weight:900 }
+.sa-home .pillar ul{ margin:0; padding-left:1.1rem }
+.sa-home .pillar li{ margin:.24rem 0 }
+
+/* CTA único no estado "com" */
+.sa-home .compare.hybrid .actions.single{ margin-top:1rem; }

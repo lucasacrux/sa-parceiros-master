@@ -1,0 +1,28 @@
+Quero dar continuidade no frontend do projeto **SaiuAcordo • Business**.
+
+Pasta C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo parceiros\sa-parceiros-master\prototipo_saas_sabusiness
+
+Estou anexando estes arquivos do *hand-off pack*:
+- 01_CONTEXT.md
+- 02_TODO.md
+- 03_home.html
+- 04_base.html
+- 05_login.html
+- 06_signup.html
+- urls.py
+- views.py
+- home-overrides.CSS
+- home_interactions.js
+- sa_business.css
+
+**Objetivo**:
+1) Criar uma solução multitenant para aplicar tudo que o saiuacordo criou para a acrux em outras empresas de uma maneira whitelabel (portal de autoatendimento, crm, relatórios, gestão fácil, materiais, jurídico, controles)
+2) passar da fase de login para parte de confirmar telefone e e-mail via (sms, wpp e email) para ativar a conta, após logar (insight para o saiuacordo para habilitarmos o cliente logar mas só pode fazer acordo ou ver detalhes da dívida após confirmar e-mail ou telefone).
+3) Garantir responsividade e compatibilidade
+4) Refinar UI/UX (dark mode, foco, reduced motion) sem quebrar nada.
+5) Preparar os componentes para data-bind futuro com as APIs (criação de carteira, criação de empresa, comunicação (sms,e-mail,wpp,anuncios), pagamentos, dados, judicial).
+
+**Observações**:
+- O projeto usa Django templates. Já existe `sa_business.js` no `base.html` (tema + menu) e `home_interactions.js` na Home.
+- Preferir CSS-only para micro-efeitos e manter vanilla JS.
+- Seguir as classes e estrutura dos arquivos atuais.

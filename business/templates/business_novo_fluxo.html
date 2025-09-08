@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% block content %}
+<style>
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .select2-container .select2-selection--multiple {
+        min-height: 36px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        background-color: #FFFFFF !important;
+        border: .0625rem solid rgba(231, 234, 243, .7) !important;
+        border-radius: .3125rem !important;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border: solid #418AE9 1px !important;
+        outline: 0 !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+        padding-left: 20px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #FFFFFF !important;
+        border: 1px solid #1366ff !important;
+        margin-top: 9px !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: #1e2022 !important;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+        color: #1e2022 !important;
+    }
+
+    .select2-container .select2-container--default .select2-container--open {
+        top: 293px !important;
+    }
+
+    .select2-container .select2-search--inline {
+        margin-top: -16px !important;
+        margin-left: 8px !important;
+    }
+</style>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h4>Criar Novo Fluxo</h4>
+        </div>
+        <div class="card-body">
+            <div id="alert" class="alert d-none" role="alert"></div>
+            <form id="acaoForm">
+                {% csrf_token %}
+                
+                <!-- Seleção de Grupos com Select2 -->
+                <div class="mb-3">
+                    <label for="grupos" class="form-label">Selecionar Grupos</label>
+                    <select id="grupos" name="grupos" class="form-control select2" multiple required>
+                        {% for grupo in grupos %}
+                            <option value="{{grupo.titulo}}">{{grupo.titulo}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Tipo de Ação -->
+                <div class="mb-3">
+                    <label for="acao" class="form-label">Tipo de Ação</label>
+                    <select id="acao" name="acao" class="form-control" required>
+                        {% for acao in acoes %}
+                            <option value="{{acao.id}}">Tipo: {{acao.action_type}} - Nome: {{acao.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Periodicidade -->
+                <div class="mb-3">
+                    <label for="periodicidade" class="form-label">Periodicidade</label>
+                    <div class="d-flex">
+                        <input type="number" id="periodicidade" name="periodicidade" class="form-control w-50 me-2" min="1" required>
+                        <select id="unidade_tempo" name="unidade_tempo" class="form-control w-50" required>
+                            <option value="minutos">Minutos</option>
+                            <option value="horas">Horas</option>
+                            <option value="dias">Dias</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Início da Ação -->
+                <div class="mb-3">
+                    <label for="data_inicio" class="form-label">Início da Ação</label>
+                    <input type="datetime-local" id="data_inicio" name="data_inicio" class="form-control" required>
+                </div>
+
+                <!-- Definir o término -->
+                <div class="mb-3">
+                    <label class="form-label">Terminar Ação</label>
+                    <div class="form-check" style="display: flex;flex-direction: row;align-items: center;gap: 10px;">
+                        <input class="form-check-input" type="radio" name="termino" id="termino_ocorrencias" value="ocorrencias" checked>
+                        <label class="form-check-label" for="termino_ocorrencias">
+                            Após <input type="number" name="qtd_ocorrencias" class="form-control d-inline w-25 ms-1" min="1" value="3"> ocorrências
+                        </label>
+                    </div>
+                    <div class="form-check" style="display: flex;flex-direction: row;align-items: center;gap: 10px;">
+                        <input class="form-check-input" type="radio" name="termino" id="termino_data" value="data">
+                        <label class="form-check-label" for="termino_data">
+                            No dia <input type="datetime-local" name="data_termino" class="form-control d-inline w-50 ms-1">
+                        </label>
+                    </div>
+                    <div class="form-check" style="display: flex;flex-direction: row;align-items: center;gap: 10px;">
+                        <input class="form-check-input" type="radio" name="termino" id="termino_nunca" value="nunca">
+                        <label class="form-check-label" for="termino_nunca">
+                            Nunca terminar ação
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Definir o status -->
+                <div class="mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-control" required>
+                        <option value="ativo">Ativo</option>
+                        <option value="desativado">Desativado</option>
+                    </select>
+                </div>
+
+                <!-- Botão de envio -->
+                <div class="mt-4 d-flex justify-content-between items-center">
+                    <a href="{% url 'business_listar_fluxos' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Salvar Ação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Adicionando Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "Selecione um ou mais grupos",
+            width: '100%',
+            allowClear: true
+        });
+
+        $('#acaoForm').on('submit', function(event) {
+            event.preventDefault();
+
+            let formData = $(this).serialize();
+
+            $.ajax({
+                url: "{% url 'business_fluxos' %}",
+                type: "POST",
+                data: formData,
+                dataType: "json",
+                success: function(response) {
+                    $('#alert').removeClass('d-none alert-danger').addClass('alert-success').text(response.message);
+                },
+                error: function(xhr) {
+                    let errorMsg = "Erro ao criar o fluxo.";
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMsg += " " + xhr.responseJSON.error;
+                    }
+                    $('#alert').removeClass('d-none alert-success').addClass('alert-danger').text(errorMsg);
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

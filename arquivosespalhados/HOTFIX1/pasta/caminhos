@@ -1,0 +1,111 @@
+cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-backend"
+cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-frontend"
+cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-raspado-backend"
+cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-chat\backend"
+cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-chat\frontend"
+
+caminhos para reiniciar os projetos:
+npx kill-port 8000; cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-raspado-backend"; npm start
+npx kill-port 8010; cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-backend"; npm start
+npx kill-port 5175; cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-frontend"; npm run dev
+npx kill-port 8020; cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-raspado-backend";
+npx kill-port 5176; cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-raspado-backend";
+npx kill-port 8055; cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo-juridico\saiuacordo-juridico-raspado-backend"; python manage.py runserver 192.168.1.161:8055
+python manage.py runserver 127.0.0.1:8055
+python manage.py runserver http://192.168.1.161:8055/
+python manage.py runserver 127.0.0.1:8055  
+
+Abra no PC: http://127.0.0.1:8055/
+No celular: http://192.168.1.161:8055/ (veja o IP com ipconfig → IPv4).
+
+gerador de hash de senha
+node -e "console.log(require('bcryptjs').hashSync('saiu123', 10))"
+node -e "const b=require('bcryptjs');console.log(b.compareSync('saiu123','$2b$10$ogowJm5a9TwedGEksKA4IeD2JI5dgxN/fP5Jm0Pt2CI7LT5dCIAeu'))"
+
+$2b$10$DiZOGZUI1mMlg4.KM1iEYuJ.h8Yadtlh2YQUoEZ3L2/veR1WJWuUe
+$2b$10$sTiJRObLT71hpDWU8n7SXuKl6MUWxvxCetzBFhI692cpoEjeqA3/y
+
+
+"http://localhost:3001/api/messages?cpf=14525757701&start=2025-08-19T00:00&end=2025-08-19T23:59"
+http://localhost:3001/api/messages?phone=5521985036782&start=2025-08-19T00:00&end=2025-08-19T23:59
+http://localhost:3001/api/messages?connectedPhone=5521974922433&start=2025-08-19T00:00&end=2025-08-19T23:59"
+
+
+"http://localhost:3001/api/messages?cpf=67883389068&start=2025-08-19T00:00&end=2025-08-19T23:59"
+
+"http://localhost:3001/api/messages?cpf=14525757701&start=2025-08-19T00:00&end=2025-08-19T23:59"
+No linha:1 caractere:81
++ ... rver.js | Select-String -SimpleMatch 'app.get("/api/messages"').Line
++                                                                    ~     
+Token ')' inesperado na expressão ou instrução.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+
+    (Invoke-WebRequest "http://localhost:3001/api/messages?cpf=67883389068&start=2025-08-19T00:00&end=2025-08-19T00:10").Content
+
+    # 3) /api/messages por CPF (só dígitos)
+    $cpf = 67883389068
+    $resp = Invoke-RestMethod "$base/api/messages?cpf=$cpf&start=$start&end=$end"
+    $resp | ConvertTo-Json -Depth 6
+    $resp.total
+    $resp.items.Count
+
+    http://localhost:3001/api/messages?cpf=67883389068&start=2025-08-19T00:00&end=2025-08-19T00:00
+    http://localhost:3001/api/messages?cpf=12345678901&start=2000-01-01T00:00&end=2030-01-01T00:00&pageSize=200
+    http://localhost:3001/api/messages?cpf=67883389068&start=2000-01-01T00:00&end=2030-01-01T00:00&pageSize=200
+
+Worker para um CNJ específico (troque pelo seu CNJ):
+
+npm run worker:once
+
+
+Worker para todos os processos cadastrados:
+
+npm run worker:all
+
+
+Worker agendado (usa CRON_SCHEDULE do .env se definir, senão segunda 07:00):
+
+npm run worker
+
+npm run scrape:one -- 1002087-86.2025.8.26.0372   # troque pelo seu CNJ
+npm run scrape:one -- 1002087-86.2025.8.26.0372
+
+
+
+
+$r2 = Invoke-WebRequest -UseBasicParsing `
+  -Uri http://localhost:8000/api/auth/tjsp/otp `
+  -Method POST -ContentType "application/json" `
+  -Body (@{ flowId = $flowId; code = "619129" } | ConvertTo-Json) `
+  -Headers @{ Authorization = "Bearer $tok" }
+
+$r2.Content
+Get-Process -Id <PID> | Format-List Id,ProcessName,Path,StartTime
+taskkill /PID 35196 /F
+netstat -ano | findstr :5175
+netstat -ano | findstr :5173
+netstat -ano | findstr :8010
+netstat -ano | findstr :8000
+netstat -ano | findstr :5175
+netstat -ano | findstr :5173
+
+curl -i -X POST http://localhost:8010/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"cpfCnpj":"14525757701","password":"saiu123"}'
+
+# carregar nessa sessão e rodar
+$env:GOOGLE_APPLICATION_CREDENTIALS = [Environment]::GetEnvironmentVariable('GOOGLE_APPLICATION_CREDENTIALS','User')
+cd "C:\Users\lcoly\OneDrive\Área de Trabalho\PROJETOS\saiuacordo parceiros\sa-parceiros-master"
+.\.venv\Scripts\Activate.ps1
+python manage.py runserver 8020
+
+.\run.ps1 -- para rodar o projeto todo (parceiro business) agora só rodar esse runps1
+
+Set-ExecutionPolicy -Scope Process Bypass -Force
+.\run.ps1
+
+.\.venv\Scripts\Activate.ps1
+python manage.py runserver 8020
+
+python manage.py runserver 192.168.1.161:8055

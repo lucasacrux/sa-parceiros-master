@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+{% extends "t_base.html" %}
+{% block content %}
+<style>
+  .autocomplete-suggestions {
+    border: 1px solid #d4d4d4;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: white;
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    display: none;
+  }
+
+  .autocomplete-suggestion {
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .autocomplete-suggestion:hover {
+    background-color: #e9e9e9;
+  }
+
+  .iti {
+    width: 100%;
+  }
+</style>
+
+<div class="content container-fluid mt-5">
+
+  <div class="row">
+    <div class="col-lg-2">
+
+    </div>
+
+    <div class="col-lg-8">
+      <div class="d-grid gap-3 gap-lg-5">
+        <!-- Card -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title h4">{{titulo}} Usuário</h2>
+          </div>
+
+          <!-- Body -->
+          <div class="card-body">
+            <!-- Form -->
+            <form method="POST">
+              {% csrf_token %}
+              <!-- Form -->
+              <div class="row mb-4">
+                <label for="nome" class="col-sm-3 col-form-label form-label">Nome</label>
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm-vertical">
+                    <input type="text" class="form-control" name="nome" id="nome" value="{{usuario.first_name}}">
+                  </div>
+                </div>
+              </div>
+              <!-- End Form -->
+
+              <div class="row mb-4">
+                <label for="telefone" class="col-sm-3 col-form-label form-label">Telefone</label>
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm-vertical">
+                    <input type="tel" class="form-control" id="telefone" name="telefone" value="{{usuario.telefone|default:''}}" placeholder="(00) 0 0000-0000" maxlength="15">
+                  </div>
+                </div>
+              </div>
+              
+              {% if usuario_logado.gerente == 1 %}
+                <!-- Form -->
+                <div class="row mb-4">
+                  <label for="languageLabel-ts-control" class="col-sm-3 col-form-label form-label" id="languageLabel-ts-label">Grupo</label>
+
+                  <div class="col-sm-9">
+                    <!-- Select -->
+                    <div class="tom-select-custom">
+                      <select id="grupo" name="grupo" class="form-control">
+                        {% for grupo in grupos %}
+                          <option value="{{grupo.id}}" {% if usuario.grupo.id == grupo.id %} selected {% endif %}>{{grupo.title}}</option>
+                        {% endfor %}
+                      </select>
+                      
+                    </div>
+                    <!-- End Select -->
+                  </div>
+                </div>
+                <!-- End Form -->
+
+                 <!-- Seleção de Empresa -->
+                <div class="row mb-4">
+                  <label for="empresa" class="col-sm-3 col-form-label form-label">Empresa</label>
+                  <div class="col-sm-9">
+                    <select id="empresa" name="empresa" class="form-control">
+                      {% for empresa in empresas %}
+                        <option value="{{empresa.id}}" {% if usuario.empresa and usuario.empresa.id == empresa.id %} selected {% endif %}>{{empresa.nome}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              {% endif %}
+
+              <!-- Form -->
+              <div id="accountType" class="row mb-4">
+                <label class="col-sm-3 col-form-label form-label"></label>
+
+                <div class="col-sm-9">
+                  <div class="input-group input-group-sm-vertical">
+
+                    <!-- Checkbox Switch -->
+                    <div class="form-check form-switch mb-4">
+                      <input type="checkbox" class="form-check-input" id="ativo" {% if usuario.ativo == 1 %} checked {% endif %} name="ativo">
+                      <label class="form-check-label" for="formSwitch1">Ativo</label>
+                    </div>
+                    <!-- End Checkbox Switch -->
+                  </div>
+                </div>
+              </div>
+              <!-- End Form -->
+
+
+              {% if usuario_logado.gerente == 1 %}
+                <!-- Form -->
+                <div id="accountType" class="row mb-4">
+                  <label class="col-sm-3 col-form-label form-label"></label>
+
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-sm-vertical">
+
+                      <!-- Checkbox Switch -->
+                      <div class="form-check form-switch mb-4">
+                        <input type="checkbox" class="form-check-input" id="adm" {% if usuario.adm == 1 %} checked {% endif %} name="adm">
+                        <label class="form-check-label" for="formSwitch1">Administrador</label>
+                      </div>
+                      <!-- End Checkbox Switch -->
+                    </div>
+                  </div>
+                </div>
+                <!-- End Form -->
+              {% endif %}
+              
+                
+
+              <!-- Form -->
+              <div class="row mb-4">
+                <label for="emailLabel" class="col-sm-3 col-form-label form-label">Email</label>
+                <div class="col-sm-9">
+                  <input type="email" class="form-control" name="email" {% if usuario.email %} disabled {% endif %} id="email" aria-label="email" value="{{usuario.email}}">
+                </div>
+              </div>
+              <!-- End Form -->
+
+              <!-- Form -->
+              <div class="row mb-4">
+                <label for="senha" class="col-sm-3 col-form-label form-label">Nova Senha</label>
+                <div class="col-sm-9">
+                  <input type="password" class="form-control" name="senha" id="senha">
+                </div>
+              </div>
+              <!-- End Form -->
+
+              <!-- Form -->
+              <div class="row mb-4">
+                <label for="confirma_senha" class="col-sm-3 col-form-label form-label">Confirmar Nova Senha</label>
+                <div class="col-sm-9">
+                  <div class="mb-3">
+                    <input type="password" class="form-control" name="confirma_senha" id="confirma_senha">
+                  </div>
+                </div>
+              </div>
+              <!-- End Form -->
+
+              <div class="d-flex justify-content-end">
+                <a href="{% url 'adm_listar_usuarios' %}" class="btn btn-secondary" style="margin-right: 10px;">Cancelar</a>
+                <input type="submit" class="btn btn-primary" value="Salvar">
+              </div>
+            </form>
+            <!-- End Form -->
+          </div>
+          <!-- End Body -->
+        </div>
+        <!-- End Card -->
+      </div>
+
+      <!-- Sticky Block End Point -->
+      <div id="stickyBlockEndPoint"></div>
+    </div>
+  </div>
+  <!-- End Row -->
+</div>
+{% endblock %}

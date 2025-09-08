@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Carteiras</h2>
+        <a href="{% url 'business_criar_carteira' %}" class="btn btn-primary">Criar nova Carteira</a>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for carteira in carteiras %}
+                    <tr>
+                        <td>{{ carteira.id }}</td>
+                        <td>{{ carteira.nome }}</td>
+                        <td>{{ carteira.descricao }}</td>
+                        <td>
+                            <a href="{% url 'business_editar_carteira' carteira.id %}" class="btn btn-warning btn-sm me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a href="{% url 'business_excluir_carteira' %}" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir esta carteira?');">
+                                <i class="bi bi-trash"></i> Excluir
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">Nenhuma carteira cadastrada.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

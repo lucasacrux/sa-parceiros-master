@@ -1,0 +1,27 @@
+
+{% extends "base.html" %}
+
+
+{% load static %}
+
+{% block content %}
+
+<main id="content" role="main" class="main">
+    <!-- Content -->
+    <div class="content container-fluid">
+      <div class="row justify-content-center align-items-sm-center py-sm-10">
+
+
+        <div class="col-sm-6 col-lg-4 text-center text-sm-start">
+          <h1 class="display-1 mb-0">404</h1>
+          <p class="lead">Oooops! Nenhum cpf encontrado :/</p>
+          <a class="btn btn-primary" href="{% url 't_listar_leads' %}">Ver leads disponíveis</a>
+        </div>
+        <!-- End Col -->
+      </div>
+      <!-- End Row -->
+    </div>
+    <!-- End Content -->
+  </main>
+  <!-- ========== END MAIN CONTENT ========== -->
+{% endblock %}

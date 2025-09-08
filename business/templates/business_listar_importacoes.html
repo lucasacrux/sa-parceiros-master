@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% block content %}
+
+
+<div class="px-5 pb-10">
+  <div class="card mt-5">
+    
+    <div class="card-header">
+      <h4 class="card-header-title">Importações</h4>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive datatable-custom">
+      {% if importacoes %}
+      <table class="js-datatable table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
+        data-hs-datatables-options='{
+        "order": [],
+        "isResponsive": false,
+        "isShowPaging": false,
+        "pagination": "datatableWithPaginationPagination"
+      }'>
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">Data</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Registros</th>
+            <th scope="col">Erros</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+  
+        <tbody>
+          {% for importacao in importacoes %}
+            <tr>
+              <td>{{ importacao.data_criacao|date:"d/m/Y h:m"|default:"-" }}</td>
+              <td>{{ importacao.tipo }}</td>
+              <td>{{ importacao.total_registros }}</td>
+              <td>{{ importacao.total_erros }}</td>
+              <td>
+                {% if importacao.status == 'sucesso' %}
+                  <span style="width: 50%;" class="badge bg-soft-success text-success">SUCESSO</span>
+                {% endif %}
+                {% if importacao.status == 'falhou' %}
+                  <span style="width: 50%;" class="badge bg-soft-danger text-danger">FALHOU</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>Nenhuma importação encontrada.</p>
+      {% endif %}
+    </div>
+    <!-- End Table -->
+  
+        <!-- End Tab Content -->
+        <div class="card-footer">
+          <div class="row justify-content-center justify-content-sm-between align-items-sm-center">
+            <div class="col-sm mb-2 mb-sm-0">
+              <div class="d-flex justify-content-center justify-content-sm-start align-items-center">
+                <span class="me-2">Registros: {{total_registros}}</span>
+              </div>
+            </div>
+            <!-- End Col -->
+
+            <div class="col-md-auto">
+              <div class="d-flex justify-content-center justify-content-sm-end">
+                <!-- Pagination -->
+                <nav id="datatablePagination" aria-label="Activity pagination" style="">
+                  <div class="dataTables_paginate paging_simple_numbers" id="datatable_paginate">
+                    <ul id="datatable_pagination" class="pagination datatable-custom-pagination">
+                      {% if importacoes.has_previous %}
+                          <a href="?{{url_filtro}}&page=1">&laquo;</a>
+                          <a href="?{{url_filtro}}&page={{ importacoes.previous_page_number }}" class="paginate_button previous page-link" aria-controls="datatable" data-dt-idx="0" tabindex="0" id="datatable_previous"><span aria-hidden="true">&laquo;</span></a>
+                      {% else %}
+                        <li class="paginate_item page-item disabled">
+                          <a class="paginate_button previous page-link" aria-controls="datatable" data-dt-idx="0" tabindex="0" id="datatable_previous"><span aria-hidden="true">&laquo;</span></a>
+                        </li>
+                      {% endif %}
+                      <li class="paginate_item page-item active">
+                        <a class="paginate_button page-link" aria-controls="datatable" data-dt-idx="1" tabindex="0">{{ importacoes.number }}  de {{ importacoes.paginator.num_pages }}</a>
+                      </li>
+                      {% if importacoes.has_next %}
+                          <a href="?{{url_filtro}}&page={{ importacoes.next_page_number }}" class="paginate_button next page-link" aria-controls="datatable" data-dt-idx="3" tabindex="0" id="datatable_next"><span aria-hidden="true">&raquo;</span></a>
+                          <a href="?{{url_filtro}}&page={{ importacoes.paginator.num_pages }}" class="paginate_button next page-link" aria-controls="datatable" data-dt-idx="3" tabindex="0" id="datatable_next"><span aria-hidden="true">&raquo;</span></a>
+                      {% else %}
+                        <li class="paginate_item page-item disabled">
+                          <a class="paginate_button previous page-link" aria-controls="datatable" data-dt-idx="0" tabindex="0" id="datatable_previous"><span aria-hidden="true">Pŕoxima</span></a>
+                        </li>
+                      {% endif %}
+                    </ul>
+                  </div>
+                </nav>
+              </div>
+            </div>
+            <!-- End Col -->
+          </div>
+          <!-- End Row -->
+        </div>
+  </div>
+</div>
+
+{% endblock %}

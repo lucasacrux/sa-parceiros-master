@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+{% extends "t_base_proposta.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+    a {
+        text-decoration: none;
+    }
+
+    .fixed-accept {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background-color: #FFF;
+        z-index: 1000;
+        transition: height 0.3s ease;
+        box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .fixed-accept-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px 10px;
+    }
+
+    .fixed-accept-item-main {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: row;
+        width: 100%;
+        margin-right: 15px;
+    }
+
+    .fixed-accept-item-main p,
+    .fixed-accept-item p,
+    .card-item p {
+        margin: 0;
+        padding: 0;
+    }
+
+    .fixed-accept-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: row;
+        margin-bottom: 10px;
+    }
+
+    .text-discount {
+        color: #1ab491;
+    }
+
+    .accordion-header {
+        box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px !important;
+    }
+
+    .accordion-header-fixed {
+        box-shadow: none !important;
+    }
+
+    .accordion-item {
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+
+    .btn-fixed {
+        width: 100%;
+        font-weight: bold;
+    }
+
+    .card-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        width: 100%;
+        margin-right: 15px;
+    }
+
+    .card-item-divider {
+        margin: 10px 0;
+        border-bottom: 1px solid #CCC;
+        width: 100%;
+    }
+
+    #content {
+        display: flex !important;
+        background-color: #f4f4f4 !important;
+    }
+
+    .fixed-wrapper {
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+    }
+
+    .content-wrapper {
+        background-color: #f4f4f4;
+        padding: 20px 30px;
+        padding-bottom: 250px;
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .card-wrapper {
+        margin-bottom: 15px;
+    }
+
+    .card-item img {
+        width: 100px;
+        height: auto;
+        object-fit: contain;
+        margin-right: 5px;
+    }
+
+    .card-header {
+        padding: 0;
+        margin-bottom: 10px;
+    }
+
+    .accordion-button::after {
+        content: '\F286';
+        font-family: 'bootstrap-icons';
+        transition: transform 0.2s ease;
+        background-image: none !important;
+    }
+
+    .accordion-button:not(.collapsed)::after {
+        transform: rotate(180deg);
+    }
+
+    #downloadPdfBtn {
+        position: fixed;
+        top: 80px;
+        right: 10px;
+        z-index: 1100;
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 30px;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        transition: background-color 0.3s ease;
+        font-size: 12px;
+    }
+
+    #downloadPdfBtn:hover {
+        background-color: #0b5ed7;
+        cursor: pointer;
+    }
+
+    .print-only-parcelas {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .btn-fixed {
+            width: 100%;
+        }
+
+        .content-wrapper {
+            background-color: #f4f4f4;
+            padding: 20px 10px;
+            padding-bottom: 250px;
+        }
+
+        .card-item {
+            margin-right: 5px;
+        }
+
+        .card-item img {
+            width: 75px;
+        }
+
+        .fixed-accept {
+            box-shadow: none;
+        }
+    }
+
+    @media print {
+
+        #content {
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        #downloadPdfBtn {
+            display: none !important;
+        }
+
+        .fixed-accept {
+            position: static !important;
+            box-shadow: none !important;
+        }
+
+        .content-wrapper {
+            padding-bottom: 20px !important;
+        }
+
+        .btn,
+        .aceitarAcordoBtn {
+            display: none !important;
+        }
+
+        .fixed-accept {
+            border-top: 1px solid #CCC !important;
+        }
+
+        .print-only-parcelas {
+            display: block !important;
+            page-break-before: always;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var fixedAccept = document.querySelector('.fixed-accept');
+        var contentWrapper = document.querySelector('.content-wrapper');
+        var observer = new MutationObserver(function() {
+            var fixedAcceptHeight = fixedAccept.offsetHeight;
+            contentWrapper.style.paddingBottom = fixedAcceptHeight + 'px';
+        });
+
+        observer.observe(fixedAccept, {
+            attributes: true,
+            childList: true,
+            subtree: true
+        });
+
+        window.addEventListener('resize', function() {
+            var fixedAcceptHeight = fixedAccept.offsetHeight;
+            contentWrapper.style.paddingBottom = fixedAcceptHeight + 'px';
+        });
+    });
+</script>
+
+<body>
+    <main id="content" role="main" class="main">
+        {% if falha %}
+        <div class="content-wrapper">
+            <div class="card-wrapper">
+                <div class="card-header">
+                    <p>Proposta Inválida ou Inexistente</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="content-wrapper">
+            <div class="card-wrapper">
+                <div class="card-header">
+                    <h3>Empresas responsáveis</h3>
+                </div>
+                <div class="card">
+                    <div class="card-body" style="padding: 0 !important;">
+                        <!-- Accordion -->
+                        <div class="accordion" id="accordionEmpresa">
+                            <div class="accordion-item">
+                                <div class="accordion-header" id="empresa1">
+                                    <a class="accordion-button" role="button" data-bs-toggle="collapse" data-bs-target="#collapseEmpresa1" aria-expanded="true" aria-controls="collapseEmpresa1">
+                                        <div class="card-item">
+                                            <div>
+                                                <p>Credor original:</p>
+                                            </div>
+                                            <div>
+                                                <p>{{acordo.nome_credor_original}}</p>
+                                            </div>
+                                            <div>
+                                                
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div id="collapseEmpresa1" class="accordion-collapse collapse show" aria-labelledby="empresa1">
+                                    <div class="accordion-body">
+                                        A empresa {{acordo.nome_credor_original}} é o dono original da dívida. Foi com esse banco que a pessoa tomou o crédito pela primeira vez. O Banco vendeu a dívida em: {{acordo.data_cessao}}.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <div class="accordion-header" id="empresa2">
+                                    <a class="accordion-button collapsed" role="button" data-bs-toggle="collapse" data-bs-target="#collapseEmpresa2" aria-expanded="false" aria-controls="collapseEmpresa2">
+                                        <div class="card-item">
+                                            <div>
+                                                <p>Credor atual:</p>
+                                            </div>
+                                            <div>
+                                                <p>{{acordo.nome_credor_atual}}</p>
+                                            </div>
+                                            <div>
+                                                <img src="{% static 'core/svg/logos/LogoAcrux.png' %}" alt="Logo Empresa">
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div id="collapseEmpresa2" class="accordion-collapse collapse" aria-labelledby="empresa2">
+                                    <div class="accordion-body">
+                                        A empresa {{acordo.nome_credor_atual}} é uma empresa do setor financeiro que comprou créditos bancários e se tornou a credora da dívida desde {{acordo.data_cessao}} ao comprar a dívida do {{acordo.nome_credor_original}}.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <div class="accordion-header" id="empresa3">
+                                    <a class="accordion-button collapsed" role="button" data-bs-toggle="collapse" data-bs-target="#collapseEmpresa3" aria-expanded="false" aria-controls="collapseEmpresa3">
+                                        <div class="card-item">
+                                            <div>
+                                                <p>Parceiro:</p>
+                                            </div>
+                                            <div>
+                                                <p>{{acordo.grupo_owner.title}}</p>
+                                            </div>
+                                            <div>
+                                                <img src="{% static 'core/svg/logos/logoParceiro.png' %}" alt="Logo Empresa">
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div id="collapseEmpresa3" class="accordion-collapse collapse" aria-labelledby="empresa3">
+                                    <div class="accordion-body">
+                                        A empresa {{acordo.grupo_owner.title}} é uma das empresas parceiras oficiais do Saiu Acordo. Ela é responsável pela cobrança e recuperação de dívidas da empresa {{acordo.nome_credor_atual}}.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Accordion -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-wrapper">
+                <div class="card-header">
+                    <h3>Resumo do acordo</h3>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-item">
+                            <div>
+                                <p>Produto</p>
+                            </div>
+                            <div>
+                                <p>{{acordo.tipo_produto}}</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>Contratos</p>
+                            </div>
+                            <div>
+                                <p>{{acordo.contratos}}</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>Data proposta</p>
+                            </div>
+                            <div>
+                                <p>{{acordo.data_criacao}}</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>Primeira Parcela</p>
+                            </div>
+                            <div>
+                                <p>{{acordo.dia_vencimento_primeira_parcela}}</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>Cliente</p>
+                            </div>
+                            <div>
+                                <p>{{acordo.nome_pessoa|default:"-"}}</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>CPF</p>
+                            </div>
+                            <div>
+                                <p>{{acordo.cpf}}</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>Nº Acordo</p>
+                            </div>
+                            <div>
+                                <p>{{acordo.id}}</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>Telefone</p>
+                            </div>
+                            <div>
+                                <p>{{acordo.telefone}}</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>Email</p>
+                            </div>
+                            <div>
+                                <p>{{acordo.email}}</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+              
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-wrapper">
+                <div class="card-header">
+                    <h3>Contatos - {{acordo.grupo_owner.title}}</h3>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-item">
+                            <div>
+                                <p>WhatsApp</p>
+                            </div>
+                            <div>
+                                <a href="https://wa.me/5521970265629" target="_blank">+55 (21) 9 7026 5629</a>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>Telefone</p>
+                            </div>
+                            <div>
+                                <p>(21) 2505 2500</p>
+                            </div>
+                        </div>
+                        <div class="card-item-divider"></div>
+                        <div class="card-item">
+                            <div>
+                                <p>Site</p>
+                            </div>
+                            <div>
+                                <a href="https://saiuacordo.com.br/" target="_blank">saiuacordo.com.br</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="card-wrapper">
+                <h3>Dúvidas frequentes</h3>
+            </div>
+            <!-- Accordion -->
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingOne">
+                        <a class="accordion-button" role="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Por que fazer esse acordo?
+                        </a>
+                    </div>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
+                        <div class="accordion-body">
+                            Seu nome sai do Serasa em até 5 dias úteis após o pagamento. Além disso, ter uma dívida a menos melhora seu Score positivo de crédito.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header" id="headingTwo">
+                        <a class="accordion-button collapsed" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Que contrato é esse?
+                        </a>
+                    </div>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+                        <div class="accordion-body">
+                            A empresa {{acordo.nome_credor_atual}} comprou sua(s) dívida(s) da empresa {{acordo.nome_credor_original}}.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Accordion -->
+        </div>
+
+        {% if not falha %}
+        <div class="fixed-accept">
+            <div class="fixed-wrapper">
+                <!-- Accordion -->
+                <div class="accordion" id="fixedAccordionAccept">
+                    <div class="accordion-item" style="border: none;">
+                        <div class="accordion-header-fixed" id="fixedCollapse">
+                            <a class="accordion-button" role="button" data-bs-toggle="collapse" data-bs-target="#collapseFixed" aria-expanded="true" aria-controls="collapseFixed" style="background-color: #FFF; color: #000;">
+                                <div class="fixed-accept-item-main">
+                                    <p>Valor do acordo</p>
+                                    <span><strong>R$ {{acordo.valor_do_acordo}}</strong></span>
+                                </div>
+                            </a>
+                        </div>
+                        <div id="collapseFixed" class="accordion-collapse collapse show" aria-labelledby="fixedCollapse" data-bs-parent="#fixedAccordionAccept">
+                            <div class="accordion-body">
+                                <div class="fixed-accept-item">
+                                    <p>Dívida:</p>
+                                    <span>R$ {{acordo.valor_pendente}}</span>
+                                </div>
+                                <div class="fixed-accept-item">
+                                    <p class="text-discount" style="color: #e14141;">Desconto:</p>
+                                    <span class="text-discount" style="color: #e14141">- R$ {{acordo.valor_desconto}}</span>
+                                </div>
+                                <div class="fixed-accept-item">
+                                    <p>Parcelas:</p>
+                                    <span id="acordoValorParcela"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Accordion -->
+                {% if acordo.status_proposta == 'Aceita' %}
+                    <div class="fixed-accept-button">
+                        {% csrf_token %}
+                        <div>
+                            <a class="btn btn-success btn-fixed">
+                                ACORDO ACEITO
+                            </a>
+                        </div>
+                    </div> 
+                {% else %}
+                    <div class="fixed-accept-button">
+                        {% csrf_token %}
+                        <div>
+                            <a class="aceitarAcordoBtn btn btn-primary btn-fixed" data-acordo-id="{{ acordo.id }}">
+                                <div id="loadingSpinner" class="spinner-border spinner-border-sm text-light d-none" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                ACEITAR ACORDO
+                            </a>
+                        </div>
+                    </div> 
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+        <div class="print-only-parcelas">
+            <div class="card-wrapper">
+                <div class="card-header">
+                <h3>Parcelas do acordo</h3>
+                </div>
+                <div class="card">
+                <div class="card-body" style="padding: 0;">
+                    <div class="table-responsive">
+                    <table class="table table-striped table-bordered" style="margin: 0;">
+                        <thead class="table-light">
+                        <tr>
+                            <th scope="col">Nº parcela</th>
+                            <th scope="col">Valor parcela</th>
+                            <th scope="col">Data de vencimento</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for parcela in acordo.parcelas %}
+                        <tr>
+                            <td>{{ parcela.numero }}</td>
+                            <td>R$ {{ parcela.valor }}</td>
+                            <td>{{ parcela.dataVencimento }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <button id="downloadPdfBtn">
+        <i class="bi bi-download"></i> Baixar PDF
+    </button>
+
+    <div id="pdfContent" style="display: none; font-family: Arial, sans-serif; font-size: 13px; color: #000;">
+        <h2 style="text-align: center; margin-bottom: 5px;">Proposta Formal de Acordo de Dívida</h2>
+        <p style="text-align: center; margin-top: 0;">Emitida em {{acordo.data_criacao}}</p>
+        <hr>
+
+        <h3>Empresas responsáveis</h3>
+        <div>
+            <strong>Credor original:</strong> {{acordo.nome_credor_original}}<br>
+            A empresa {{acordo.nome_credor_original}} é o dono original da dívida. Foi com esse banco que a pessoa tomou o crédito pela primeira vez. O Banco vendeu a dívida em: {{acordo.data_cessao}}.
+        </div>
+        <hr>
+        <div>
+            <img src="{% static 'core/svg/logos/LogoAcrux.png' %}" alt="Logo Empresa" style="width: 100px;"><br>
+            <strong>Credor atual:</strong> {{acordo.nome_credor_atual}}<br>
+            A empresa {{acordo.nome_credor_atual}} é uma empresa do setor financeiro que comprou créditos bancários e se tornou a credora da dívida desde {{acordo.data_cessao}} ao comprar a dívida do {{acordo.nome_credor_original}}.
+        </div>
+        <hr>
+        <div>
+            <img src="{% static 'core/svg/logos/logoParceiro.png' %}" alt="Logo Empresa" style="width: 100px;"><br>
+            <strong>Parceiro:</strong> {{acordo.grupo_owner.title}}<br>
+            A empresa {{acordo.grupo_owner.title}} é uma das empresas parceiras oficiais do Saiu Acordo. Ela é responsável pela cobrança e recuperação de dívidas da empresa {{acordo.nome_credor_atual}}.
+        </div>
+        <hr><br>
+
+        <h3>Resumo do acordo</h3>
+        <ul style="padding-left: 18px;">
+            <li><strong>Produto:</strong> {{acordo.tipo_produto}}</li>
+            <li><strong>Contratos:</strong> {{acordo.contratos}}</li>
+            <li><strong>Data proposta:</strong> {{acordo.data_criacao}}</li>
+            <li><strong>Primeira Parcela:</strong> {{acordo.dia_vencimento_primeira_parcela}}</li>
+            <li><strong>Cliente:</strong> {{acordo.nome_pessoa|default:"-"}}</li>
+            <li><strong>CPF:</strong> {{acordo.cpf}}</li>
+            <li><strong>Nº Acordo:</strong> {{acordo.id}}</li>
+            <li><strong>Telefone:</strong> {{acordo.telefone}}</li>
+            <li><strong>Email:</strong> {{acordo.email}}</li>
+        </ul>
+
+        <h3>Contatos</h3>
+        <ul style="padding-left: 18px;">
+            <li><strong>WhatsApp:</strong> +55 (21) 9 7026 5629</li>
+            <li><strong>Telefone:</strong> (21) 2505 2500</li>
+            <li><strong>Site:</strong> saiuacordo.com.br</li>
+        </ul>
+
+        <h3>Valor do acordo</h3>
+        <ul style="padding-left: 18px;">
+            <li><strong>Valor do acordo:</strong> R$ {{acordo.valor_do_acordo}}</li>
+            <li><strong>Dívida:</strong> R$ {{acordo.valor_pendente}}</li>
+            <li><strong>Desconto:</strong> <span style="color: rgb(225, 65, 65);">- R$ {{acordo.valor_desconto}}</span></li>
+            <li><strong>Parcelas:</strong>
+                <span id="acordoValorParcela2"></span>
+            </li>
+        </ul>
+
+        <div class="card-wrapper" style="margin-top: 30px;">
+            <div class="card-header">
+                <h3 style="margin: 0;">Parcelas do acordo</h3>
+            </div>
+            <div class="card">
+                <div class="card-body" style="padding: 0;">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered" style="margin: 0; font-size: 12px;">
+                    <thead class="table-light">
+                        <tr>
+                        <th scope="col">Nº parcela</th>
+                        <th scope="col">Valor parcela</th>
+                        <th scope="col">Data de vencimento</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parcela in acordo.parcelas %}
+                        <tr>
+                        <td class="text-center">{{ parcela.numero }}</td>
+                        <td class="text-center">R$ {{ parcela.valor }}</td>
+                        <td class="text-center">{{ parcela.dataVencimento }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentAcordo = {
+            valor_parcela: "{{ acordo.valor_parcela }}",
+            parcelas: {{ acordo.parcelas|safe }}
+        };
+
+        const acordoValorParcelaElement = document.getElementById('acordoValorParcela');
+        const acordoValorParcelaElement2 = document.getElementById('acordoValorParcela2');
+
+        if (currentAcordo.valor_parcela === "0.00" || parseFloat(currentAcordo.valor_parcela) === 0) {
+            const groupedParcelas = groupParcelasByValue(currentAcordo.parcelas);
+            let parcelasText = '';
+
+            groupedParcelas.forEach((group, index) => {
+                if (index > 0) {
+                    parcelasText += `<br>`;
+                }
+                parcelasText += `Parcelas ${group.start} a ${group.end}: R$ ${group.valor} cada`;
+            });
+
+            if (acordoValorParcelaElement) {
+                acordoValorParcelaElement.innerHTML = parcelasText.trim();
+            }
+
+            if (acordoValorParcelaElement2) {
+                acordoValorParcelaElement2.innerHTML = parcelasText.trim();
+            }
+
+        } else {
+            const text = `{{ acordo.num_parcelas_acordo }}x de R$ {{ acordo.valor_parcela }}`;
+
+            if (acordoValorParcelaElement) {
+                acordoValorParcelaElement.textContent = text;
+            }
+
+            if (acordoValorParcelaElement2) {
+                acordoValorParcelaElement2.textContent = text;
+            }
+        }
+
+        function groupParcelasByValue(parcelas) {
+            const groups = [];
+            let currentGroup = null;
+
+            parcelas.forEach(parcela => {
+                const valor = parcela.valor;
+                if (currentGroup && currentGroup.valor === valor) {
+                    currentGroup.end = parcela.numero;
+                } else {
+                    if (currentGroup) {
+                        groups.push(currentGroup);
+                    }
+                    currentGroup = { start: parcela.numero, end: parcela.numero, valor: valor };
+                }
+            });
+
+            if (currentGroup) {
+                groups.push(currentGroup);
+            }
+
+            return groups;
+        }
+
+        sessionStorage.setItem('currentUrl', window.location.href);
+        document.querySelectorAll('.aceitarAcordoBtn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                const acordoId = this.getAttribute('data-acordo-id');
+                const spinner = this.querySelector('.spinner-border');
+
+                if (spinner) {
+                    spinner.classList.remove('d-none');
+                }
+
+                fetch('/t/acordos/enviar/' + acordoId, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        window.location.href = '/t/propostas/concluida/';
+                        return;
+                    }
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        if (data.error.includes('Deseja sobrescrever?') || data.error.includes('já possui um acordo vigente')) {
+                            sobrescreverAcordo(acordoId);
+                        } else {
+                            if (spinner) {
+                                spinner.classList.add('d-none');
+                            }
+                        }
+                    } else {
+                        if (spinner) {
+                            spinner.classList.add('d-none');
+                        }
+                    }
+                })
+                .catch(error => {
+                    if (error.error && (error.error.includes('já possui um acordo vigente') || error.error.includes('Deseja sobrescrever?'))) {
+                        sobrescreverAcordo(acordoId);
+                    } else {
+                        if (spinner) {
+                            spinner.classList.add('d-none');
+                        }
+                    }
+                });
+            });
+        });
+
+        function sobrescreverAcordo(acordoId) {
+            fetch(`/t/acordos/enviar/${acordoId}/?continuar=True&subs=True`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    window.location.href = '/t/propostas/concluida/';
+                    return;
+                }
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+            })
+            .catch((error) => {
+            });
+        }
+    });
+</script>
+
+<script>
+document.getElementById('downloadPdfBtn').addEventListener('click', function () {
+    const content = document.getElementById('pdfContent');
+
+    // Torna visível só durante a geração
+    content.style.display = 'block';
+
+    const opt = {
+        margin: 10,
+        filename: 'acordo-{{ acordo.id }}.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(content).save().then(() => {
+        content.style.display = 'none';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f9f9f9;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+
+    .message-container {
+        text-align: center;
+    }
+
+    h1 {
+        color: #1f2020;
+        font-size: 3em;
+        margin: 0;
+    }
+
+    .back-button, .boleto-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 15px 30px;
+        font-size: 1em;
+        color: white;
+        background-color: #467ce0;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-right: 10px;
+    }
+
+    .back-button:hover, .boleto-button:hover {
+        background-color: #295ebf;
+    }
+
+    .boleto-button i {
+        margin-right: 10px;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.5em;
+        }
+
+        .back-button, .boleto-button {
+            padding: 12px 25px;
+            font-size: 0.9em;
+        }
+    }
+
+    @media (max-width: 480px) {
+        h1 {
+            font-size: 2em;
+        }
+
+        .back-button, .boleto-button {
+            padding: 10px 20px;
+            font-size: 0.8em;
+        }
+
+        .boleto-button i {
+            margin-right: 5px;
+        }
+    }
+</style>
+
+<body>
+    <main id="content" role="main" class="main">
+        <div class="message-container">
+            <h1>Proposta Aceita</h1>
+            <a href="javascript:void(0)" id="back-button" class="back-button">Ver Meu Acordo</a>
+            <a href="https://wa.me/5521970265629?text=Quero%20receber%20meu%20boleto" class="boleto-button">
+                <i class="fab fa-whatsapp"></i> Receber Boleto
+            </a>
+        </div>
+    </main>
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const backButton = document.getElementById('back-button');
+        const savedUrl = sessionStorage.getItem('currentUrl');
+        if (savedUrl) {
+            backButton.href = savedUrl;
+        } else {
+            backButton.href = "javascript:history.back()";
+        }
+    });
+</script>
+{% endblock %}

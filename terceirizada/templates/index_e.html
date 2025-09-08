@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+    <meta charset="UTF-8">
+{% load static %}
+{% load extras %}
+
+<head>
+    <title>Extrato de Pagamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px 0;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .extrato {
+            padding: 5px;
+        }
+
+        .titulo {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .titulo-box {
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .titulo-logo {
+            float: left;
+            white-space: nowrap;
+            font-weight: 600;
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        .titulo-logo .logoAcrux {
+            vertical-align: middle;
+            width: 150px;
+            height: auto;
+            margin: 0 25px 0 10px;
+        }
+
+        .titulo-logo .logoBmg {
+            vertical-align: middle;
+            width: 100px;
+            height: auto;
+            margin: 0 0 0 10px;
+        }
+
+        .titulo-texto {
+            float: right;
+            text-align: right;
+            font-size: 28px;
+            line-height: normal;
+        }
+
+        .divider {
+            width: 100%;
+            border-bottom: 2px solid #000;
+            margin: 20px 0;
+        }
+
+        .linha {
+            padding: 5px 5px;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .linha span {
+            font-size: 14px;
+        }
+
+        .linha strong {
+            margin-right: 5px;
+        }
+
+        .header-box {
+            display: table;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .header-box .col {
+            display: table-cell;
+            vertical-align: top;
+            width: 36%;
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border-bottom: 1px solid #000;
+            padding: 10px 7px;
+            text-align: left;
+        }
+
+        th {
+            font-size: 12px;
+            text-align: center;
+        }
+
+        td {
+            font-size: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="extrato">
+        <div class="titulo-box">
+            <div class="titulo-logo">
+                Credor atual: <img src="https://tinyurl.com/2y9lz3yz" alt="logo" class="logoAcrux"> Credor original: <img src="https://tinyurl.com/2an83hax" alt="bmg logo" class="logoBmg">
+            </div>
+            <div class="titulo-texto">
+                Extrato de Pagamento
+                <br/>
+                Agrupado por parcelas
+            </div>
+        </div>
+        <div>
+            Este extrato de parcelas foi criado com base no banco de dados transferido entre o credor original <strong>Banco BMG SA</strong> e o credor atual <strong>{{ first_header.contrato_info.razao_social }} - {{ first_header.contrato_info.cnpj }}</strong> em <strong>{{ first_header.contrato_info.data_cessao }}</strong>.
+        </div>   
+        <div class="divider"></div>
+
+        <div class="header-box" style="padding-left: 2px;">
+            <div class="col">
+                <div class="linha"><strong>Cliente:</strong><span>{{ nome_dev.nome }}</span></div>
+                <div class="linha"><strong>Contrato Consultado:</strong><span>{{ first_header.contrato_info.contrato }}</span></div>
+                <div class="linha"><strong>Contrato em outra instituição:</strong><span>{{ cpf_dev.contrato }}</span></div>
+                <div class="linha"><strong>Entidade:</strong><span>{{ first_header.contrato_info.convenio }}</span></div>
+                <div class="linha"><strong>Matrícula:</strong><span>{{ first_header.contrato_info.matricula }}</span></div>
+            </div>
+
+            <div class="col">
+                <div class="linha"><strong>CPF/CNPJ:</strong><span>{{ cpf_dev.cpf }}</span></div>
+                <div class="linha"><strong>Total de parcelas:</strong><span>{{ first_header.contrato_info.qtd_parcelas }}</span></div>
+                <div class="linha"><strong>Data Início:</strong><span>{{ first_header.contrato_info.data_inicio_contrato }}</span></div>
+                <div class="linha"><strong>Dt implantação:</strong><span>{{ first_header.contrato_info.data_inicio_contrato }}</span></div>
+            </div>
+
+            <div class="col">
+                <div class="linha"><strong>DT. Vencimento:</strong><span>{{ first_header.contrato_info.data_fim_contrato }}</span></div>
+                <div class="linha"><strong>Taxa contrato:</strong><span>{{ first_header.contrato_info.tx_mensal }}</span></div>
+                <div class="linha"><strong>Valor Financiado:</strong><span>{{ first_header.contrato_info.valor_financiado }}</span></div>
+                <div class="linha"><strong>Valor liberado:</strong><span>{{ first_header.contrato_info.valor_liberado }}</span></div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+        <table style="width: 100%;">
+            <tr style="text-align: left;">
+              <th>Número parcela<br>Data Pagamento<br/>Data Vencto</th>  
+              <th>Saldo Parcela</th>
+              <th>Valor Pago <br/> Origem</th>
+              <th>Mora <br/> Baixa</th>
+              <th>Multa <br/> Tipo cessão</th>
+              <th>IOF <br/> Processamento</th>
+              <th>Desconto <br/> Age</th>
+              <th>Total Pago <br/> Financeiro</th>
+            </tr>
+            {% for dados in extrato_info %}
+            <tr style="text-align: center;">
+                <td>{{ dados.parcelas_info.num_parcela }}<br/> {{ dados.parcelas_info.data_pagamento }} <br/> {{ dados.parcelas_info.data_parcela }} </td>
+                <td>{{ dados.parcelas_info.valor_parcela }} </td>
+                <td>{{ dados.parcelas_info.valor_parcela }} <br> {{ dados.parcelas_info.origem_baixa }} </td>
+                <td>{{ dados.parcelas_info.valor_mora }}<br/></td>
+                <td>{{ dados.parcelas_info.valor_multa }} <br/>{{ dados.parcelas_info.indica_cessao }}</td>
+                <td>{{ dados.parcelas_info.valor_iof }}<br/></td>
+                <td>{{ dados.parcelas_info.valor_desconto }}<br/></td>
+                <td>{{ dados.parcelas_info.valor_pago }}<br/></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

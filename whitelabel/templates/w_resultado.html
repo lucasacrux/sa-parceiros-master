@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+{% extends "w_base.html" %}
+{% block content %}
+
+<style>
+  .flatpickr-calendar .flatpickr-day.today {
+    background-color: #377dff30 !important;
+    color: #1e2022 !important;
+    border-color: transparent !important;
+  }
+
+  .valor-parcela {
+    white-space: pre-line;
+  }
+</style>
+
+<div class="px-5" style="padding-bottom: 9.5rem !important;">
+
+    {% if result %}
+    <div class="card mt-5">
+        <div class="row col-sm-divider" style="padding: 20px;">
+            <div class="col-sm text-end">
+              <span class="d-block h4 mb-0">{{result.cpf}}</span>
+              <span class="d-block">CPF-CNPJ</span>
+            </div>
+            <!-- End Col -->
+          
+            <div class="col-sm text-end">
+              <span class="d-block h4 mb-0">
+                {{result.nome}}
+              </span>
+              <span class="d-block">Nome</span>
+            </div>
+            <!-- End Col -->
+
+            <div class="col-sm text-end">
+                <span class="d-block h4 mb-0">
+                  {{result.empresa}}
+                </span>
+                <span class="d-block">Empresa</span>
+              </div>
+          </div>
+    </div>
+
+
+  <div class="card mt-5">
+    <div class="card-header">
+      <h4 class="card-header-title">Quadro Credores em 2010</h4>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive datatable-custom">
+      <table class="js-datatable table table-bordered table-thead-bordered table-nowrap table-align-middle card-table"
+             data-hs-datatables-options='{
+                     "order": [],
+                     "isResponsive": false,
+                     "isShowPaging": false,
+                     "pagination": "datatableWithPaginationPagination"
+                   }'>
+        <thead class="thead-light">
+          <tr>
+            <th scope="col"></th>
+            <th scope="col" colspan="3">Crédito (em Real) valores agosto 2010</th>
+            <th scope="col" colspan="3">Reserva (em Real) valores agosto 2010</th>
+          </tr>
+        </thead>
+  
+        <tbody>
+            <tr>
+                <td></td>
+                <td>Classe 1</td>
+                <td>Classe 3</td>
+                <td class="table-active"></td>
+                <td>Classe 1</td>
+                <td>Classe 3</td>
+                <td class="table-active"></td>
+            </tr>
+            <tr>
+                <td>Empresa</td>
+                <td>{{result.credito_classe1_2010_faixa}}</td>
+                <td>{{result.credito_classe3_2010_faixa}}</td>
+                <td class="table-active">Total</td>
+                <td>{{result.reserva_classe1_2010_faixa}}</td>
+                <td>{{result.reserva_classe3_2010_faixa}}</td>
+                <td class="table-active">Total</td>
+            </tr>
+            <tr>
+                <td>{{result.empresa_2010}}</td>
+                <td>{{result.credito_classe1_2010_valor}}</td>
+                <td>{{result.credito_classe3_2010_valor}}</td>
+                <td class="table-active">{{result.credito_2010_total}}</td>
+                <td>{{result.reserva_classe1_2010_valor}}</td>
+                <td>{{result.reserva_classe3_2010_valor}}</td>
+                <td class="table-active">{{result.reserva_2010_total}}</td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- End Table -->
+  </div>
+
+  <div class="card mt-5">
+    <div class="card-header">
+      <h4 class="card-header-title">Quadro Credores em 2024</h4>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive datatable-custom">
+      <table class="js-datatable table table-bordered table-thead-bordered table-nowrap table-align-middle card-table"
+             data-hs-datatables-options='{
+                     "order": [],
+                     "isResponsive": false,
+                     "isShowPaging": false,
+                     "pagination": "datatableWithPaginationPagination"
+                   }'>
+        <thead class="thead-light">
+          <tr>
+            <th scope="col"></th>
+            <th scope="col" colspan="3">Crédito (em Real)</th>
+            <th scope="col" colspan="3">Reserva (em Real)</th>
+          </tr>
+        </thead>
+  
+        <tbody>
+            <tr>
+                <td></td>
+                <td>Classe 1</td>
+                <td>Classe 3</td>
+                <td class="table-active"></td>
+                <td>Classe 1</td>
+                <td>Classe 3</td>
+                <td class="table-active"></td>
+            </tr>
+            <tr>
+                <td>Empresa</td>
+                <td>{{result.credito_classe1_2024_faixa}}</td>
+                <td>{{result.credito_classe3_2024_faixa}}</td>
+                <td class="table-active">Total</td>
+                <td>{{result.reserva_classe1_2024_faixa}}</td>
+                <td>{{result.reserva_classe3_2024_faixa}}</td>
+                <td class="table-active">Total</td>
+            </tr>
+            <tr>
+                <td>{{result.empresa_2024}}</td>
+                <td>{{result.credito_classe1_2024_valor}}</td>
+                <td>{{result.credito_classe3_2024_valor}}</td>
+                <td class="table-active">{{result.credito_2024_total}}</td>
+                <td>{{result.reserva_classe1_2024_valor}}</td>
+                <td>{{result.reserva_classe3_2024_valor}}</td>
+                <td class="table-active">{{result.reserva_2024_total}}</td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- End Table -->
+  </div>
+
+  <div class="card mt-5">
+    <div class="card-header">
+      <h4 class="card-header-title">Observações</h4>
+      <p style="margin-top: 30px;">{{result.observacoes}}</p>
+    </div>
+  </div>
+  {% else %}
+    <div class="row" style="margin-top: 30px;">
+        <h4 class="card-header-title">Nenhum registro encontrado</h4>
+        <p style="margin-top: 30px;">Verifique as informações fornecidas. <a href="{% url 'w_home' %}">Clique aqui</a> para tentar novamente.</p>
+    </div>
+  {% endif %}
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+{% extends "t_base.html" %}
+{% block content %}
+<div class="container">
+  <div class="card mt-5">
+    <div class="card-header">
+      <h4 class="card-header-title">Grupos</h4>
+    </div>
+  
+    <!-- Table -->
+    <div class="table-responsive datatable-custom">
+      {% if grupos %}
+      <table class="js-datatable table table-borderless table-thead-bordered table-nowrap table-align-middle card-table"
+             data-hs-datatables-options='{
+                     "order": [],
+                     "isResponsive": false,
+                     "isShowPaging": false,
+                     "pagination": "datatableWithPaginationPagination"
+                   }'>
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">Nome</th>
+            <th scope="col">Descrição</th>
+            <th scope="col">IDSA</th>
+            <th scope="col">Status</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+  
+        <tbody>
+          {% for grupo in grupos %}
+            <tr>
+              <td scope="row">{{ grupo.title }}</td>
+              <td>{{ grupo.description | default:'-' }}</td>
+              <td>{{ grupo.id_resolvecontas }}</td>
+              <td>
+                {% if grupo.ativo %}
+                  <span class="badge bg-success">Ativo</span>
+                {% else %}
+                  <span class="badge bg-danger">Inativo</span>
+                {% endif %}
+              </td>
+              <td>
+                <a class="btn btn-primary btn-info" href="{% url 'adm_detalhes_grupo' grupo.id %}">
+                  <i class="bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+        <p>Nenhum grupo ainda.</p>
+      {% endif %}
+    </div>
+    <!-- End Table -->
+  
+    <!-- Footer -->
+    <div class="card-footer">
+      <!-- Pagination -->
+      <div class="d-flex justify-content-center justify-content-sm-end">
+        <nav id="datatableWithPaginationPagination" aria-label="Activity pagination"></nav>
+      </div>
+      <!-- End Pagination -->
+    </div>
+    <!-- End Footer -->
+
+  </div>
+</div>
+{% endblock %}

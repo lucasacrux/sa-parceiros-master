@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <!-- Required Meta Tags Always Come First -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Title -->
+  <title>SA Parceiros - Login</title>
+	<link rel="canonical" href="rcdatahub" />
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="preview/front-dashboard-v2.1.1/favicon.ico" >
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <!-- CSS Implementing Plugins -->
+  <link rel="stylesheet" href="{% static 'core/css/vendor.min.css' %}" >
+  <!-- CSS Front Template -->
+  <link rel="stylesheet" href="{% static 'core/css/theme.min.css' %}" >
+  <link rel="preload" href="{% static 'core/css/theme.min.css' %}"  data-hs-appearance="default" as="style">
+  <link rel="preload" href="{% static 'core/css/theme-dark.min.css' %}"  data-hs-appearance="dark" as="style">
+  <style data-hs-appearance-onload-styles>
+    *
+    {
+      transition: unset !important;
+    }
+    body
+    {
+      opacity: 0;
+    }
+  </style>
+  <script>
+            window.hs_config = {"autopath":"@@autopath","deleteLine":"hs-builder:delete","deleteLine:build":"hs-builder:build-delete","deleteLine:dist":"hs-builder:dist-delete","previewMode":false,"startPath":"index_html.html","vars":{"themeFont":"https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap","version":"?v=1.0"},"layoutBuilder":{"extend":{"switcherSupport":true},"header":{"layoutMode":"default","containerMode":"container-fluid"},"sidebarLayout":"default"},"themeAppearance":{"layoutSkin":"default","sidebarSkin":"default","styles":{"colors":{"primary":"#377dff","transparent":"transparent","white":"#fff","dark":"132144","gray":{"100":"#f9fafc","900":"#1e2022"}},"font":"Inter"}},"languageDirection":{"lang":"en"},"skipFilesFromBundle":{"dist":["{% static 'core/js/hs.theme-appearance.js' %}" ,"{% static 'core/js/hs.theme-appearance-charts.js' %}" ,"{% static 'core/js/demo.js' %}" ],"build":["{% static 'core/css/theme.css' %}" ,"{% static 'core/vendor/hs-navbar-vertical-aside/dist/hs-navbar-vertical-aside-mini-cache.js' %}" ,"{% static 'core/js/demo.js' %}" ,"{% static 'core/css/theme-dark.css' %}" ,"{% static 'core/css/docs.css' %}" ,"{% static 'core/vendor/icon-set/style.css' %}" ,"{% static 'core/js/hs.theme-appearance.js' %}" ,"{% static 'core/js/hs.theme-appearance-charts.js' %}" ,"node_modules/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js' %}" ,"{% static 'core/js/demo.js' %}" ]},"minifyCSSFiles":["{% static 'core/css/theme.css' %}" ,"{% static 'core/css/theme-dark.css' %}" ],"copyDependencies":{"dist":{"{% static 'core/js/theme-custom.js' %}" :""},"build":{"{% static 'core/js/theme-custom.js' %}" :"","node_modules/bootstrap-icons/font/*fonts/**":"{% static 'core/css"}},"buildFolder":"","replacePathsToCDN":{},"directoryNames":{"src":"./src","dist":"./dist","build":"./build"},"fileNames":{"dist":{"js":"theme.min.js' %}" ,"css":"theme.min.css' %}" },"build":{"css":"theme.min.css' %}" ,"js":"theme.min.js' %}" ,"vendorCSS":"vendor.min.css' %}" ,"vendorJS":"vendor.min.js' %}" }},"fileTypes":"jpg|png|svg|mp4|webm|ogv|json"}
+            window.hs_config.gulpRGBA = (p1) => {
+  const options = p1.split(',')
+  const hex = options[0].toString()
+  const transparent = options[1].toString()
+  var c;
+  if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+    c= hex.substring(1).split('');
+    if(c.length== 3){
+      c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+    }
+    c= '0x'+c.join('');
+    return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+',' + transparent + ')';
+  }
+  throw new Error('Bad Hex');
+}
+            window.hs_config.gulpDarken = (p1) => {
+  const options = p1.split(',')
+  let col = options[0].toString()
+  let amt = -parseInt(options[1])
+  var usePound = false
+  if (col[0] == "#") {
+    col = col.slice(1)
+    usePound = true
+  }
+  var num = parseInt(col, 16)
+  var r = (num >> 16) + amt
+  if (r > 255) {
+    r = 255
+  } else if (r < 0) {
+    r = 0
+  }
+  var b = ((num >> 8) & 0x00FF) + amt
+  if (b > 255) {
+    b = 255
+  } else if (b < 0) {
+    b = 0
+  }
+  var g = (num & 0x0000FF) + amt
+  if (g > 255) {
+    g = 255
+  } else if (g < 0) {
+    g = 0
+  }
+  return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16)
+}
+            window.hs_config.gulpLighten = (p1) => {
+  const options = p1.split(',')
+  let col = options[0].toString()
+  let amt = parseInt(options[1])
+  var usePound = false
+  if (col[0] == "#") {
+    col = col.slice(1)
+    usePound = true
+  }
+  var num = parseInt(col, 16)
+  var r = (num >> 16) + amt
+  if (r > 255) {
+    r = 255
+  } else if (r < 0) {
+    r = 0
+  }
+  var b = ((num >> 8) & 0x00FF) + amt
+  if (b > 255) {
+    b = 255
+  } else if (b < 0) {
+    b = 0
+  }
+  var g = (num & 0x0000FF) + amt
+  if (g > 255) {
+    g = 255
+  } else if (g < 0) {
+    g = 0
+  }
+  return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16)
+}
+            </script>
+</head>
+<body>
+  <script src="{% static 'core/js/hs.theme-appearance.js' %}" ></script>
+
+  {% block content %}
+
+  {% endblock %}
+  <!-- JS Implementing Plugins -->
+  <script src="{% static 'core/js/vendor.min.js' %}" ></script>
+  <!-- JS Front -->
+  <script src="{% static 'core/js/theme.min.js' %}" ></script>
+  <!-- JS Plugins Init. -->
+  <script>
+    (function() {
+      // INITIALIZATION OF BOOTSTRAP DROPDOWN
+      // =======================================================
+      HSBsDropdown.init()
+      // INITIALIZATION OF MEGA MENU
+      // =======================================================
+      new HSMegaMenu('.js-mega-menu', {
+        desktop: {
+          position: 'left'
+        }
+      })
+    })()
+  </script>
+
+    <!-- JS Plugins Init. -->
+    <script>
+      (function() {
+        window.onload = function () {
+          
+  
+          // INITIALIZATION OF NAVBAR VERTICAL ASIDE
+          // =======================================================
+          new HSSideNav('.js-navbar-vertical-aside').init()
+  
+  
+          // INITIALIZATION OF FORM SEARCH
+          // =======================================================
+          new HSFormSearch('.js-form-search')
+  
+  
+          // INITIALIZATION OF BOOTSTRAP DROPDOWN
+          // =======================================================
+          HSBsDropdown.init()
+  
+  
+          // INITIALIZATION OF FILE ATTACH
+          // =======================================================
+          new HSFileAttach('.js-file-attach')
+
+            // INITIALIZATION OF CIRCLES
+        // =======================================================
+        const colors = () => {
+          return [HSThemeAppearance.getAppearance() === 'dark' ? '#34383b' : '#e7eaf3', '#377dff']
+        }
+
+        setTimeout(() => {
+          document.querySelectorAll('.js-circle').forEach(item => {
+            HSCore.components.HSCircles.init(item, {
+              colors: colors()
+            })
+          })
+
+          window.addEventListener('on-hs-appearance-change', () => {
+            HSCore.components.HSCircles.getItems().forEach(circle => {
+              circle.updateColors(colors())
+            })
+          })
+        })
+  
+  
+          // INITIALIZATION OF STEP FORM
+          // =======================================================
+          new HSStepForm('.js-step-form', {
+            finish: () => {
+              document.getElementById("addUserStepFormProgress").style.display = 'none'
+              document.getElementById("addUserStepProfile").style.display = 'none'
+              document.getElementById("addUserStepBillingAddress").style.display = 'none'
+              document.getElementById("addUserStepConfirmation").style.display = 'none'
+              document.getElementById("successMessageContent").style.display = 'block'
+              scrollToTop('#header');
+              const formContainer = document.getElementById('formContainer')
+            },
+            onNextStep: function () {
+              scrollToTop()
+            },
+            onPrevStep: function () {
+              scrollToTop()
+            }
+          })
+  
+          function scrollToTop(el = '.js-step-form') {
+            el = document.querySelector(el)
+            window.scrollTo({
+              top: (el.getBoundingClientRect().top + window.scrollY) - 30,
+              left: 0,
+              behavior: 'smooth'
+            })
+          }
+  
+  
+          // INITIALIZATION OF ADD FIELD
+          // =======================================================
+          new HSAddField('.js-add-field', {
+            addedField: field => {
+              HSCore.components.HSTomSelect.init(field.querySelector('.js-select-dynamic'))
+              HSCore.components.HSMask.init(field.querySelector('.js-input-mask'))
+            }
+          })
+  
+  
+          // INITIALIZATION OF SELECT
+          // =======================================================
+          HSCore.components.HSTomSelect.init('.js-select', {
+            render: {
+              'option': function (data, escape) {
+                return data.optionTemplate || `<div>${data.text}</div>>`
+              },
+              'item': function (data, escape) {
+                return data.optionTemplate || `<div>${data.text}</div>>`
+              }
+            }
+          })
+  
+  
+          // INITIALIZATION OF INPUT MASK
+          // =======================================================
+          HSCore.components.HSMask.init('.js-input-mask')
+        }
+      })()
+    </script>
+
+  <script>
+    (function() {
+      // INITIALIZATION OF FLATPICKR
+      // =======================================================
+      HSCore.components.HSFlatpickr.init('.js-flatpickr')
+    })();
+  </script>
+  <script>
+      (function () {
+        // STYLE SWITCHER
+        // =======================================================
+        const $dropdownBtn = document.getElementById('selectThemeDropdown') // Dropdowon trigger
+        const $variants = document.querySelectorAll(`[aria-labelledby="selectThemeDropdown"] [data-icon]`) // All items of the dropdown
+        // Function to set active style in the dorpdown menu and set icon for dropdown trigger
+        const setActiveStyle = function () {
+          $variants.forEach($item => {
+            if ($item.getAttribute('data-value') === HSThemeAppearance.getOriginalAppearance()) {
+              $dropdownBtn.innerHTML = `<i class="${$item.getAttribute('data-icon')}" />`
+              return $item.classList.add('active')
+            }
+            $item.classList.remove('active')
+          })
+        }
+        // Add a click event to all items of the dropdown to set the style
+        $variants.forEach(function ($item) {
+          $item.addEventListener('click', function () {
+            HSThemeAppearance.setAppearance($item.getAttribute('data-value'))
+          })
+        })
+        // Call the setActiveStyle on load page
+        setActiveStyle()
+        // Add event listener on change style to call the setActiveStyle function
+        window.addEventListener('on-hs-appearance-change', function () {
+          setActiveStyle()
+        })
+      })()
+    </script>
+  <!-- End Style Switcher JS -->
+</html>

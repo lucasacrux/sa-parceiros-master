@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+{% extends "t_base.html" %}
+
+{% load static %}
+
+{% block content %}
+<!-- ========== MAIN CONTENT ========== -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<style>
+  .flatpickr-calendar .flatpickr-day.today {
+    background-color: #377dff30 !important;
+    color: #1e2022 !important;
+    border-color: transparent !important;
+  }
+
+  .select2-container {
+    width: 100% !important;
+  }
+
+  .select2-container .select2-selection--multiple {
+    min-height: 36px !important;
+  }
+
+  .select2-container--default .select2-selection--multiple {
+    background-color: #FFFFFF !important;
+    border: .0625rem solid rgba(231, 234, 243, .7) !important;
+    border-radius: .3125rem !important;
+  }
+
+  .select2-container--default.select2-container--focus .select2-selection--multiple {
+    border: solid #418AE9 1px !important;
+    outline: 0 !important;
+  }
+
+  .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    padding-left: 20px !important;
+  }
+
+  .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #FFFFFF !important;
+    border: 1px solid #1366ff !important;
+    margin-top: 9px !important;
+  }
+
+  .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #1e2022 !important;
+  }
+
+  .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+    color: #1e2022 !important;
+  }
+
+  .select2-container .select2-container--default .select2-container--open {
+    top: 293px !important;
+  }
+
+  .select2-container .select2-search--inline {
+    margin-top: -16px !important;
+    margin-left: 8px !important;
+  }
+
+  .ant-select {
+    position: absolute;
+    width: 100%;
+    height: 45px !important;
+    z-index: 999;
+    background-color: transparent;
+  }
+
+  .autocomplete-suggestions {
+    border: 1px solid #d4d4d4;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: white;
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    display: none;
+  }
+
+  .autocomplete-suggestion {
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .autocomplete-suggestion:hover {
+    background-color: #e9e9e9;
+  }
+
+  .iti {
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .ant-select {
+      height: 230px !important;
+    }
+  }
+</style>
+
+<main id="content" role="main" class="main">
+    <div class="content container-fluid">
+      <!-- Step Form -->
+      <form class="js-step-form py-md-5" method="POST" data-hs-step-form-options="{
+              &quot;progressSelector&quot;: &quot;#addUserStepFormProgress&quot;,
+              &quot;stepsSelector&quot;: &quot;#addUserStepFormContent&quot;,
+              &quot;endSelector&quot;: &quot;#addUserFinishBtn&quot;,
+              &quot;isValidate&quot;: false
+            }" action="{% url 't_criar_acordo' %}" >
+        {% csrf_token %}
+
+        <input type="hidden" name="acordo_data" value="{{ acordo_data }}">
+
+        <div class="row justify-content-lg-center">
+          <div class="col-lg-8" style="position: relative;">
+            <div class="col-lg-8 ant-select"></div>
+            <!-- Step -->
+            <ul id="addUserStepFormProgress" class="js-step-progress step step-sm step-icon-sm step step-inline step-item-between mb-3 mb-md-5">
+              <li class="step-item active focus">
+                <a class="step-content-wrapper" href="javascript:;" data-hs-step-form-next-options="{
+                    &quot;targetSelector&quot;: &quot;#addUserStepProfile&quot;
+                  }">
+                  <span class="step-icon step-icon-soft-dark">1</span>
+                  <div class="step-content">
+                    <span class="step-title">CPF</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="step-item">
+                <a class="step-content-wrapper" href="javascript:;" data-hs-step-form-next-options="{
+                    &quot;targetSelector&quot;: &quot;#addUserStepBillingAddress&quot;
+                  }">
+                  <span class="step-icon step-icon-soft-dark">2</span>
+                  <div class="step-content">
+                    <span class="step-title">Contratos</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="step-item">
+                <a class="step-content-wrapper" href="javascript:;" data-hs-step-form-next-options="{
+                    &quot;targetSelector&quot;: &quot;#addUserStepConfirmation&quot;
+                  }">
+                  <span class="step-icon step-icon-soft-dark">3</span>
+                  <div class="step-content">
+                    <span class="step-title">Criar proposta</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+            <!-- End Step -->
+
+            <!-- Content Step Form -->
+            <div id="addUserStepFormContent">
+              <div id="addUserStepProfile" class="card card-lg active" style="display: block; opacity: 1.0325;">
+                <div class="card-body">
+                  <!-- Form -->
+                  <div class="row mb-4">
+                    <label for="emailLabel" class="col-sm-3 col-form-label form-label">CPF:</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="js-input-mask form-control" name="cpf" data-name="cpf" placeholder="xxx.xxx.xxx-xx" aria-label="xxx.xxx.xxx-xx" data-hs-mask-options='{
+                        "mask": "000.000.000-00"
+                      }'>
+                      <small id="cpfError" class="form-text text-danger" style="display:none;">CPF não encontrado ou inválido.</small>
+                    </div>
+                  </div>
+                  <!-- End Form -->
+                </div>
+                <!-- Footer -->
+                <div class="card-footer d-flex justify-content-end align-items-center">
+                  <button id="nextButton" type="button" class="btn btn-primary">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                    Proximo <i class="bi-chevron-right"></i>
+                  </button>
+                </div>
+                <!-- End Footer -->
+              </div>
+
+              <div id="addUserStepBillingAddress" class="card card-lg" style="display: none; opacity: 1.02;">
+                <div class="card-body">
+                  <!-- Form -->
+                  <div class="row mb-4">
+                    <label for="locationLabel-ts-control" class="col-sm-3 col-form-label form-label" id="locationLabel-ts-label">Contratos:</label>
+                    <div class="col-sm-9">
+                      <div class="mb-4">
+                        <!-- Select -->
+                        <select id="contractSelect" class="form-control" name="contrato" multiple>
+                          
+                        </select>
+                        <small id="contratosError" class="form-text text-danger" style="display:none;">Por favor, selecione ao menos um contrato para prosseguir.</small>
+                        <!-- End Select -->
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End Form -->
+                </div>
+                <!-- Footer -->
+                <div class="card-footer d-flex align-items-center">
+                  <button type="button" class="btn btn-ghost-secondary" data-hs-step-form-prev-options="{
+                       &quot;targetSelector&quot;: &quot;#addUserStepProfile&quot;
+                     }">
+                    <i class="bi-chevron-left"></i> Voltar
+                  </button>
+
+                  <div class="ms-auto">
+                    <button id="nextButton2" type="button" class="btn btn-primary">
+                      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                      Proximo <i class="bi-chevron-right"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- End Footer -->
+              </div>
+
+              <div id="addUserStepConfirmation" class="card card-lg" style="display: none;position: relative;">
+
+                <div id="spinner-border" class="justify-content-center" style="background-color: #00000014;border-radius: 0.6875rem;display: none;position: absolute;z-index: 999;width: 100%;height: 100%;">
+                  <div style="display: flex;flex-direction: column;justify-content: center;align-items: center;gap: 15px;">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h3 style="color: #377DFF;">Criando proposta</h3>
+                  </div>
+                </div>    
+                <div class="card-body">
+
+                  <div class="row mb-4">
+                    <h2>Detalhes da proposta</h2>
+                  </div>
+
+                  <div class="row mb-4">
+                  <!-- Table -->
+                  <table class="table mb-5">
+                    <tbody>
+                      <tr>
+                        <th scope="row"></th>
+                        <td>
+                          <div><strong>Nome do Cliente: </strong><span id="pessoaNome"></span></div>
+                        </td>
+                        <td>
+                          <div><strong>CPF: </strong><span id="pessoaCpf"></span></div>
+                        </td>
+                        <td>
+                          <div><strong>Contratos selecionados: </strong><span id="selectedContracts"></span></div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row"></th>
+                        <td>
+                          <div><strong>Valor pendente de amortização: </strong><span id="valorPendente"></span></div>
+                        </td>
+                        <td>
+                          <div><strong>Nº minimo de parcelas: </strong><span id="minParcelas"></span></div>
+                        </td>
+                        <td>
+                          <div><strong>Nº maximo de parcelas: </strong><span id="maxParcelas"></span></div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row"></th>
+                        <td>
+                          <div><strong style="color: green;">Menor valor a recuperar: </strong><span id="maiorDesconto"></span></div>
+                        </td>
+                        <td style="display: none;">
+                          <div><strong style="color: red;">Menor desconto: </strong><span id="menorDesconto"></span></div>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <!-- End Table -->
+                  </div>
+
+                  <div class="row mb-4">
+                    <h2>Descontos sugeridos</h2>
+                    <span>Caso prefira, selecione um dos descontos abaixo.</span>
+                  </div>
+
+                  <div class="row mb-4">
+                    <div class="col mb-3 mb-lg-3">
+                      <!-- Card -->
+                      <div class="card card-hover-shadow text-center h-100 discount-card" data-valor="valorMaiorDesconto2" data-parcelas="minParcelas2" style="cursor: pointer;">  
+                        <!-- Body -->
+                        <div class="card-body">
+                          <div class="mb-4">
+                            <h2 class="mb-1" style="color: green;"><span id="maiorDesconto2"></span> OFF</h2>
+                          </div>
+
+                          <!-- <a class="stretched-link" href="#"></a> -->
+                        </div>
+                        <!-- End Body -->
+    
+                        <!-- Footer -->
+                        <div class="card-footer">
+                          <!-- Stats -->
+                          <div class="row col-divider">
+                            <div class="col">
+                              <span class="d-block fs-5">De</span>
+                              <span class="h5"><span id="valorPendente2"></span></span>
+                            </div>
+                            <!-- End Col -->
+    
+                            <div class="col">
+                              <span class="d-block fs-5">Por</span>
+                              <span class="h5"><span id="valorMaiorDesconto2"></span></span>
+                            </div>
+                            <!-- End Col -->
+    
+                            <div class="col">
+                              
+                                <span class="d-block fs-5">Em Até</span>
+                                <span class="h5"><span id="minParcelas2"></span>x</span>
+                              
+                            </div>
+                            <!-- End Col -->
+                          </div>
+                          <!-- End Stats -->
+                        </div>
+                        <!-- End Footer -->
+                      </div>
+                      <!-- End Card -->
+                    </div>
+
+                    <div class="col mb-3 mb-lg-3">
+                      <!-- Card -->
+                      <div class="card card-hover-shadow text-center h-100 discount-card" data-valor="valorMedioDesconto2" data-parcelas="medParcelas2" style="cursor: pointer;">  
+                        <!-- Body -->
+                        <div class="card-body">
+                          <div class="mb-4">
+                            <h2 class="mb-1"><span id="medioDesconto2"></span> OFF</h2>
+                          </div>
+
+                          <!-- <a class="stretched-link" href="#"></a> -->
+                        </div>
+                        <!-- End Body -->
+    
+                        <!-- Footer -->
+                        <div class="card-footer">
+                          <!-- Stats -->
+                          <div class="row col-divider">
+                            <div class="col">
+                              <span class="d-block fs-5">De</span>
+                              <span class="h5"><span id="valorPendente3"></span></span>
+                            </div>
+                            <!-- End Col -->
+    
+                            <div class="col">
+                              <span class="d-block fs-5">Por</span>
+                              <span class="h5"><span id="valorMedioDesconto2"></span></span>
+                            </div>
+                            <!-- End Col -->
+    
+                            <div class="col">
+                              
+                                <span class="d-block fs-5">Em Até</span>
+                                <span class="h5"><span id="medParcelas2"></span> x</span>
+                              
+                            </div>
+                            <!-- End Col -->
+                          </div>
+                          <!-- End Stats -->
+                        </div>
+                        <!-- End Footer -->
+                      </div>
+                      <!-- End Card -->
+                    </div>
+
+                    <div class="col mb-3 mb-lg-3">
+                      <!-- Card -->
+                      <div class="card card-hover-shadow text-center h-100 discount-card" data-valor="valorMenorDesconto2" data-parcelas="maxParcelas2" style="cursor: pointer;">
+                        <!-- Body -->
+                        <div class="card-body">
+                          <div class="mb-4">
+                            <h2 class="mb-1" style="color: red;"><span id="menorDesconto2"></span> OFF</h2>
+                          </div>
+
+                          <!-- <a class="stretched-link" href="#"></a> -->
+                        </div>
+                        <!-- End Body -->
+    
+                        <!-- Footer -->
+                        <div class="card-footer">
+                          <!-- Stats -->
+                          <div class="row col-divider">
+                            <div class="col">
+                              <span class="d-block fs-5">De</span>
+                              <span class="h5"><span id="valorPendente4"></span></span>
+                            </div>
+                            <!-- End Col -->
+    
+                            <div class="col">
+                              <span class="d-block fs-5">Por</span>
+                              <span class="h5"><span id="valorMenorDesconto2"></span></span>
+                            </div>
+                            <!-- End Col -->
+    
+                            <div class="col">
+                              
+                                <span class="d-block fs-5">Em Até</span>
+                                <span class="h5"><span id="maxParcelas2"></span> x</span>
+                              
+                            </div>
+                            <!-- End Col -->
+                          </div>
+                          <!-- End Stats -->
+                        </div>
+                        <!-- End Footer -->
+                      </div>
+                      <!-- End Card -->
+                    </div>
+                  </div>
+
+                  <div class="row mb-4">
+                    <h2>Criação de proposta</h2>
+                  </div>
+
+                  <div class="row mb-4">
+                    <label for="Valor_do_Acordo" class="col-sm-3 col-form-label form-label">Valor da proposta:</label>
+                    <div class="col-sm-9">
+                      <div class="col-sm-9">
+                        <div class="input-group mb-3">
+                          <span class="input-group-text">R$</span>
+                          <input type="text" class="form-control" name="Valor_do_Acordo" id="Valor_do_Acordo">
+                        </div>
+                        <small id="valorAcordoError" class="form-text text-danger" style="display:none;">valor da proposta menor que o valor pendente de amortização.</small>
+                      </div>        
+                    </div>
+                  </div>
+
+                  <div class="row mb-4" style="background-color: #f8f8f8;border: 1px solid #ecedf0;border-radius: 10px;">
+                    <!-- Nav -->
+                    <ul class="nav nav-pills justify-content-center mb-3" role="tablist">
+                      <li class="nav-item" style="width: 48%;border: 1px solid #86affc;border-radius: 10px;">
+                        <a class="nav-link active" id="nav-one-eg2-tab" href="#nav-one-eg2" data-bs-toggle="pill" data-bs-target="#nav-one-eg2" role="tab" aria-controls="nav-one-eg2" aria-selected="true">
+                          <div class="d-flex align-items-center">
+                            <i class="bi-card-checklist" style="margin-right: 10px;"></i> Parcelas fixas
+                          </div>
+                        </a>
+                      </li>
+                      <li class="nav-item" style="width: 48%;border: 1px solid #86affc;border-radius: 10px;">
+                        <a class="nav-link" id="nav-two-eg2-tab" href="#nav-two-eg2" data-bs-toggle="pill" data-bs-target="#nav-two-eg2" role="tab" aria-controls="nav-two-eg2" aria-selected="false">
+                          <div class="d-flex align-items-center">
+                            <i class="bi-card-list" style="margin-right: 10px;"></i> Parcelas personalizadas
+                          </div>
+                        </a>
+                      </li>
+                    </ul>
+                    <!-- End Nav -->
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                      <div class="tab-pane fade show active" id="nav-one-eg2" role="tabpanel" aria-labelledby="nav-one-eg2-tab">
+                        <div class="row mb-4">
+                          <label for="num_parcelas_acordo" class="col-sm-3 col-form-label form-label">Parcelas:</label>
+                          <div class="col-sm-9">
+                            <div class="input-group input-group-md-vertical" style="display: flex; align-items: center;">
+                              <input type="text" class="form-control" id="parcelasInput" style="margin-right: 20px;">
+                              <input type="range" class="form-range" id="customRange1" style="width: 75%;">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row mb-4">
+                          <label for="valor_parcela" class="col-sm-3 col-form-label form-label">Valor parcela:</label>
+                          <div class="col-sm-9">
+                            <div class="input-group mb-3">
+                              <span class="input-group-text">R$</span>
+                              <input type="text" class="form-control" name="valor_parcela" id="valor_parcela" disabled>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="tab-pane fade" id="nav-two-eg2" role="tabpanel" aria-labelledby="nav-two-eg2-tab">
+
+                        <div style="display: flex;width: 100%;height: 1px;background-color: #ecedf0;margin: 10px 0px;"></div>
+
+                        <div class="row mb-4 parcela-segmento" style="display: flex;align-items: center;align-content: center;">
+                          <div class="col-sm-2">
+                            <label for="De" class="form-label">De:</label>
+                            <input type="text" class="form-control" name="de_parc" id="de_parc" value="1" readonly>
+                          </div>
+                
+                          <div class="col-sm-2">
+                            <label for="Até" class="form-label">Até:</label>
+                            <input type="text" class="form-control" name="ate_parc" id="ate_parc">
+                          </div>
+                
+                          <div class="col-sm-2" style="margin-top: 25px;">
+                            <span>Parcelas</span>
+                          </div>
+                          
+                          <div class="col-sm-4" style="margin-top: 15px;">
+                            <label for="valor_parcela_perso" class="form-label">Valor parcela:</label>
+                            <div class="col-sm-9">
+                              <div class="input-group mb-3">
+                                <span class="input-group-text">R$</span>
+                                <input type="text" class="form-control" name="valor_parcela_perso" id="valor_parcela_perso" value="0,00">
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style="display: flex;width: 100%;height: 1px;background-color: #ecedf0;margin: 10px 0px;"></div>
+
+                        <div id="personalizadasContainer"></div>
+
+                        <div class="row mb-4" style="display: flex;align-items: center;justify-content: space-between;align-content: center;">
+                          <div class="col-sm-6">
+                            <label for="" class="form-label">Total de parcelas:</label>
+                            <div class="col-sm-9">
+                              <div class="input-group mb-3" style="width: 50%;">
+                                <input type="text" class="form-control" name="total_parc" id="total_parc">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-6" style="display: flex;justify-content: flex-end;">
+                            <button type="button" class="btn btn-sm btn-white" id="addParcelaBtn"><i class="bi bi-plus"></i> Adicionar nova parcela</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- End Tab Content --> 
+                  </div>
+
+                  <div class="row mb-4">
+                    <label for="dia_vencimento_primeira_parcela" class="col-sm-3 col-form-label form-label">Vencimento primeira parcela:</label>
+                    <div class="col-sm-9">
+                      <div class="form-group">                          
+                        <div id="projectDeadlineNewProjectFlatpickr" class="flatpickr-custom input-group">
+                          <div class="input-group-prepend input-group-text" data-bs-toggle>
+                            <i class="bi-calendar-week"></i>
+                          </div>
+                          <input type="text" name="dia_vencimento_primeira_parcela" class="form-control" id="primeiroVencimentoFlatpickrInput" placeholder="Selecione uma data">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mb-4">
+                    <label for="dia_vencimento_proximas_parcelas" class="col-sm-3 col-form-label form-label">Vencimento próximas parcelas:</label>
+                    <div class="col-sm-9">
+                        <div class="form-group">                          
+                            <select name="dia_vencimento_proximas_parcelas" class="form-control" id="proximovencimentoFlatpickrInput">
+                            </select>
+                        </div>
+                    </div>
+                  </div>
+
+                  <!-- <div class="row mb-4">
+                    <label for="dia_vencimento_primeira_parcela" class="col-sm-3 col-form-label form-label">Vencimento proposta:</label>
+                    <div class="col-sm-9">
+                      <div class="form-group">                          
+                        <div id="projectDeadlineNewProjectFlatpickr2" class="flatpickr-custom input-group">
+                          <div class="input-group-prepend input-group-text" data-bs-toggle>
+                            <i class="bi-calendar-week"></i>
+                          </div>
+                          <input type="text" name="dia_vencimento_primeira_parcela" class="form-control" id="primeiroVencimentoFlatpickrInput2" placeholder="Selecione uma data">
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+
+                  <div class="row mb-4">
+                    <label for="email" class="col-sm-3 col-form-label form-label">Email:</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="email" id="email" placeholder="exemplo@saparceiros.com">
+                    </div>
+                  </div>
+
+                  <div class="row mb-4">
+                    <label for="telefone" class="col-sm-3 col-form-label form-label">Telefone:</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="js-input-mask form-control" id="telefone" placeholder="(00) 0 0000-0000" maxlength="15">
+                    </div>
+                  </div>
+
+                  <div class="mt-5 mb-2" style="display: flex;align-items: center;justify-content: center;width: 100%;">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" id="preVisualizarAcordoBtn">Pré visualizar proposta</button>
+
+                    <!-- Modal -->
+                    <div class="modal modal-lg fade" id="previewAcordo" tabindex="-1" aria-labelledby="previewAcordoLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="previewAcordoLabel">Pré visualização da proposta</h5>
+                            <button type="button" class="btn-close" id="simularAcordoBtn" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+
+                          <div class="modal-body">
+                            <!-- Table -->
+                            <table class="table mb-5">
+                              <tbody>
+                                <tr>
+                                  <th scope="row"></th>
+                                  <td>
+                                    <div>CPF: <span id="pessoaCpf2"></span></div>
+                                    <div>Carteira ID: <span id="carteira_id"></span></div>
+                                  </td>
+                                  <td>
+                                    
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row"></th>
+                                  <td>
+                                    <div>Email: <span id="emailSpan"></span></div>
+                                  </td>
+                                  <td>
+                                    <div>Telefone: <span id="telefoneSpan"></span></div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row"></th>
+                                  <td>
+                                    <div>Contratos selecionados: <span id="selectedContracts2"></span></div>
+                                  </td>
+                                  <td>
+                                    <div>Valor acordo: <span id="valorAcordoSpan"></span></div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row"></th>
+                                  <td>
+                                    <div>Nº parcelas: <span id="numParcelasSpan"></span></div>
+                                  </td>
+                                  <td>
+                                    <div id="conteudoFixas" style="display: none;">
+                                      <div>Valor Parcela: <span id="valorParcelaSpan"></span></div>
+                                    </div>
+
+                                    <div id="conteudoPersonalizadas" style="display: none;">
+                                      <div id="previsualizacaoParcelas">
+                                        <h3>Detalhes das Parcelas Personalizadas</h3>
+                                        <ul id="listaParcelas"></ul>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th scope="row"></th>
+                                  <td>
+                                    <div>Venc Primeira Parc: <span id="vencPrimeiraParcelaSpan"></span></div>
+                                  </td>
+                                  <td>
+                                    <div>Venc Próximas Parc: <span id="vencProximasParcelasSpan"></span></div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <!-- End Table -->
+
+                            <div class="accordion" id="accordionContrato">
+                              <div class="accordion-item">
+                                <div class="accordion-header" id="headingTwo">
+                                  <a class="accordion-button collapsed" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Parcelas
+                                  </a>
+                                </div>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionContrato">
+                                  <div class="accordion-body">
+                                    <table class="table">
+                                      <thead class="thead-light">
+                                        <tr>
+                                          <th scope="col">Nº parcela</th>
+                                          <th scope="col">Valor parcela</th>
+                                          <th scope="col">Data de vencimento</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody id="parcelasTBody">
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-white" data-bs-dismiss="modal">Cancelar</button>
+                              <button type="button" class="btn btn-primary" id="aceitarAcordoBtn" data-bs-dismiss="modal">Salvar simulação da proposta</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    <!-- End Modal -->
+                    </div>
+                  </div>
+
+                  <!-- Footer -->
+                  <div class="card-footer d-sm-flex align-items-sm-center">
+                    <button type="button" class="btn btn-ghost-secondary mb-2 mb-sm-0" data-hs-step-form-prev-options='{
+                      "targetSelector": "#addUserStepBillingAddress"
+                        }'>
+                      <i class="bi-chevron-left"></i> Voltar
+                    </button>
+                  </div>
+                  <!-- End Footer -->
+                </div>
+              </div>
+              <!-- End Content Step Form -->
+            </div>
+          </div>
+        </div>
+      </form>
+      <!-- End Step Form -->
+    </div>
+  </main>
+<!-- ========== END MAIN CONTENT ========== -->
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const cpfField               = document.querySelector('input[name="cpf"]');
+    const nextButton             = document.getElementById('nextButton');
+    const selectContainer        = document.getElementById('addUserStepBillingAddress').querySelector('.col-sm-9 .mb-4');
+    const nextButton2            = document.getElementById('nextButton2');
+    const selectedContractsSpan  = document.getElementById('selectedContracts');
+    const selectedContractsSpan2 = document.getElementById('selectedContracts2');
+    const contratosError         = document.getElementById('contratosError');
+    const pessoaCpfSpan          = document.getElementById('pessoaCpf');
+    const pessoaCpfSpan2         = document.getElementById('pessoaCpf2');
+    const pessoaNomeSpan         = document.getElementById('pessoaNome');
+    const valorPendenteSpan      = document.getElementById('valorPendente');
+    const valorPendenteSpan2     = document.getElementById('valorPendente2');
+    const valorPendenteSpan3     = document.getElementById('valorPendente3');
+    const valorPendenteSpan4     = document.getElementById('valorPendente4');
+
+    const maiorDescontoSpan      = document.getElementById('maiorDesconto');
+    const maiorDescontoSpan2      = document.getElementById('maiorDesconto2');
+    const valorMaiorDescontoSpan2      = document.getElementById('valorMaiorDesconto2');
+
+    const medioDescontoSpan2      = document.getElementById('medioDesconto2');
+    const valorMedioDescontoSpan2      = document.getElementById('valorMedioDesconto2');
+
+    const menorDescontoSpan      = document.getElementById('menorDesconto');
+    const menorDescontoSpan2      = document.getElementById('menorDesconto2');
+    const valorMenorDescontoSpan2      = document.getElementById('valorMenorDesconto2');
+
+    const minParcelasSpan        = document.getElementById('minParcelas');
+    const minParcelasSpan2        = document.getElementById('minParcelas2');
+    const medParcelasSpan2        = document.getElementById('medParcelas2');
+    const maxParcelasSpan        = document.getElementById('maxParcelas');
+    const maxParcelasSpan2        = document.getElementById('maxParcelas2');
+    let apiResponse;
+
+    cpfField.addEventListener('change', function() {
+        let selectElement = selectContainer.querySelector('select');
+        if (selectElement) {
+            selectElement.remove();
+        }
+    });
+
+    nextButton.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        var cpf = cpfField.value.replace(/\D/g, '');
+        var spinner = this.querySelector('.spinner-border');
+        var cpfError = document.getElementById('cpfError');
+
+        spinner.style.display = 'inline-block';
+
+        fetch('/verificar-cpf/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ cpf: cpf })
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.style.display = 'none';
+
+            if (data.result.length === 0) {
+                cpfField.style.borderColor = '#E02B1D';
+                cpfError.style.display = 'block';
+            } else {
+                apiResponse = data;
+                cpfField.style.borderColor = '';
+                cpfError.style.display = 'none';
+                document.querySelector('#addUserStepFormProgress .step-item:nth-child(2) a').click();
+                fillContractSelect(data.result[0].contratos);
+                const pessoa = data.result[0].pessoa;
+                pessoaCpfSpan.textContent  = pessoa.cpf;
+                pessoaCpfSpan2.textContent = pessoa.cpf;
+                pessoaNomeSpan.textContent = pessoa.nome;
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao verificar o CPF:', error);
+            spinner.style.display = 'none';
+        });
+    });
+
+    function fillContractSelect(contratos) {
+      const selectContainer = document.getElementById('addUserStepBillingAddress').querySelector('.col-sm-9 .mb-4');
+
+      while (selectContainer.firstChild) {
+          selectContainer.removeChild(selectContainer.firstChild);
+      }
+
+      let selectElement = document.createElement('select');
+      selectElement.id = 'contractSelect';
+      selectElement.setAttribute('multiple', 'multiple');
+      selectElement.className = 'form-control';
+      selectContainer.appendChild(selectElement);
+
+      const groupedContratos = contratos.reduce((acc, contrato) => {
+          (acc[contrato.nomeCarteira] = acc[contrato.nomeCarteira] || []).push(contrato);
+          return acc;
+      }, {});
+
+      Object.keys(groupedContratos).forEach(carteira => {
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = carteira;
+          groupedContratos[carteira].forEach(contrato => {
+              const option = document.createElement('option');
+              option.value = contrato.numeroContrato + "|" + contrato.carteira_id;
+              option.text = contrato.numeroContrato;
+              optgroup.appendChild(option);
+          });
+          selectElement.appendChild(optgroup);
+      });
+
+      $(selectElement).select2({
+          placeholder: "Selecione um contrato",
+          allowClear: true
+      });
+
+      $(selectElement).on('select2:select', function (e) {
+          const selectedCarteira = e.params.data.element.parentElement.label;
+          $(selectElement).find('optgroup').not(`[label="${selectedCarteira}"]`).prop('disabled', true);
+          $(selectElement).select2();
+      });
+
+      $(selectElement).on('select2:unselect', function () {
+          if ($(selectElement).select2('data').length === 0) {
+              $(selectElement).find('optgroup').prop('disabled', false);
+              $(selectElement).select2();
+          }
+      });
+    }
+
+    nextButton2.addEventListener('click', function(e) {
+        const selectElement = document.getElementById('contractSelect');
+        const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value.split("|")[0]);
+        const selectedCarteiraIds = Array.from(selectElement.selectedOptions).map(option => option.value.split("|")[1]);
+
+        if (selectedOptions.length === 0) {
+            e.preventDefault();
+            selectElement.style.borderColor = '#E02B1D';
+            contratosError.style.display = 'block';
+        } else {
+            selectedContractsSpan.textContent = selectedOptions.join(', ');
+            selectedContractsSpan2.textContent = selectedOptions.join(', ');
+            const carteiraId = selectedCarteiraIds[0];
+            selectElement.style.borderColor = '';
+            contratosError.style.display = 'none';
+            document.querySelector('#addUserStepFormProgress .step-item:nth-child(3) a').click();
+            logDiscounts(selectedOptions);
+        }
+    });
+
+    function logDiscounts(selectedContracts) {
+      if (!apiResponse) {
+          console.error('API response is not defined');
+          return;
+      }
+
+      const contratos = apiResponse.result[0].contratos;
+      const descontos = apiResponse.result[0].descontos;
+      let valorPendenteAmortizacao = 0;
+      let maiorDescontoPct = 0;
+      let medioDescontoPct = 100;
+      let menorDescontoPct = 100;
+      let minParcelas = Infinity;
+      let medParcelas = 0;
+      let maxParcelas = 0;
+
+      selectedContracts.forEach(contractNumber => {
+          const contrato = contratos.find(c => c.numeroContrato === contractNumber);
+          if (contrato) {
+              valorPendenteAmortizacao += contrato.saldoAPagar;
+
+              const contractDiscounts = descontos[contractNumber];
+              if (contractDiscounts && contractDiscounts.length > 1) {
+                const medioDesconto = contractDiscounts[1];
+                if (medioDesconto.pct_desconto < medioDescontoPct) {
+                    medioDescontoPct = medioDesconto.pct_desconto;
+                }
+                if (medioDesconto.qtd_parcelas > medParcelas) {
+                    medParcelas = medioDesconto.qtd_parcelas;
+                }
+              }
+              contractDiscounts.forEach(desconto => {
+                  if (desconto.pct_desconto > maiorDescontoPct ) maiorDescontoPct  = desconto.pct_desconto;
+                  if (desconto.pct_desconto < menorDescontoPct) menorDescontoPct = desconto.pct_desconto;
+                  if (desconto.qtd_parcelas < minParcelas) minParcelas = desconto.qtd_parcelas;
+                  if (desconto.qtd_parcelas > maxParcelas) maxParcelas = desconto.qtd_parcelas;
+              });
+          }
+      });
+
+      const maiorDescontoValor = valorPendenteAmortizacao * (1 - maiorDescontoPct / 100);
+      const maiorDescontoValor2 = valorPendenteAmortizacao * (1 - maiorDescontoPct / 100);
+      const medioDescontoValor = valorPendenteAmortizacao * (1 - medioDescontoPct / 100);
+      const menorDescontoValor = valorPendenteAmortizacao * (1 - menorDescontoPct / 100);
+      const menorDescontoValor2 = valorPendenteAmortizacao * (menorDescontoPct / 100);
+
+      valorPendenteSpan.textContent = 'R$ ' + valorPendenteAmortizacao.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+      maiorDescontoSpan.textContent = 'R$' + maiorDescontoValor2.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") + ` (${maiorDescontoPct}% de desconto)`;
+      menorDescontoSpan.textContent = 'R$' + menorDescontoValor2.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") + ` (${menorDescontoPct}% de desconto)`;
+
+      maiorDescontoSpan2.textContent = maiorDescontoPct + '% ';
+      menorDescontoSpan2.textContent = menorDescontoPct + '% ';
+      medioDescontoSpan2.textContent = medioDescontoPct + '%';
+
+      valorMaiorDescontoSpan2.textContent = 'R$ ' + maiorDescontoValor.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+      valorMedioDescontoSpan2.textContent = 'R$ ' + medioDescontoValor.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+      valorMenorDescontoSpan2.textContent = 'R$ ' + menorDescontoValor.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+
+      valorPendenteSpan2.textContent = 'R$ ' + valorPendenteAmortizacao.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+      valorPendenteSpan3.textContent = 'R$ ' + valorPendenteAmortizacao.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+      valorPendenteSpan4.textContent = 'R$ ' + valorPendenteAmortizacao.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+
+      const rangeInput = document.getElementById('customRange1');
+      const textInput = document.getElementById('parcelasInput');
+      rangeInput.min = minParcelas.toString();
+      rangeInput.max = maxParcelas.toString();
+      rangeInput.value = minParcelas.toString();
+      textInput.value = minParcelas.toString();
+
+      minParcelasSpan.textContent = minParcelas;
+      medParcelasSpan2.textContent = medParcelas;
+      minParcelasSpan2.textContent = minParcelas;
+      maxParcelasSpan.textContent = maxParcelas;
+      maxParcelasSpan2.textContent = maxParcelas;
+
+      rangeInput.addEventListener('input', function() {
+        textInput.value = rangeInput.value;
+        atualizarValorParcela();
+      });
+
+      document.getElementById('Valor_do_Acordo').addEventListener('input', function(e) {
+        let valor = this.value.replace(/[\D]/g, '');
+        valor = (valor / 100).toFixed(2);
+        valor = valor.replace('.', ',');
+        valor = valor.replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+        
+        this.value = valor;
+
+        atualizarValorParcela();
+      });
+
+      function calcularValorTotalAcordo() {
+        const parcelas = document.querySelectorAll('.parcela-segmento');
+        let valorTotal = 0;
+
+        parcelas.forEach(segmento => {
+          const valorParcelaInput = segmento.querySelector('[name="valor_parcela_perso"]');
+          const valorParcela = parseFloat(valorParcelaInput.value.replace(/[\D]/g, '')) / 100;
+          const deParcInput = segmento.querySelector('[name="de_parc"]');
+          const ateParcInput = segmento.querySelector('[name="ate_parc"]');
+          const deParc = parseInt(deParcInput.value);
+          const ateParc = parseInt(ateParcInput.value);
+          const numeroParcelas = ateParc - deParc + 1;
+
+          valorTotal += valorParcela * numeroParcelas;
+        });
+
+        const valorAcordoInput = document.getElementById('Valor_do_Acordo');
+        valorAcordoInput.value = valorTotal.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+      }
+
+      function atualizarValorParcela() {
+        const valor_do_acordo = parseFloat(document.getElementById('Valor_do_Acordo').value.replace(/\./g, '').replace(',', '.') || 0);
+        const numParcelas = parseInt(document.getElementById('parcelasInput').value);
+        const valor_parcela = valor_do_acordo / numParcelas;
+
+        document.getElementById('valor_parcela').value = valor_parcela.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
+      }
+
+      minParcelasSpan.textContent = minParcelas;
+      maxParcelasSpan.textContent = maxParcelas;
+
+      const discounts = selectedContracts.reduce((acc, contractNumber) => {
+          const contractDiscounts = apiResponse.result[0].descontos[contractNumber];
+          if (contractDiscounts) {
+              acc[contractNumber] = contractDiscounts;
+          }
+          return acc;
+      }, {});
+
+      document.querySelectorAll('.discount-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const valorId = this.getAttribute('data-valor');
+        const parcelasId = this.getAttribute('data-parcelas');
+        
+        const valor = document.getElementById(valorId).textContent.replace('R$', '').trim();
+        const parcelas = document.getElementById(parcelasId).textContent.replace('x', '').trim();
+
+        const valorInput = document.getElementById('Valor_do_Acordo');
+        const parcelasInput = document.getElementById('parcelasInput');
+        const customRange = document.getElementById('customRange1');
+
+        valorInput.value = valor;
+        parcelasInput.value = parcelas;
+        customRange.value = parcelas;
+
+        atualizarValorParcela();
+      });
+    });
+
+    document.getElementById('valor_parcela_perso').addEventListener('input', function(e) {
+      let valor = this.value.replace(/[\D]/g, '');
+      valor = (valor / 100).toFixed(2);
+      valor = valor.replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+      
+      this.value = valor;
+      calcularValorTotalAcordo();
+    });
+
+    const ateInput = document.getElementById('ate_parc');
+
+    ateInput.addEventListener('change', function() {
+      updateTotalParc();
+      calcularValorTotalAcordo();
+    });
+
+    function updateTotalParc() {
+      const allAteInputs = document.querySelectorAll('[name="ate_parc"]');
+      const lastAteValue = allAteInputs[allAteInputs.length - 1].value;
+      totalParcInput.value = lastAteValue;
+    }
+
+    const personalizadasContainer = document.getElementById('personalizadasContainer');
+    const totalParcInput = document.getElementById('total_parc');
+    const addParcelaBtn = document.getElementById('addParcelaBtn');
+
+    document.getElementById('valor_parcela_perso').addEventListener('input', function(e) {
+      let valor = this.value.replace(/[\D]/g, '');
+      valor = (valor / 100).toFixed(2);
+      valor = valor.replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+      
+      this.value = valor;
+    });
+
+    addParcelaBtn.addEventListener('click', function() {
+      let lastAte = parseInt(document.getElementById('ate_parc').value, 10);
+      let lastSegment = personalizadasContainer.lastElementChild;
+      if (lastSegment) {
+        lastAte = parseInt(lastSegment.querySelector('[name="ate_parc"]').value, 10);
+      }
+
+      const deValueParc = lastAte + 1;
+      const ateValueParc = deValueParc + 1;
+      
+      addParcelaSegment(deValueParc, ateValueParc);
+      updateTotalParc();
+      calcularValorTotalAcordo();
+    });
+
+    function addParcelaSegment(deValueParc, ateValueParc) {
+      const segmentoId = 'parcelaSegmento' + deValueParc;
+      const segmento = document.createElement('div');
+      segmento.id = segmentoId;
+      segmento.className = "parcela-segmento";
+      segmento.innerHTML = `
+        <div class="row mb-4" style="display: flex;align-items: center;align-content: center;">
+          <div class="col-sm-2">
+            <label for="De" class="form-label">De:</label>
+            <input type="text" class="form-control" value="${deValueParc}" name="de_parc" readonly>
+          </div>
+
+          <div class="col-sm-2">
+            <label for="Até" class="form-label">Até:</label>
+            <input type="text" class="form-control" value="${ateValueParc}" name="ate_parc">
+          </div>
+
+          <div class="col-sm-2" style="margin-top: 25px;">
+            <span>Parcelas</span>
+          </div>
+          
+          <div class="col-sm-4" style="margin-top: 15px;">
+            <label for="valor_parcela_perso" class="form-label">Valor parcela:</label>
+            <div class="col-sm-9">
+              <div class="input-group mb-3">
+                <span class="input-group-text">R$</span>
+                <input type="text" class="form-control" name="valor_parcela_perso" id="valor_parcela_perso" value="0,00">
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-2" style="margin-top: 25px;">
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeSegmento('${segmentoId}')"><i class="bi-trash"></i></button>
+          </div>
+        </div>
+
+        <div style="display: flex;width: 100%;height: 1px;background-color: #ecedf0;margin: 10px 0px;"></div>
+      `;
+      
+      personalizadasContainer.appendChild(segmento);
+
+      const ateInput = segmento.querySelector('[name="ate_parc"]');
+      const valorInput = segmento.querySelector('[name="valor_parcela_perso"]');
+      valorInput.addEventListener('input', calcularValorTotalAcordo);
+
+      ateInput.addEventListener('change', function() {
+        updateTotalParc();
+        calcularValorTotalAcordo();
+      });
+
+      valorInput.addEventListener('input', function() {
+        let valor = this.value.replace(/[\D]/g, '');
+        valor = (valor / 100).toFixed(2);
+        valor = valor.replace(/(\d)(?=(\d{3})+\,)/g, '$1.');
+        
+        this.value = valor;
+      });
+
+      updateTotalParc();
+      calcularValorTotalAcordo();
+    }
+
+    function updateTotalParc() {
+      const allAteInputs = document.querySelectorAll('[name="ate_parc"]');
+      const lastAteValue = allAteInputs[allAteInputs.length - 1].value;
+      totalParcInput.value = lastAteValue;
+    }
+
+    window.removeSegmento = function(segmentId) {
+      const segmentToRemove = document.getElementById(segmentId);
+      if (segmentToRemove) {
+        personalizadasContainer.removeChild(segmentToRemove);
+        updateTotalParc();
+        calcularValorTotalAcordo();
+      }
+    };
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var firstDatePicker = flatpickr("#primeiroVencimentoFlatpickrInput", {
+        dateFormat: "d/m/Y",
+        minDate: "today",
+        maxDate: new Date().setDate(new Date().getDate() + 5),
+        onChange: function(selectedDates, dateStr, instance) {
+            var proximoVencimentoSelect = document.getElementById('proximovencimentoFlatpickrInput');
+            proximoVencimentoSelect.innerHTML = '';
+
+            var dataSelecionada = selectedDates[0];
+            var proximoMes = new Date(dataSelecionada);
+            proximoMes.setMonth(proximoMes.getMonth() + 1);
+
+            var diasHabilitados = [5, 10, 15, 20, 25, 30];
+
+            diasHabilitados.forEach(function(dia) {
+                var proximoVencimento = new Date(dataSelecionada.getFullYear(), dataSelecionada.getMonth(), dia);
+                if (proximoVencimento > dataSelecionada) {
+                    var option = document.createElement('option');
+                    option.value = proximoVencimento.toISOString().slice(0, 10);
+                    option.textContent = ('0' + dia).slice(-2) + '/' + ('0' + (proximoVencimento.getMonth() + 1)).slice(-2);
+                    proximoVencimentoSelect.appendChild(option);
+                }
+            });
+
+            diasHabilitados.forEach(function(dia) {
+                var proximoVencimento = new Date(dataSelecionada.getFullYear(), dataSelecionada.getMonth() + 1, dia);
+                if (proximoVencimento <= proximoMes) {
+                    var option = document.createElement('option');
+                    option.value = proximoVencimento.toISOString().slice(0, 10);
+                    option.textContent = ('0' + dia).slice(-2) + '/' + ('0' + (proximoVencimento.getMonth() + 1)).slice(-2);
+                    proximoVencimentoSelect.appendChild(option);
+                }
+            });
+        }
+    });
+    // var firstDatePicker = flatpickr("#primeiroVencimentoFlatpickrInput2", {
+    //   dateFormat: "d/m/Y",
+    //   minDate: "today",
+    //   maxDate: new Date().setDate(new Date().getDate() + 1),
+    // });
+});
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabFixas = document.getElementById('nav-one-eg2-tab');
+    const tabPersonalizadas = document.getElementById('nav-two-eg2-tab');
+    const conteudoFixas = document.getElementById('conteudoFixas');
+    const conteudoPersonalizadas = document.getElementById('conteudoPersonalizadas');
+    const valorDoAcordoInput = document.getElementById('Valor_do_Acordo');
+    const valorParcelaPerso = document.getElementById('valor_parcela_perso');
+    const valorPendenteSpan = document.getElementById('valorPendente');
+    const valorMaiorDescontoSpan2 = document.getElementById('valorMaiorDesconto2');
+    const valorMenorDescontoSpan2 = document.getElementById('valorMenorDesconto2');
+    const minParcelasSpan2 = document.getElementById('minParcelas2');
+    const maxParcelasSpan2 = document.getElementById('maxParcelas2');
+    const valorAcordoError = document.getElementById('valorAcordoError');
+    const parcelasInput = document.getElementById('parcelasInput');
+    const primeiroVencimentoInput = document.getElementById('primeiroVencimentoFlatpickrInput');
+    const proximoVencimentoInput = document.getElementById('proximovencimentoFlatpickrInput');
+    const emailInput = document.getElementById('email');
+    const telefoneInput = document.getElementById('telefone');
+    const preVisualizarAcordoBtn = document.getElementById('preVisualizarAcordoBtn');
+    const aceitarAcordoBtn = document.getElementById('aceitarAcordoBtn');
+    const tbody = document.getElementById('parcelasTBody');
+    let parcelasGeradas = [];
+    let acordoId = null;
+    let simulacaoEnviada = false;
+    let aceitacaoEnviada = false;
+
+
+    function verificarCampos() {
+      const todosPreenchidos = valorDoAcordoInput.value.trim() && parcelasInput.value.trim() && primeiroVencimentoInput.value.trim() && proximoVencimentoInput.value.trim() && emailInput.value.trim() && telefoneInput.value.trim();
+      preVisualizarAcordoBtn.disabled = !todosPreenchidos;
+    }
+
+    [valorDoAcordoInput, parcelasInput, primeiroVencimentoInput, proximoVencimentoInput, emailInput, telefoneInput].forEach(input => {
+      input.addEventListener('input', verificarCampos);
+    });
+
+    verificarCampos();
+
+    function gerarParcelasFixas() {
+      const valorDoAcordo = parseFloat(valorDoAcordoInput.value.replace(/\./g, '').replace(',', '.') || 0);
+      const numeroParcelas = parseInt(parcelasInput.value);
+      const valorParcela = valorDoAcordo / numeroParcelas;
+      const primeiraDataVencimento = primeiroVencimentoInput.value;
+      const proximaDataVencimento = proximoVencimentoInput.value;
+
+      parcelasGeradas = [];
+      tbody.innerHTML = '';
+
+      let dataVencimento = new Date(primeiraDataVencimento.split('/').reverse().join('-') + 'T00:00:00');
+      let proximaData = new Date(proximaDataVencimento.split('/').reverse().join('-') + 'T00:00:00');
+
+      let diaParc = proximaData.getDate();
+      let mesParc = proximaData.getMonth();
+      let anoParc = proximaData.getFullYear();
+
+      let mes = mesParc;
+
+      for (let i = 1; i <= numeroParcelas; i++ ) {
+        if (dataVencimento.getMonth() === proximaData.getMonth() && dataVencimento.getFullYear() === proximaData.getFullYear()) {
+          if (i === 1) {
+            diaParc = dataVencimento.getDate();
+            mes = dataVencimento.getMonth() + 1;
+            anoParc = dataVencimento.getFullYear();
+          } else if (i === 2) {
+            diaParc = proximaData.getDate();
+            mes = proximaData.getMonth() + 1;
+            anoParc = proximaData.getFullYear();
+          } else {
+            diaParc = proximaData.getDate();
+            mes = parseInt(mes) + 1;
+          }
+        } else {
+          if (i > 1) {
+            diaParc = proximaData.getDate();
+            mes = parseInt(mes) + 1;
+          } else {
+            diaParc = dataVencimento.getDate();
+            mes = mes;
+          }
+        }
+
+        if ( mes === 13 ) {
+          mes = 1;
+          anoParc = anoParc + 1;
+        }
+
+        dia = diaParc;
+
+        if ( mes === 2 && diaParc > 28 ) {
+          diaParc = 28;
+        }
+
+        if ( mes < 10 ) {
+          mes = '0' + mes;
+        }
+
+        if ( diaParc < 10 ) {
+          diaParc = '0' + diaParc;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <th scope="row">${i}</th>
+            <td>R$ ${valorParcela.toFixed(2).replace('.', ',')}</td>
+            <td>${diaParc}/${mes}/${anoParc}</td>
+        `;
+
+        const parcela = {
+          numero: `${i}`,
+          valor: `${valorParcela.toFixed(2).replace('.', ',')}`,
+          dataVencimento: `${diaParc}/${mes}/${anoParc}`
+        };
+
+        parcelasGeradas.push(parcela);
+        tbody.appendChild(tr);
+
+        diaParc = dia;
+      }
+    }
+
+    function gerarParcelasPersonalizadas() {
+      const numeroParcelas = document.getElementById('total_parc').value;
+      const segmentos = document.querySelectorAll('.parcela-segmento');
+      const valorParcela = parseFloat(valorParcelaPerso.value);
+
+      const primeiraDataVencimento = primeiroVencimentoInput.value;
+      const proximaDataVencimento = proximoVencimentoInput.value;
+
+      parcelasGeradas = [];
+      tbody.innerHTML = '';
+
+      let dataVencimento = new Date(primeiraDataVencimento.split('/').reverse().join('-') + 'T00:00:00');
+      let proximaData = new Date(proximaDataVencimento.split('/').reverse().join('-') + 'T00:00:00');
+
+      let diaParc = proximaData.getDate();
+      let mesParc = proximaData.getMonth();
+      let anoParc = proximaData.getFullYear();
+
+      let mes = mesParc;
+
+      for (let i = 1; i <= numeroParcelas; i++ ) {
+        if (dataVencimento.getMonth() === proximaData.getMonth() && dataVencimento.getFullYear() === proximaData.getFullYear()) {
+          if (i === 1) {
+            diaParc = dataVencimento.getDate();
+            mes = dataVencimento.getMonth() + 1;
+            anoParc = dataVencimento.getFullYear();
+          } else if (i === 2) {
+            diaParc = proximaData.getDate();
+            mes = proximaData.getMonth() + 1;
+            anoParc = proximaData.getFullYear();
+          } else {
+            diaParc = proximaData.getDate();
+            mes = parseInt(mes) + 1;
+          }
+        } else {
+          if (i > 1) {
+            diaParc = proximaData.getDate();
+            mes = parseInt(mes) + 1;
+          } else {
+            diaParc = dataVencimento.getDate();
+            mes = mes;
+          }
+        }
+
+        if ( mes === 13 ) {
+          mes = 1;
+          anoParc = anoParc + 1;
+        }
+
+        dia = diaParc;
+
+        if ( mes === 2 && diaParc > 28 ) {
+          diaParc = 28;
+        }
+
+        if ( mes < 10 ) {
+          mes = '0' + mes;
+        }
+
+        if ( diaParc < 10 ) {
+          diaParc = '0' + diaParc;
+        }
+
+        let valorParcelaAtual = 0;
+        segmentos.forEach(segmento => {
+            const de = parseInt(segmento.querySelector('[name="de_parc"]').value, 10);
+            const ate = parseInt(segmento.querySelector('[name="ate_parc"]').value, 10);
+            const valor = parseFloat(segmento.querySelector('[name="valor_parcela_perso"]').value.replace(',', '.'));
+            if (i >= de && i <= ate) {
+                valorParcelaAtual = valor;
+            }
+        });
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <th scope="row">${i}</th>
+            <td>R$ ${valorParcelaAtual.toFixed(2).replace('.', ',')}</td>
+            <td>${diaParc}/${mes}/${anoParc}</td>
+        `;
+
+        const parcela = {
+          numero: `${i}`,
+          valor: `${valorParcelaAtual.toFixed(2).replace('.', ',')}`,
+          dataVencimento: `${diaParc}/${mes}/${anoParc}`
+        };
+
+        parcelasGeradas.push(parcela);
+        tbody.appendChild(tr);
+
+        diaParc = dia;
+      }
+    }
+
+    function atualizarPrevisualizacaoParcelas() {
+      const listaParcelas = document.getElementById('listaParcelas');
+      if (listaParcelas) {
+        listaParcelas.innerHTML = '';
+        const parcelas = document.querySelectorAll('.parcela-segmento');
+
+        parcelas.forEach((segmento, index) => {
+          const valorParcelaInput = segmento.querySelector('[name="valor_parcela_perso"]');
+          const valorParcela = valorParcelaInput.value;
+
+          const item = document.createElement('li');
+          item.textContent = `Parcela ${index + 1}: R$ ${valorParcela}`;
+          listaParcelas.appendChild(item);
+        });
+      }
+    }
+
+    function agruparEExibirParcelas() {
+      const parcelas = document.querySelectorAll('.parcela-segmento');
+      let valorAtual = null;
+      let inicioIntervalo = null;
+      let detalhesParcelas = '';
+      let indexAtual = 1;
+
+      parcelas.forEach((segmento, index) => {
+        const deParcInput = segmento.querySelector('[name="de_parc"]');
+        const ateParcInput = segmento.querySelector('[name="ate_parc"]');
+        const valorParcelaInput = segmento.querySelector('[name="valor_parcela_perso"]');
+        const valorParcela = valorParcelaInput.value;
+        const deParc = parseInt(deParcInput.value, 10);
+        const ateParc = parseInt(ateParcInput.value, 10);
+
+        if (valorParcela !== valorAtual || deParc !== indexAtual) {
+          if (valorAtual !== null) {
+            detalhesParcelas += `Parcelas ${inicioIntervalo} a ${indexAtual - 1}: R$ ${valorAtual} cada<br>`;
+          }
+          inicioIntervalo = deParc;
+          valorAtual = valorParcela;
+        }
+        indexAtual = ateParc + 1;
+      });
+
+      if (valorAtual !== null && inicioIntervalo !== null) {
+        detalhesParcelas += `Parcelas ${inicioIntervalo} a ${indexAtual - 1}: R$ ${valorAtual} cada<br>`;
+      }
+
+      const previsualizacaoParcelas = document.getElementById('previsualizacaoParcelas');
+      if (previsualizacaoParcelas) {
+        previsualizacaoParcelas.innerHTML = detalhesParcelas;
+      }
+    }
+
+    function handleFixedTabClick() {
+    }
+
+    function handleCustomTabClick() {
+    }
+
+    tabFixas.addEventListener('click', handleFixedTabClick);
+    tabPersonalizadas.addEventListener('click', handleCustomTabClick);
+
+    if (tabFixas.classList.contains('active')) {
+      handleFixedTabClick();
+    } else if (tabPersonalizadas.classList.contains('active')) {
+      handleCustomTabClick();
+    }
+
+    preVisualizarAcordoBtn.addEventListener('click', function() {
+      const nome_pessoa_text = document.getElementById('pessoaNome').textContent.trim();
+      if (tabFixas.classList.contains('active')) {
+        conteudoFixas.style.display = 'block';
+        conteudoPersonalizadas.style.display = 'none';
+        const valorDoAcordo = parseFloat(valorDoAcordoInput.value.replace(/\./g, '').replace(',', '.') || 0);
+        const maiorDescontoValor = parseFloat(valorMaiorDescontoSpan2.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+        const menorDescontoValor = parseFloat(valorMenorDescontoSpan2.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+
+        valorDoAcordoInput.style.borderColor = '';
+        valorAcordoError.style.display = 'none';
+        document.querySelector('#previewAcordo .modal-body span[id="valorAcordoSpan"]').textContent = valorDoAcordoInput.value;
+        document.querySelector('#previewAcordo .modal-body span[id="numParcelasSpan"]').textContent = parcelasInput.value;
+        document.querySelector('#previewAcordo .modal-body span[id="valorParcelaSpan"]').textContent = (valorDoAcordo / parseInt(parcelasInput.value)).toFixed(2).replace('.', ',');
+        document.querySelector('#previewAcordo .modal-body span[id="vencPrimeiraParcelaSpan"]').textContent = primeiroVencimentoInput.value;
+        document.querySelector('#previewAcordo .modal-body span[id="vencProximasParcelasSpan"]').textContent = proximoVencimentoInput.value;
+        document.querySelector('#previewAcordo .modal-body span[id="emailSpan"]').textContent = emailInput.value;
+        document.querySelector('#previewAcordo .modal-body span[id="telefoneSpan"]').textContent = telefoneInput.value;
+
+        gerarParcelasFixas();
+
+        var myModal = new bootstrap.Modal(document.getElementById('previewAcordo'));
+        myModal.show();
+      
+      } else if (tabPersonalizadas.classList.contains('active')) {
+        conteudoFixas.style.display = 'none';
+        conteudoPersonalizadas.style.display = 'block';
+        const valorDoAcordo = parseFloat(valorDoAcordoInput.value.replace(/\./g, '').replace(',', '.') || 0);
+        const maiorDescontoValor = parseFloat(valorMaiorDescontoSpan2.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+        const menorDescontoValor = parseFloat(valorMenorDescontoSpan2.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+
+        valorDoAcordoInput.style.borderColor = '';
+        valorAcordoError.style.display = 'none';
+        document.querySelector('#previewAcordo .modal-body span[id="valorAcordoSpan"]').textContent = valorDoAcordoInput.value;
+        document.querySelector('#previewAcordo .modal-body span[id="numParcelasSpan"]').textContent = document.getElementById('total_parc').value;
+        document.querySelector('#previewAcordo .modal-body span[id="valorParcelaSpan"]').textContent = document.getElementById('listaParcelas');
+        document.querySelector('#previewAcordo .modal-body span[id="vencPrimeiraParcelaSpan"]').textContent = primeiroVencimentoInput.value;
+        document.querySelector('#previewAcordo .modal-body span[id="vencProximasParcelasSpan"]').textContent = proximoVencimentoInput.value;
+        document.querySelector('#previewAcordo .modal-body span[id="emailSpan"]').textContent = emailInput.value;
+        document.querySelector('#previewAcordo .modal-body span[id="telefoneSpan"]').textContent = telefoneInput.value;
+
+        gerarParcelasPersonalizadas();
+        atualizarPrevisualizacaoParcelas();
+        agruparEExibirParcelas();
+
+        var myModal = new bootstrap.Modal(document.getElementById('previewAcordo'));
+        myModal.show();
+        
+      }
+    });
+
+    aceitarAcordoBtn.addEventListener('click', function() {
+      if (tabFixas.classList.contains('active')) {
+        enviarDadosFormulario("Simulação");
+      } else if (tabPersonalizadas.classList.contains('active')) {
+        enviarDadosFormularioSecundario("Simulação");
+      }
+    });
+
+    function enviarDadosFormulario(status) {
+      const spinner2 = document.getElementById('spinner-border');
+      spinner2.style.display = 'flex';
+      
+      const cpf                             = document.querySelector('input[name="cpf"]').value;
+      var   cpfError                        = document.getElementById('cpfError');
+      const nome_pessoa                     = document.getElementById('pessoaNome').textContent.trim();
+      const selectedContracts               = Array.from(document.getElementById('contractSelect').selectedOptions).map(option => option.value.split("|")[0]);
+      const valor_do_acordo                 = valorDoAcordoInput.value;
+      const numParcelas                     = parcelasInput.value;
+      const valor_parcela                   = (parseFloat(valorDoAcordoInput.value.replace(/\./g, '').replace(',', '.') || 0) / parseInt(parcelasInput.value)).toFixed(2).replace('.', ',');
+      const dia_vencimento_primeira_parcela = primeiroVencimentoInput.value;
+      const dia_vencimento_proxima_parcela  = proximoVencimentoInput.value;
+      const email                           = emailInput.value;
+      const telefone                        = telefoneInput.value;
+      const carteiraId                      = Array.from(document.getElementById('contractSelect').selectedOptions).map(option => option.value.split("|")[1]);
+      const rangeInput                      = document.getElementById('customRange1');
+      const minParcelas                     = rangeInput.min;
+      const maxParcelas                     = rangeInput.max;
+      const maiorDescontoValor              = parseFloat(valorMaiorDescontoSpan2.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+      const menorDescontoValor              = parseFloat(valorMenorDescontoSpan2.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+      const valor_pendente                  = parseFloat(valorPendenteSpan.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+
+      const formData = {
+        acordoId,
+        cpf,
+        contratos: selectedContracts,
+        valor_do_acordo,
+        valor_pendente,
+        numParcelas,
+        valor_parcela,
+        parcelas: parcelasGeradas,
+        dia_vencimento_primeira_parcela,
+        dia_vencimento_proxima_parcela,
+        email,
+        telefone,
+        status,
+        carteiraId,
+        minParcelas,
+        maxParcelas,
+        maiorDescontoValor,
+        nome_pessoa,
+        menorDescontoValor
+      };
+
+      fetch('{% url "t_criar_acordo" %}', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify(formData)
+      })
+      .then(response => {
+        spinner2.style.display = 'none';
+        if (response.ok) {
+          window.location.href = '/t/propostas';
+        }
+      })
+      .catch((error) => {
+        spinner2.style.display = 'none';
+        console.error('Erro:', error);
+        alert('Erro ao salvar o acordo: ' + error.message);
+      });
+    }
+
+    function enviarDadosFormularioSecundario(status) {
+      const spinner2 = document.getElementById('spinner-border');
+      spinner2.style.display = 'flex';
+      
+      const cpf                             = document.querySelector('input[name="cpf"]').value;
+      var   cpfError                        = document.getElementById('cpfError');
+      const selectedContracts               = Array.from(document.getElementById('contractSelect').selectedOptions).map(option => option.value.split("|")[0]);
+      const valor_do_acordo                 = valorDoAcordoInput.value;
+      const nome_pessoa                     = document.getElementById('pessoaNome').textContent.trim();
+      const numParcelas                     = document.getElementById('total_parc').value;
+      const valor_parcela                   = "0,00";
+      const dia_vencimento_primeira_parcela = primeiroVencimentoInput.value;
+      const dia_vencimento_proxima_parcela  = proximoVencimentoInput.value;
+      const email                           = emailInput.value;
+      const telefone                        = telefoneInput.value;
+      const carteiraId                      = Array.from(document.getElementById('contractSelect').selectedOptions).map(option => option.value.split("|")[1]);
+      const rangeInput                      = document.getElementById('customRange1');
+      const minParcelas                     = rangeInput.min;
+      const maxParcelas                     = rangeInput.max;
+      const maiorDescontoValor              = parseFloat(valorMaiorDescontoSpan2.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+      const menorDescontoValor              = parseFloat(valorMenorDescontoSpan2.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+      const valor_pendente                  = parseFloat(valorPendenteSpan.textContent.replace(/[^\d,]/g, '').replace(',', '.') || 0);
+
+      const formData = {
+        acordoId,
+        cpf,
+        contratos: selectedContracts,
+        valor_do_acordo,
+        valor_pendente,
+        numParcelas,
+        valor_parcela,
+        parcelas: parcelasGeradas,
+        dia_vencimento_primeira_parcela,
+        dia_vencimento_proxima_parcela,
+        email,
+        telefone,
+        status,
+        carteiraId,
+        minParcelas,
+        maxParcelas,
+        maiorDescontoValor,
+        nome_pessoa,
+        menorDescontoValor
+      };
+
+      fetch('{% url "t_criar_acordo" %}', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          },
+          body: JSON.stringify(formData)
+      })
+      .then(response => {
+        spinner2.style.display = 'none';
+        if (response.ok) {
+          window.location.href = '/t/propostas';
+        }
+      })
+      .catch((error) => {
+        spinner2.style.display = 'none';
+        console.error('Erro:', error);
+        alert('Erro ao salvar o acordo: ' + error.message);
+      });
+    }
+  });
+</script>
+
+{% endblock %}

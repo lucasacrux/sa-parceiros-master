@@ -1,0 +1,75 @@
+<!-- COMPARE HÍBRIDO (substitui <section class="compare">...</section>) -->
+<section class="compare hybrid" data-state="sem">
+  <h2 class="section-title">De complexo a simples: <span class="gradient-text">tudo em um só lugar</span></h2>
+
+  <!-- Tabs -->
+  <div class="toggle-tabs" role="tablist" aria-label="Comparativo">
+    <input type="radio" id="tab-sem" name="cmp" checked>
+    <label for="tab-sem" role="tab" aria-controls="cmp-sem" aria-selected="true">Sem o SaiuAcordo Business</label>
+
+    <input type="radio" id="tab-com" name="cmp">
+    <label for="tab-com" role="tab" aria-controls="cmp-com" aria-selected="false">Com o SaiuAcordo Business</label>
+    <span class="pill" aria-hidden="true"></span>
+  </div>
+
+  <!-- Painéis -->
+  <div class="compare-panels">
+    <!-- Mapa “negativo” (centralizado) -->
+    <div class="panel sem" id="cmp-sem" role="tabpanel">
+      <div class="ecosystem-map">
+        <div class="bubble">Gateway</div>
+        <div class="bubble">Banco</div>
+        <div class="bubble">Planilhas</div>
+        <div class="bubble">SMS terceirizado</div>
+        <div class="bubble">E-mail terceirizado</div>
+        <div class="bubble">WhatsApp informal</div>
+        <div class="bubble">Sem portal whitelabel</div>
+        <div class="bubble">Conciliação manual</div>
+        <div class="bubble">Baixa conversão</div>
+        <div class="bubble">Jurídico desconectado</div>
+      </div>
+      <p class="map-note">Muitos fornecedores, integrações frágeis e retrabalho.</p>
+    </div>
+
+    <!-- Solução “positiva” (4 pilares) -->
+    <div class="panel com" id="cmp-com" role="tabpanel" hidden>
+      <div class="pillars">
+        <article class="pillar">
+          <h4>Comunicação & Conversão</h4>
+          <ul>
+            <li>Agentes de IA + SEO + Ads</li>
+            <li>SMS, E-mail e WhatsApp oficial</li>
+            <li>Portal com cupons e trilhas</li>
+          </ul>
+        </article>
+        <article class="pillar">
+          <h4>Cobrança</h4>
+          <ul>
+            <li>Integrações com fintechs e bancos</li>
+            <li>Carteiras/subcarteiras com regras</li>
+            <li>Automação ponta a ponta</li>
+          </ul>
+        </article>
+        <article class="pillar">
+          <h4>Pagamentos</h4>
+          <ul>
+            <li>Pix, Boleto, Cartão</li>
+            <li>Links e faturas customizadas</li>
+            <li>Conciliação e relatórios</li>
+          </ul>
+        </article>
+        <article class="pillar">
+          <h4>Judicial, CRM & Dados</h4>
+          <ul>
+            <li>Integração SERASA & Big Data</li>
+            <li>Petições com IA + alertas</li>
+            <li>Receita, custos e performance</li>
+          </ul>
+        </article>
+      </div>
+      <div class="center actions single">
+        <a class="btn primary lg" href="{% url 'saas:signup' %}?origin=COMPARE">Criar conta</a>
+      </div>
+    </div>
+  </div>
+</section>

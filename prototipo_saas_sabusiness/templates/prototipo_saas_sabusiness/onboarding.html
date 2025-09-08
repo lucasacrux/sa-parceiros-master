@@ -1,0 +1,122 @@
+{% extends "prototipo_saas_sabusiness/base.html" %}
+{% load static %}
+{% block title %}Onboarding • SaiuAcordo Business{% endblock %}
+{% block body_attrs %}class="page-onboarding" data-initial-step="{{ step }}"{% endblock %}
+
+{% block head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'prototipo_saas_sabusiness/css/onboarding_overrides.css' %}?v=4">
+{% endblock %}
+
+{% block content %}
+{# Critical overrides para garantir nav/footer ocultos e layout mesmo que o <head> não injete #}
+<style>
+  .page-onboarding #navbar .nav-links,
+  .page-onboarding #navbar .nav-cta{display:none!important}
+  .page-onboarding #navbar .nav-inner{justify-content:center!important}
+  .page-onboarding #navbar .brand{margin:0 auto!important}
+  .page-onboarding .footer-pro{display:none!important}
+</style>
+
+<section class="onboard">
+  <div class="ob-shell">
+    <!-- Barra de progresso -->
+    <div class="ob-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="25">
+      <div id="wbFill" class="ob-progress__fill"></div>
+    </div>
+
+    <div class="ob-card">
+      <!-- STEP 1 -->
+      <div id="step1">
+        <header class="ob-head">
+          <h2>Dados da empresa</h2>
+          <p class="muted">Pessoa Jurídica (MEI, LTDA, S/A, SS). Informe o CNPJ para prosseguir.</p>
+        </header>
+
+        <form id="formStep1" class="ob-form" novalidate>
+          <label class="ob-field">
+            <span class="ob-label">CNPJ</span>
+            <input id="cnpjInput"
+                   class="ui-input input-cnpj"
+                   inputmode="numeric"
+                   autocomplete="off"
+                   placeholder="00.000.000/0001-91"
+                   maxlength="18">
+          </label>
+
+          <div class="ob-actions">
+            <button class="btn ob-btn" id="btnLookup">Avançar</button>
+          </div>
+        </form>
+
+        <p id="step1Msg" class="muted ob-msg" aria-live="polite"></p>
+      </div>
+
+      <!-- STEP 2 -->
+      <div id="step2" hidden>
+        <header class="ob-head">
+          <h2>Confirme os dados e informe seu WhatsApp</h2>
+          <p class="muted">Usamos seu número para ativar com segurança.</p>
+        </header>
+
+        <div id="companyBox" class="ob-grid ob-company"></div>
+
+        <form id="formStep2" class="ob-form" novalidate>
+          <label class="ob-field">
+            <span class="ob-label">Seu WhatsApp (pessoal)</span>
+            <input id="waInput" class="ui-input" inputmode="tel" placeholder="(11) 91234-5678" autocomplete="off">
+          </label>
+
+          <div class="ob-actions">
+            <button class="btn ob-btn" id="btnSendCode">Enviar código</button>
+            <button type="button" class="btn ob-btn-ghost" id="btnChangeCnpj">Trocar CNPJ</button>
+          </div>
+        </form>
+
+        <p id="step2Msg" class="muted ob-msg" aria-live="polite"></p>
+      </div>
+
+      <!-- STEP 3 -->
+      <div id="step3" hidden>
+        <header class="ob-head">
+          <h2>Digite o código recebido</h2>
+          <p class="muted">O código tem 6 dígitos.</p>
+        </header>
+
+        <form id="formStep3" class="ob-form" novalidate>
+          <label class="ob-field">
+            <span class="ob-label">Código</span>
+            <input id="codeInput" class="ui-input input-otp" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="one-time-code">
+          </label>
+
+          <div class="ob-actions">
+            <button class="btn ob-btn" id="btnVerify">Confirmar código</button>
+            <button type="button" class="btn ob-btn-ghost" id="btnResend">Reenviar</button>
+          </div>
+        </form>
+
+        <p class="muted ob-msg" id="devHint" style="display:none">[DEV] Código: <span id="devCode" style="font-family:monospace"></span></p>
+        <p id="step3Msg" class="muted ob-msg" aria-live="polite"></p>
+      </div>
+
+      <!-- STEP 4 -->
+      <div id="step4" hidden>
+        <header class="ob-head">
+          <h2>Tudo certo! ✅</h2>
+          <p class="muted">Você já pode experimentar as features do SA Business.</p>
+        </header>
+
+        <div class="ob-actions wrap">
+          <a class="btn primary" href="{% url 'saas:home_logged' %}">Acesse SA Business</a>
+          <a class="btn ob-btn-ghost" href="{% url 'saas:developers' %}">Ver documentação de API</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script defer src="{% static 'prototipo_saas_sabusiness/js/onboarding.js' %}?v=13"></script>
+{% endblock %}

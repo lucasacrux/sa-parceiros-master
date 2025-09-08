@@ -1,0 +1,45 @@
+{% extends "prototipo_saas_sabusiness/base.html" %}
+{% block title %}Dashboard • SaiuAcordo Business{% endblock %}
+{% block body_attrs %}class="page-dashboard"{% endblock %}
+
+{% block content %}
+<section class="onboard">
+  <div class="ui-card p">
+    {% if request.is_readonly %}
+      <div class="ui-alert warn" role="status" style="margin-bottom:.75rem">
+        Modo visualização: confirme seu contato para liberar todas as ações.
+      </div>
+    {% endif %}
+
+    <h2>Bem-vindo(a) ao SA Business</h2>
+    <p class="muted">Atalhos rápidos:</p>
+
+    <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px">
+      {# Exemplo 1 — <button> pode ser realmente desabilitado #}
+      {% if request.is_readonly %}
+        <button class="btn primary is-disabled" disabled
+                title="Confirme seu contato para usar esta ação">
+          Criar carteira
+        </button>
+      {% else %}
+        <a class="btn primary" href="{% url 'saas:carteiras_nova' %}">Criar carteira</a>
+      {% endif %}
+
+      {# Exemplo 2 — <a> não tem disabled nativo; use aria-disabled e CSS #}
+      {% if request.is_readonly %}
+        <a class="btn ghost is-disabled" role="button" aria-disabled="true" tabindex="-1"
+           title="Confirme seu contato para usar esta ação">Configurar carteira</a>
+      {% else %}
+        <a class="btn ghost" href="{% url 'saas:carteiras_config' %}">Configurar carteira</a>
+      {% endif %}
+
+      {% if request.is_readonly %}
+        <a class="btn ghost is-disabled" role="button" aria-disabled="true" tabindex="-1"
+           title="Confirme seu contato para usar esta ação">Portal de autoatendimento (demo)</a>
+      {% else %}
+        <a class="btn ghost" href="{% url 'saas:portal_demo' %}">Portal de autoatendimento (demo)</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

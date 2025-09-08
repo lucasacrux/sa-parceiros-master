@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+{% extends "business_base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Lista de Campos</h2>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome do Campo</th>
+                <th>Tipo</th>
+                <th>Cadastro</th>
+                <th>Default</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for campo in campos %}
+            <tr>
+                <td>{{ campo.label }}</td>
+                <td>{{ campo.data_type }}</td>
+                <td>{{ campo.import_type }}</td>
+                <td>{{ campo.default_col }}</td>
+                <td>
+                    {% if not campo.default_col %}
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                ...
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" href="#" onclick="openEditModal('{{ campo.id }}', '{{ campo.label }}', '{{ campo.import_type }}', '{{ campo.data_type }}', '{{ campo.char_limit}}')">Editar</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="deleteCampo('{{ campo.id }}')">Excluir</a></li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Campo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" onsubmit="submitEditForm(event)">
+                    {% csrf_token %}
+                    <input type="hidden" id="campo_id" name="campo_id" disabled>
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="label" name="label" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="import_type" class="form-label">Origem</label>
+                        <select type="select" class="form-control" id="origem" name="origem" required>
+                            <option type="text" class="form-control" value="pessoas">Tabela de Pessoas</option>
+                            <option type="text" class="form-control" value="contratos">Tabela de Contratos</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="data_type" class="form-label">Tipo</label>
+                        <select type="select" class="form-control" id="data_type" name="data_type" onchange="toggleCharLimit()" required>
+                            <option type="text" class="form-control" value="value">Número</option>
+                            <option type="text" class="form-control" value="date">Data</option>
+                            <option type="text" class="form-control" value="text">Texto</option>
+                            <!-- <option type="text" class="form-control" value="list">Lista</option>
+                            <option type="text" class="form-control" value="float">Valor</option>
+                            <option type="text" class="form-control" value="bool">Booleano</option>
+                            <option type="text" class="form-control" value="char">Charset</option> -->
+                        </select>
+                    </div>
+                    <div class="mb-3" id="char-limit-container" style="display: none;">
+                        <label for="char-limit" class="form-label">Limite de caracteres</label>
+                        <input type="number" class="form-control" id="char-limit" name="char-limit">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Você tem certeza que deseja excluir? Esse campo pode estar sendo utilizado para Segmentações, Ações e Fluxos, caso você tenha certeza disso, digite abaixo "DELETAR":</p>
+                <input type="text" id="confirmationInput" class="form-control" placeholder="Digite 'DELETAR' para confirmar">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton" disabled onclick="confirmDelete()">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function openEditModal(id, label, import_type, data_type, char_limit) {
+        const charLimitContainer = document.getElementById('char-limit-container');
+        document.getElementById('campo_id').value       = id;
+        document.getElementById('label').value          = label;
+        document.getElementById('origem').value         = import_type;
+        document.getElementById('data_type').value      = data_type;
+        if (data_type === "char") {
+            document.getElementById('char-limit').value = char_limit;
+            charLimitContainer.style.display = "block";
+            document.getElementById('char-limit').setAttribute("required", "true");
+        } else {
+            charLimitContainer.style.display = "none";
+            document.getElementById('char-limit').removeAttribute("required");
+        }
+        var modal = new bootstrap.Modal(document.getElementById('editModal'));
+        modal.show();
+    }
+
+    
+    function toggleCharLimit() {
+        
+        const select = document.getElementById("data_type").value;
+        const charLimitContainer = document.getElementById("char-limit-container");
+        const charLimit = document.getElementById("char-limit");
+
+        console.log(select)
+        if (select === "char") {
+            charLimitContainer.style.display = "block";
+            charLimit.setAttribute("required", "true");
+        } else {
+            charLimitContainer.style.display = "none";
+            charLimit.removeAttribute("required");
+        }
+    }
+
+    function submitEditForm(event) {
+        event.preventDefault();
+        let id = document.getElementById('campo_id').value;
+        let charLimit = document.getElementById('char-limit').value
+        if(charLimit === ''){
+            charLimit = null;
+        };
+        let data = {
+            label: document.getElementById('label').value,
+            tabela: document.getElementById('origem').value,
+            data_type: document.getElementById('data_type').value,
+            limite_char: charLimit
+        };
+        fetch(`editar/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(data)
+        }).then(response => response.json())
+          .then(data => {
+              alert('Campo alterado com sucesso!');
+              location.reload();
+          }).catch(error => console.error('Erro:', error));
+    }
+
+    function deleteCampo(id) {
+    // Abrir o modal de confirmação
+    document.getElementById('deleteModal').dataset.campoId = id; // Armazenar o ID do campo no modal
+    var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+    }
+
+    // Habilitar o botão de confirmação se o texto "DELETAR" for digitado
+    document.getElementById('confirmationInput').addEventListener('input', function() {
+        const confirmationInput = document.getElementById('confirmationInput').value;
+        const confirmButton = document.getElementById('confirmDeleteButton');
+        if (confirmationInput === 'DELETAR') {
+            confirmButton.disabled = false;
+        } else {
+            confirmButton.disabled = true;
+        }
+    });
+
+    // Função para confirmar a exclusão
+    function confirmDelete() {
+        let data = {
+            id_campo : document.getElementById('campo_id').value
+        };
+        const campoId = document.getElementById('deleteModal').dataset.campoId; // Recuperar ID do campo
+        fetch(`excluir/${campoId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(data)
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Falha ao excluir');
+            }
+            return response.json();
+        }).then(data => {
+            alert('Campo excluído com sucesso!');
+            location.reload();
+        }).catch(error => {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao tentar excluir o campo.');
+        });
+
+        // Fechar o modal de confirmação após exclusão
+        var modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+        modal.hide();
+    }
+</script>
+
+{% endblock %}
+

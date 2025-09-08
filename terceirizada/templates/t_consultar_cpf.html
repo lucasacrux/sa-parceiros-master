@@ -1,0 +1,29 @@
+
+{% extends "t_base.html" %}
+
+
+{% load static %}
+
+{% block content %}
+
+<main id="content" role="main" class="main">
+    <!-- Content -->
+    <div class="content container-fluid">
+        <div class="row" style="text-align: center; margin-top: 50px;">
+          <div class="col-md-3 col-lg-3"></div>
+          <div class="col-md-6 col-lg-6">
+            <form action="/t/busca" method="GET">
+            <input type="text" class="js-input-mask form-control" name="cpf"  id="clear-input-loading" placeholder="Digite um cpf..." data-hs-mask-options='{
+              "mask": "000.000.000-00"
+                  }' style="margin-bottom: 20px;font-size: 18px;">
+                  <button id="loadBtn" type="submit" class="btn btn-primary">Pesquisar</button>
+            </form>
+          </div>
+        </div>
+      <!-- End Form -->
+    </div>
+    </div>
+    <!-- End Content -->
+  </main>
+  <!-- ========== END MAIN CONTENT ========== -->
+{% endblock %}
