@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SaiuAcordo Business Design System - Blue gradient theme with glass effects */
+
+@layer base {
+  :root {
+    /* Core SaiuAcordo brand colors - HSL only */
+    --saiu-blue-50: 214 100% 97%;
+    --saiu-blue-100: 214 95% 93%;
+    --saiu-blue-200: 213 96% 87%;
+    --saiu-blue-300: 212 96% 78%;
+    --saiu-blue-400: 213 94% 68%;
+    --saiu-blue-500: 217 91% 60%;
+    --saiu-blue-600: 221 83% 53%;
+    --saiu-blue-700: 224 76% 48%;
+    --saiu-blue-800: 226 71% 40%;
+    --saiu-blue-900: 224 64% 33%;
+    --saiu-blue-950: 226 55% 21%;
+
+    /* Gradients for SaiuAcordo brand */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--saiu-blue-600)), hsl(var(--saiu-blue-500)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--saiu-blue-100)), hsl(var(--saiu-blue-200)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--saiu-blue-700)), hsl(var(--saiu-blue-500)), hsl(var(--saiu-blue-400)));
+    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    --gradient-card: linear-gradient(135deg, hsl(var(--card)), hsl(var(--saiu-blue-50)));
+
+    /* Glass effects */
+    --glass-light: rgba(255, 255, 255, 0.08);
+    --glass-medium: rgba(255, 255, 255, 0.12);
+    --glass-strong: rgba(255, 255, 255, 0.16);
+    --glass-blur: blur(12px);
+
+    /* Shadows with brand colors */
+    --shadow-brand: 0 4px 20px hsl(var(--saiu-blue-500) / 0.15);
+    --shadow-brand-strong: 0 8px 32px hsl(var(--saiu-blue-600) / 0.25);
+    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
+    --shadow-elevation: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Design System Colors */
+    --background: 0 0% 100%;
+    --foreground: 226 55% 21%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 226 55% 21%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 226 55% 21%;
+
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 214 95% 93%;
+    --secondary-foreground: 226 55% 21%;
+
+    --muted: 214 100% 97%;
+    --muted-foreground: 224 64% 33%;
+
+    --accent: 213 96% 87%;
+    --accent-foreground: 226 55% 21%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 95% 93%;
+    --input: 214 95% 93%;
+    --ring: 221 83% 53%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar theme */
+    --sidebar-background: 226 55% 21%;
+    --sidebar-foreground: 214 95% 93%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 224 64% 33%;
+    --sidebar-accent-foreground: 214 95% 93%;
+    --sidebar-border: 224 64% 33%;
+    --sidebar-ring: 221 83% 53%;
+  }
+
+  .dark {
+    --background: 226 55% 21%;
+    --foreground: 214 95% 93%;
+
+    --card: 224 64% 33%;
+    --card-foreground: 214 95% 93%;
+
+    --popover: 224 64% 33%;
+    --popover-foreground: 214 95% 93%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 226 55% 21%;
+
+    --secondary: 224 76% 48%;
+    --secondary-foreground: 214 95% 93%;
+
+    --muted: 224 71% 40%;
+    --muted-foreground: 213 96% 78%;
+
+    --accent: 224 76% 48%;
+    --accent-foreground: 214 95% 93%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 214 95% 93%;
+
+    --border: 224 71% 40%;
+    --input: 224 71% 40%;
+    --ring: 217 91% 60%;
+
+    /* Dark sidebar */
+    --sidebar-background: 226 55% 15%;
+    --sidebar-foreground: 214 95% 93%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 226 55% 21%;
+    --sidebar-accent: 224 64% 25%;
+    --sidebar-accent-foreground: 214 95% 93%;
+    --sidebar-border: 224 64% 25%;
+    --sidebar-ring: 217 91% 60%;
+
+    /* Dark mode glass adjustments */
+    --glass-light: rgba(255, 255, 255, 0.05);
+    --glass-medium: rgba(255, 255, 255, 0.08);
+    --glass-strong: rgba(255, 255, 255, 0.12);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
