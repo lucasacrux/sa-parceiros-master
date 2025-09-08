@@ -18,7 +18,7 @@
   .page-onboarding .footer-pro{display:none!important}
 </style>
 
-<section class="onboard">
+<section class="onboard" data-email="{{ user_email }}" data-name="{{ user_name }}" data-wa="{{ user_whatsapp }}" data-app-url="{{ app_public_url }}">
   <div class="ob-shell">
     <!-- Barra de progresso -->
     <div class="ob-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="25">
@@ -118,5 +118,5 @@
 
 {% block scripts %}
   {{ block.super }}
-  <script defer src="{% static 'prototipo_saas_sabusiness/js/onboarding.js' %}?v=13"></script>
+  <script defer src="{% static 'prototipo_saas_sabusiness/js/onboarding.js' %}?v=14"></script>
 {% endblock %}

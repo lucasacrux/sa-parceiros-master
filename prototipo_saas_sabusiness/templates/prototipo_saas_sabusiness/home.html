@@ -23,10 +23,10 @@
     <div class="hero-inner">
       <!-- Título e subtítulo -->
       <header class="hero-copy">
-        <h1 class="hero-heading">Conta digital PJ completa e sem mensalidade</h1>
+        <h1 class="hero-heading">Cobrança 360 whitelabel com UX moderna</h1>
         <p class="hero-sub">
-          Ofereça diferentes formas de pagamento, gerencie cobranças, emita notas, antecipe recebíveis
-          e pague fornecedores. Tudo em um só lugar.
+          Portal de autoatendimento na sua marca, Pix/Boleto/Cartão, comunicação multicanal e API pública. 
+          Escale conversão com uma experiência elegante para seus clientes.
         </p>
       </header>
 
@@ -37,18 +37,18 @@
 
           <form class="hero-form" method="get" action="{% url 'saas:signup' %}" autocomplete="on">
             <input
-              class="ui-input"
+              class="ui-input ui-xl"
               type="email"
               name="email"
-              placeholder="Preencha seu e-mail"
+              placeholder="Seu e-mail corporativo"
               aria-label="Digite seu e-mail"
               autocomplete="email"
               inputmode="email"
               required
-              style="height:64px;font-size:17px;border-radius:18px"
             >
-            <input type="hidden" name="origin" value="HOME_HERO_V2_A">
-            <button class="btn primary lg pill" type="submit" style="height:64px">Criar conta grátis</button>
+            <input type="hidden" name="origin" value="HOME_HERO_V2_LOVABLE">
+            <button class="btn primary xl pill" type="submit">Começar grátis</button>
+            <a class="btn ghost xl pill" href="{% url 'saas:portal_preview' %}" rel="noopener">Ver demo</a>
           </form>
         </div>
 
@@ -391,7 +391,7 @@
   <section class="section final-cta">
     <div class="center">
       <h2 class="section-title">Pronto para começar?</h2>
-      <a class="btn primary lg pill" href="{% url 'saas:signup' %}?origin=FOOTER_CTA">Cadastre sua empresa</a>
+      <a class="btn primary lg pill" href="{% url 'saas:signup' %}?origin=FOOTER_CTA">Começar grátis</a>
     </div>
   </section>
 

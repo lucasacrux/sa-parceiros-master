@@ -1,4 +1,3 @@
-import magic
 from django import forms
 from django.utils.deconstruct import deconstructible
 from django.core.exceptions import ValidationError

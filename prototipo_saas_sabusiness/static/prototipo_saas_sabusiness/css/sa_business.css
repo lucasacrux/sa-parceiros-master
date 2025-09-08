@@ -51,6 +51,9 @@
   .btn:hover{box-shadow:0 8px 24px rgba(2,6,23,.06)}
   .btn:active{transform:translateY(1px)}
   .btn.primary{border:none;color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand-2));box-shadow:0 12px 30px rgba(11,59,255,.25)}
+  .btn.primary.pill{ border-radius:999px; }
+  .btn.ghost.pill{ border-radius:999px; }
+  .btn.xl{ height:64px; padding:0 26px; border-radius:18px; font-size:1.06rem }
   .btn.primary:hover{filter:brightness(.98)}
   .btn.ghost{background:transparent;border-color:var(--border)}
   .btn.lg{height:50px;padding:0 20px;border-radius:16px;font-size:1.05rem}

@@ -8,6 +8,11 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from urllib.parse import urlencode
+import json
+import os
 
 
 
@@ -47,7 +52,16 @@ def onboarding(request: HttpRequest) -> HttpResponse:
     except ValueError:
         step = 1
     step = 1 if step < 1 else 4 if step > 4 else step
-    return render(request, "prototipo_saas_sabusiness/onboarding.html", {"step": step})
+    # Dados do pré-cadastro (guardados pela signup_post)
+    app_public_url = os.getenv("APP_PUBLIC_URL") or "http://192.168.1.161:8080/app"
+    ctx: Dict[str, str | int] = {
+        "step": step,
+        "user_email": request.session.get("user_email", ""),
+        "user_name": request.session.get("user_name", ""),
+        "user_whatsapp": request.session.get("user_whatsapp", ""),
+        "app_public_url": app_public_url,
+    }
+    return render(request, "prototipo_saas_sabusiness/onboarding.html", ctx)
 
 
 @require_http_methods(["GET"])
@@ -153,3 +167,86 @@ def login_post(request: HttpRequest) -> HttpResponseRedirect:
     # TODO: autenticar de fato (authenticate/login) e redirecionar para dashboard.
     messages.success(request, "Login efetuado com sucesso.")
     return redirect("saas:home")
+
+
+@require_http_methods(["POST", "GET"])
+@csrf_exempt
+def wizard_finish_sso(request: HttpRequest):
+    """
+    Finalização do wizard com SSO Supabase.
+    - Com SUPABASE_SERVICE_ROLE: envia Magic Link (1 clique) e redireciona.
+    - Sem service role: redireciona para app com need_otp=1 para OTP no frontend.
+
+    Entrada mínima: email (POST form/JSON ou GET)
+    Param opcional: redirect_to (default: http://localhost:8080/app)
+    Outros campos vão como user_metadata quando houver SERVICE_ROLE
+    """
+    # Coleta parâmetros
+    email = None
+    redirect_to = None
+    metadata = {}
+
+    if request.method == 'POST':
+        if request.content_type and 'application/json' in request.content_type:
+            try:
+                payload = json.loads(request.body or b"{}")
+            except Exception:
+                payload = {}
+            email = (payload.get('email') or payload.get('user_email') or '').strip().lower()
+            redirect_to = payload.get('redirect_to')
+            metadata = {k: v for k, v in payload.items() if k not in {'email', 'user_email', 'redirect_to'}}
+        else:
+            email = (request.POST.get('email') or request.POST.get('user_email') or '').strip().lower()
+            redirect_to = request.POST.get('redirect_to')
+            metadata = {k: v for k, v in request.POST.items() if k not in {'email', 'user_email', 'redirect_to'}}
+    else:
+        email = (request.GET.get('email') or request.GET.get('user_email') or '').strip().lower()
+        redirect_to = request.GET.get('redirect_to')
+        metadata = {k: v for k, v in request.GET.items() if k not in {'email', 'user_email', 'redirect_to'}}
+
+    if not email:
+        if 'application/json' in (request.headers.get('Accept') or ''):
+            return JsonResponse({"ok": False, "error": "email é obrigatório"}, status=400)
+        messages.error(request, "Informe um e-mail válido.")
+        return redirect('saas:onboarding')
+
+    if not redirect_to:
+        redirect_to = os.getenv("APP_PUBLIC_URL") or "http://192.168.1.161:8080/app"
+
+    wants_json = 'application/json' in (request.headers.get('Accept') or '')
+
+    # Importa helper apenas aqui para evitar quebrar o servidor caso env não esteja configurado
+    try:
+        from utils import supabase_sso as sso
+    except RuntimeError:
+        # Env ausente para Supabase: fallback OTP
+        url = f"{redirect_to}?" + urlencode({"need_otp": 1, "email": email})
+        if wants_json:
+            return JsonResponse({"ok": True, "mode": "otp", "next": url})
+        return redirect(url)
+    except Exception:
+        if wants_json:
+            return JsonResponse({"ok": False, "error": "Falha ao carregar SSO"}, status=500)
+        messages.error(request, "Falha ao carregar integrações de SSO.")
+        return redirect('saas:onboarding')
+
+    try:
+        if sso.has_admin_access():
+            try:
+                sso.ensure_user(email=email, metadata=metadata)
+            except Exception:
+                pass
+            link = sso.generate_magic_link(email=email, redirect_to=redirect_to)
+            if wants_json:
+                return JsonResponse({"ok": True, "mode": "magiclink", "action_link": link, "next": redirect_to})
+            return redirect(link)
+        else:
+            url = f"{redirect_to}?" + urlencode({"need_otp": 1, "email": email})
+            if wants_json:
+                return JsonResponse({"ok": True, "mode": "otp", "next": url})
+            return redirect(url)
+    except Exception:
+        if wants_json:
+            return JsonResponse({"ok": False, "error": "Falha no SSO"}, status=500)
+        messages.error(request, "Falha no SSO.")
+        return redirect('saas:onboarding')

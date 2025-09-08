@@ -122,8 +122,7 @@ def download_modelo(request):
     try:
         return FileResponse(open(caminho_arquivo, 'rb'), as_attachment=True)
     except FileNotFoundError:
-
-        pass       
+        return HttpResponse(status=404)
     
     
 def convert_to_decimal(value):
@@ -131,6 +130,9 @@ def convert_to_decimal(value):
 
 def somenteNumeros(cpf):
     return cpf.replace('-', '').replace('.','').replace('(','').replace(')','').replace(' ', '')
+
+
+
 
 
 def salvar_acordo(request):
@@ -401,4 +403,3 @@ def erro_404(request, exception):
 
 def erro_500(request):
     return render(request,'500.html')
-

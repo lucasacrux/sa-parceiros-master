@@ -17,11 +17,18 @@ class StorageGCP:
     def __init__(self):
         self.bucket_name = "resolve-contas-docs" #
         self.credentials = PATH + 'mythical-runner-350501-79f85db1d3dd.json'
-        self.client = storage.Client()  # usa GOOGLE_APPLICATION_CREDENTIALS
-        self.bucket      = self.client.bucket(self.bucket_name)
+        # Em dev/local sem credenciais, evite quebrar import
+        try:
+            self.client = storage.Client()  # usa GOOGLE_APPLICATION_CREDENTIALS
+            self.bucket      = self.client.bucket(self.bucket_name)
+        except Exception:
+            self.client = None
+            self.bucket = None
     
     
     def list(self, prefix):
+        if not self.client:
+            return []
         blobs_list = []
         blobs = self.client.list_blobs(self.bucket_name, prefix=prefix, delimiter='/')
         for blob in blobs:
@@ -30,18 +37,24 @@ class StorageGCP:
     
     
     def upload(self, source, destination):
+        if not self.client:
+            raise RuntimeError("GCP Storage não configurado em ambiente local")
         blob = self.bucket.blob(destination)
         blob.upload_from_filename(source)
         print(f"File {source} uploaded to gs://{self.bucket_name}/{destination}")
     
         
     def download(self, source, destination):
+        if not self.client:
+            raise RuntimeError("GCP Storage não configurado em ambiente local")
         blob = self.bucket.blob(source)
         blob.download_to_filename(destination)
         print(f"File gs://{self.bucket_name}/{source} downloaded to {destination}")
     
     
     def check(self, source): #Verifica a existencia do 'SOURCE'
+        if not self.client:
+            return False
         blob = self.bucket.blob(source)
         result = blob.exists()
         return result

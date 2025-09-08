@@ -186,10 +186,15 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # Tenta usar a env var GOOGLE_APPLICATION_CREDENTIALS;
 # se não existir, cai no JSON dentro do repo (em terceirizada/).
-_creds_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or str(
-    BASE_DIR / "terceirizada" / "mythical-runner-350501-79f85db1d3dd.json"
-)
-GS_CREDENTIALS = service_account.Credentials.from_service_account_file(_creds_path)
-
-DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-GS_BUCKET_NAME = "services-static-lake"
+_creds_path_env = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+_fallback_path = BASE_DIR / "terceirizada" / "mythical-runner-350501-79f85db1d3dd.json"
+_creds_path = _creds_path_env or str(_fallback_path)
+try:
+    if _creds_path and os.path.isfile(_creds_path):
+        GS_CREDENTIALS = service_account.Credentials.from_service_account_file(_creds_path)
+        DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+        GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME", "services-static-lake")
+    else:
+        GS_CREDENTIALS = None
+except Exception:
+    GS_CREDENTIALS = None

@@ -140,6 +140,9 @@ body.menu-open{ overflow:hidden; }
 /* Form do herói */
 .sa-home .hero-form{ display:flex; gap:10px; flex-wrap:wrap; }
 .sa-home .hero-form .btn.lg{ height:56px; border-radius:14px; }
+/* XL size for Lovable-like hero CTAs */
+.sa-home .hero-form .btn.xl{ height:64px; border-radius:18px; padding:0 26px; font-size:1.06rem; }
+.sa-home .hero-v2 .hero-form .ui-input.ui-xl{ height:64px; border-radius:18px; font-size:17px; }
 
 /* Input maior (iOS-friendly) dentro do herói v2 */
 .sa-home .hero-v2 .hero-form .ui-input{
@@ -152,6 +155,18 @@ body.menu-open{ overflow:hidden; }
   outline:none; border-color:#98b0ff; box-shadow:0 0 0 3px rgba(59,130,246,.22);
 }
 .sa-home .hero-v2 .cta-card .btn.primary{ height:60px; border-radius:999px; padding:0 26px; font-weight:800; }
+/* Ghost variant refinement to match Lovable look */
+.sa-home .hero-form .btn.ghost{
+  background:transparent; border:1.5px solid #dfe6ff; color:#1e2a78; font-weight:900;
+}
+:root[data-theme="dark"] .sa-home .hero-form .btn.ghost{
+  border-color:#23315d; color:#dbe3ff;
+}
+/* Slightly stronger gradient + shadow for primary */
+.sa-home .hero-form .btn.primary{
+  background:linear-gradient(135deg,var(--brand),var(--brand-2));
+  box-shadow:0 16px 34px rgba(11,59,255,.28);
+}
 
 :root[data-theme="dark"] .sa-home .hero-v2 .hero-form .ui-input{ background:#0f172a; color:#e6e9ff; border-color:#2a3765; }
 :root[data-theme="dark"] .sa-home .hero-v2 .hero-form .ui-input::placeholder{ color:#8fa0d6; }

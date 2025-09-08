@@ -28,6 +28,7 @@ urlpatterns = [
 
     # Onboarding + Home logada
     path("onboarding/",   views.onboarding,        name="onboarding"),
+    path("onboarding/finish/", views.wizard_finish_sso, name="wizard_finish_sso"),
     path("home/logada/",  views.home_logged_view,  name="home_logged"),  # <- garante nome da view correto
 
     # ---- Carteiras / Portal (views stub + aliases de nome) ----

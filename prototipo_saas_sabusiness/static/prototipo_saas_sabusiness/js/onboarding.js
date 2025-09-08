@@ -365,4 +365,25 @@
     const initial = Number(document.body.dataset.initialStep || "1");
     go(isNaN(initial) ? 1 : initial);
   })();
-  
+
+// Make "Acesse SA Business" link hit the SSO finish route directly
+(() => {
+  const root = document.querySelector('section.onboard');
+  if (!root) return;
+  const appUrl = root.dataset.appUrl || 'http://localhost:8080/app';
+  const email  = (root.dataset.email || '').trim().toLowerCase();
+  const name   = root.dataset.name || '';
+  const wa     = root.dataset.wa || '';
+  const btn    = document.querySelector('#step4 a.btn.primary');
+  if (!btn) return;
+
+  const params = new URLSearchParams();
+  if (email) params.set('email', email);
+  params.set('redirect_to', appUrl);
+  if (name) params.set('name', name);
+  if (wa) params.set('whatsapp', wa);
+
+  // Build absolute URL against current origin to avoid relative path issues
+  const base = window.location.origin || '';
+  btn.href = `${base}/onboarding/finish/?${params.toString()}`;
+})();

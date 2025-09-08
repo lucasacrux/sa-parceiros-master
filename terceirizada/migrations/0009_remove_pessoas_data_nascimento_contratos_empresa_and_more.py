@@ -10,10 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='pessoas',
-            name='data_nascimento',
-        ),
         migrations.AddField(
             model_name='contratos',
             name='empresa',
