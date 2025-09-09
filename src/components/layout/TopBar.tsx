@@ -1,4 +1,4 @@
-import { Bell, User, Settings, LogOut, Moon, Sun } from "lucide-react";
+import { Bell, User, Settings, LogOut, Moon, Sun, Crown, Shield, HelpCircle, FileText } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,14 +13,29 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from "@/components/ThemeProvider";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function TopBar() {
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
+
+  // Mock user data - in real app this would come from auth context
+  const user = {
+    name: "Admin",
+    email: "admin@democompany.com",
+    role: "super_admin" // Could be: 'super_admin', 'admin', 'user'
+  };
+
+  const isAdmin = user.role === "super_admin" || user.role === "admin";
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleNavigateToAdmin = (path: string) => {
+    navigate(path);
+  };
 
   if (!mounted) {
     return null;
@@ -41,6 +56,26 @@ export function TopBar() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Top Navigation Menu */}
+          <div className="hidden md:flex items-center gap-1">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/app/dashboard')}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Dashboard
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/app/integracoes')}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Docs
+            </Button>
+          </div>
+
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-4 w-4" />
@@ -50,6 +85,15 @@ export function TopBar() {
             >
               3
             </Badge>
+          </Button>
+
+          {/* Settings */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/app/general')}
+          >
+            <Settings className="h-4 w-4" />
           </Button>
 
           {/* Theme Toggle */}
@@ -80,22 +124,42 @@ export function TopBar() {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Admin</p>
+                  <p className="text-sm font-medium leading-none">{user.name}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    admin@democompany.com
+                    {user.email}
                   </p>
+                  {isAdmin && (
+                    <p className="text-xs leading-none text-yellow-600 font-medium">
+                      Administrador
+                    </p>
+                  )}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              
+              {/* Admin Section - Only for admins */}
+              {isAdmin && (
+                <>
+                  <DropdownMenuItem onClick={() => handleNavigateToAdmin('/app/admin')}>
+                    <Crown className="mr-2 h-4 w-4" />
+                    <span>Administrador</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              
               <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Perfil</span>
+                <FileText className="mr-2 h-4 w-4" />
+                <span>Termos e Condições</span>
               </DropdownMenuItem>
+              
               <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Configurações</span>
+                <HelpCircle className="mr-2 h-4 w-4" />
+                <span>Help Center</span>
               </DropdownMenuItem>
+              
               <DropdownMenuSeparator />
+              
               <DropdownMenuItem className="text-destructive">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Sair</span>

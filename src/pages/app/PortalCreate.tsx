@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,8 @@ import {
   FileKey,
   Shield
 } from "lucide-react";
+import { upsertTenantAndConfig } from "@/lib/tenant";
+import type { ThemeTokens, LoginMethods, PaymentMethods } from "@/types/portal";
 
 const steps = [
   { id: 1, title: "Identidade da marca", icon: Palette },
@@ -30,31 +33,47 @@ const steps = [
   { id: 4, title: "Conversão & Pagamentos", icon: CreditCard },
 ];
 
+// Default tokens for Acrux demo
+const defaultTokens: ThemeTokens = {
+  primary: "#1E40AF",
+  secondary: "#3882F6", 
+  bg: "#F8FAFC",
+  fg: "#0F172A",
+  muted: "#E2E8F0",
+  radius: 14,
+  fonts: {
+    heading: "Poppins",
+    body: "Inter"
+  }
+};
+
 export default function PortalCreate() {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isCreating, setIsCreating] = useState(false);
+  const { toast } = useToast();
+  
   const [formData, setFormData] = useState({
-    // Step 1
-    companyName: "",
+    // Step 1 - Brand Identity
+    companyName: "Acrux Securitizadora",
     websiteUrl: "",
     logoFile: null as File | null,
-    primaryColor: "#3B82F6",
-    secondaryColor: "#1E40AF",
-    fontFamily: "Inter",
+    primaryColor: defaultTokens.primary,
+    secondaryColor: defaultTokens.secondary,
+    fontFamily: "Poppins",
+    portalType: "semi" as "semi" | "full",
     
-    // Step 2
-    subdomain: "",
-    customDomain: "",
-    portalType: "subdomain",
+    // Step 2 - Portal Address
+    slug: "acrux",
     
-    // Step 3
-    loginModes: [] as string[],
+    // Step 3 - Login Methods
+    loginModes: ["cpf_otp", "contract"] as string[],
     whatsappEnabled: false,
-    emailEnabled: false,
+    emailEnabled: true,
     smsEnabled: false,
     
-    // Step 4
-    paymentMethods: [] as string[],
-    asaasEnabled: false,
+    // Step 4 - Payments
+    paymentMethods: ["pix", "cartao"] as string[],
+    asaasEnabled: true,
   });
 
   const progress = (currentStep / steps.length) * 100;
@@ -71,6 +90,140 @@ export default function PortalCreate() {
     }
   };
 
+  const handleCreatePortal = async () => {
+    setIsCreating(true);
+    try {
+      const tokens: ThemeTokens = {
+        primary: formData.primaryColor,
+        secondary: formData.secondaryColor,
+        bg: defaultTokens.bg,
+        fg: defaultTokens.fg,
+        muted: defaultTokens.muted,
+        radius: defaultTokens.radius,
+        fonts: {
+          heading: formData.fontFamily,
+          body: "Inter"
+        }
+      };
+
+      const loginMethods: LoginMethods = {
+        cpfOtp: formData.loginModes.includes("cpf_otp"),
+        contrato: formData.loginModes.includes("contract"),
+        cupom: formData.loginModes.includes("coupon"),
+        channels: {
+          email: formData.emailEnabled,
+          whatsapp: formData.whatsappEnabled,
+          sms: formData.smsEnabled
+        }
+      };
+
+      const payments: PaymentMethods = {
+        boleto: formData.paymentMethods.includes("boleto"),
+        pix: formData.paymentMethods.includes("pix"),
+        cartao: formData.paymentMethods.includes("cartao"),
+        provedor: "ASAAS"
+      };
+
+      await upsertTenantAndConfig({
+        slug: formData.slug,
+        name: formData.companyName,
+        site_url: formData.websiteUrl,
+        type: formData.portalType,
+        tokens,
+        login_methods: loginMethods,
+        payments,
+        logoFile: formData.logoFile
+      });
+
+      toast({
+        title: "Portal criado com sucesso!",
+        description: "Redirecionando para o preview...",
+      });
+
+      // Redirect to portal preview
+      window.location.href = `/t/${formData.slug}`;
+    } catch (error) {
+      console.error("Erro ao criar portal:", error);
+      toast({
+        title: "Erro ao criar portal",
+        description: "Tente novamente em alguns instantes.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file size (2MB max)
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "Arquivo muito grande",
+          description: "O arquivo deve ter no máximo 2MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Tipo de arquivo inválido",
+          description: "Apenas imagens são permitidas.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setFormData(prev => ({ ...prev, logoFile: file }));
+      toast({
+        title: "Logo carregada!",
+        description: "A logo foi carregada com sucesso.",
+      });
+    }
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const files = event.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "Arquivo muito grande",
+          description: "O arquivo deve ter no máximo 2MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Tipo de arquivo inválido",
+          description: "Apenas imagens são permitidas.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setFormData(prev => ({ ...prev, logoFile: file }));
+      toast({
+        title: "Logo carregada!",
+        description: "A logo foi carregada com sucesso.",
+      });
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
   const handleLoginModeChange = (mode: string, checked: boolean) => {
     if (checked) {
       setFormData(prev => ({
@@ -81,6 +234,20 @@ export default function PortalCreate() {
       setFormData(prev => ({
         ...prev,
         loginModes: prev.loginModes.filter(m => m !== mode)
+      }));
+    }
+  };
+
+  const handlePaymentMethodChange = (method: string, checked: boolean) => {
+    if (checked) {
+      setFormData(prev => ({
+        ...prev,
+        paymentMethods: [...prev.paymentMethods, method]
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        paymentMethods: prev.paymentMethods.filter(m => m !== method)
       }));
     }
   };
@@ -194,14 +361,53 @@ export default function PortalCreate() {
 
                   <div className="space-y-2">
                     <Label>Logo da empresa</Label>
-                    <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
-                      <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                      <p className="text-sm text-muted-foreground">
-                        Clique para fazer upload ou arraste aqui
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        PNG, SVG até 2MB
-                      </p>
+                    <div 
+                      className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer relative overflow-hidden"
+                      onClick={() => document.getElementById('logo-upload')?.click()}
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                    >
+                      <input
+                        id="logo-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                      />
+                      {formData.logoFile ? (
+                        <div className="space-y-2">
+                          <div className="w-16 h-16 mx-auto bg-primary/10 rounded-lg flex items-center justify-center overflow-hidden">
+                            <img 
+                              src={URL.createObjectURL(formData.logoFile)} 
+                              alt="Logo preview"
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
+                          <p className="text-sm font-medium">{formData.logoFile.name}</p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFormData(prev => ({ ...prev, logoFile: null }));
+                            }}
+                          >
+                            Remover
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            Clique para fazer upload ou arraste aqui
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            PNG, JPG, SVG até 2MB
+                          </p>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -270,62 +476,45 @@ export default function PortalCreate() {
                       </select>
                     </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <Label>Tipo de portal</Label>
+                    <Tabs value={formData.portalType} onValueChange={(value) => 
+                      setFormData(prev => ({ ...prev, portalType: value as "semi" | "full" }))
+                    }>
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="semi">Semi (Recomendado)</TabsTrigger>
+                        <TabsTrigger value="full">Full White Label</TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </div>
                 </div>
               )}
 
               {/* Step 2: Portal Address */}
               {currentStep === 2 && (
                 <div className="space-y-6">
-                  <Tabs value={formData.portalType} onValueChange={(value) => 
-                    setFormData(prev => ({ ...prev, portalType: value }))
-                  }>
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="subdomain">Subdomínio</TabsTrigger>
-                      <TabsTrigger value="custom">Domínio personalizado</TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="subdomain" className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="subdomain">Subdomínio</Label>
-                        <div className="flex">
-                          <Input
-                            id="subdomain"
-                            placeholder="suaempresa"
-                            value={formData.subdomain}
-                            onChange={(e) => setFormData(prev => ({
-                              ...prev,
-                              subdomain: e.target.value
-                            }))}
-                            className="rounded-r-none"
-                          />
-                          <div className="bg-muted px-3 py-2 border border-l-0 rounded-r-md flex items-center text-sm text-muted-foreground">
-                            .saiuacordo.com.br
-                          </div>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          Seu portal ficará disponível em: {formData.subdomain || "suaempresa"}.saiuacordo.com.br
-                        </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="slug">Slug do portal</Label>
+                    <div className="flex">
+                      <div className="bg-muted px-3 py-2 border border-r-0 rounded-l-md flex items-center text-sm text-muted-foreground">
+                        /t/
                       </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="custom" className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="custom-domain">Domínio personalizado</Label>
-                        <Input
-                          id="custom-domain"
-                          placeholder="portal.suaempresa.com.br"
-                          value={formData.customDomain}
-                          onChange={(e) => setFormData(prev => ({
-                            ...prev,
-                            customDomain: e.target.value
-                          }))}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Você precisará configurar os registros DNS do seu domínio
-                        </p>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
+                      <Input
+                        id="slug"
+                        placeholder="acrux"
+                        value={formData.slug}
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
+                          slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')
+                        }))}
+                        className="rounded-l-none"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Seu portal ficará disponível em: /t/{formData.slug || "acrux"}
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -380,22 +569,6 @@ export default function PortalCreate() {
                   <div>
                     <h3 className="font-semibold mb-4">Canais de comunicação</h3>
                     <div className="grid gap-4 sm:grid-cols-3">
-                      <Card variant={formData.whatsappEnabled ? "feature" : "outline"}>
-                        <CardContent className="p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <Smartphone className="h-5 w-5" />
-                            <Checkbox
-                              checked={formData.whatsappEnabled}
-                              onCheckedChange={(checked) => 
-                                setFormData(prev => ({ ...prev, whatsappEnabled: checked as boolean }))
-                              }
-                            />
-                          </div>
-                          <h4 className="font-medium">WhatsApp</h4>
-                          <p className="text-xs text-muted-foreground">OTP via WhatsApp</p>
-                        </CardContent>
-                      </Card>
-                      
                       <Card variant={formData.emailEnabled ? "feature" : "outline"}>
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-2">
@@ -408,23 +581,35 @@ export default function PortalCreate() {
                             />
                           </div>
                           <h4 className="font-medium">Email</h4>
-                          <p className="text-xs text-muted-foreground">OTP via email</p>
+                          <p className="text-sm text-muted-foreground">
+                            Envio de códigos por email
+                          </p>
                         </CardContent>
                       </Card>
                       
-                      <Card variant={formData.smsEnabled ? "feature" : "outline"}>
+                      <Card variant="outline">
                         <CardContent className="p-4">
                           <div className="flex items-center justify-between mb-2">
-                            <Smartphone className="h-5 w-5" />
-                            <Checkbox
-                              checked={formData.smsEnabled}
-                              onCheckedChange={(checked) => 
-                                setFormData(prev => ({ ...prev, smsEnabled: checked as boolean }))
-                              }
-                            />
+                            <Smartphone className="h-5 w-5 text-muted-foreground" />
+                            <Badge variant="outline">Em breve</Badge>
                           </div>
-                          <h4 className="font-medium">SMS</h4>
-                          <p className="text-xs text-muted-foreground">OTP via SMS</p>
+                          <h4 className="font-medium text-muted-foreground">WhatsApp</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Códigos via WhatsApp
+                          </p>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card variant="outline">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <Smartphone className="h-5 w-5 text-muted-foreground" />
+                            <Badge variant="outline">Em breve</Badge>
+                          </div>
+                          <h4 className="font-medium text-muted-foreground">SMS</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Códigos via SMS
+                          </p>
                         </CardContent>
                       </Card>
                     </div>
@@ -437,87 +622,75 @@ export default function PortalCreate() {
                 <div className="space-y-6">
                   <div>
                     <h3 className="font-semibold mb-4">Métodos de pagamento</h3>
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="boleto"
-                          checked={formData.paymentMethods.includes("boleto")}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setFormData(prev => ({
-                                ...prev,
-                                paymentMethods: [...prev.paymentMethods, "boleto"]
-                              }));
-                            } else {
-                              setFormData(prev => ({
-                                ...prev,
-                                paymentMethods: prev.paymentMethods.filter(m => m !== "boleto")
-                              }));
-                            }
-                          }}
-                        />
-                        <Label htmlFor="boleto">Boleto bancário</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="pix"
-                          checked={formData.paymentMethods.includes("pix")}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setFormData(prev => ({
-                                ...prev,
-                                paymentMethods: [...prev.paymentMethods, "pix"]
-                              }));
-                            } else {
-                              setFormData(prev => ({
-                                ...prev,
-                                paymentMethods: prev.paymentMethods.filter(m => m !== "pix")
-                              }));
-                            }
-                          }}
-                        />
-                        <Label htmlFor="pix">PIX</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id="cartao"
-                          checked={formData.paymentMethods.includes("cartao")}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setFormData(prev => ({
-                                ...prev,
-                                paymentMethods: [...prev.paymentMethods, "cartao"]
-                              }));
-                            } else {
-                              setFormData(prev => ({
-                                ...prev,
-                                paymentMethods: prev.paymentMethods.filter(m => m !== "cartao")
-                              }));
-                            }
-                          }}
-                        />
-                        <Label htmlFor="cartao">Cartão de crédito/débito</Label>
-                      </div>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                      <Card variant={formData.paymentMethods.includes("boleto") ? "feature" : "outline"}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <CreditCard className="h-5 w-5" />
+                            <Checkbox
+                              checked={formData.paymentMethods.includes("boleto")}
+                              onCheckedChange={(checked) => 
+                                handlePaymentMethodChange("boleto", checked as boolean)
+                              }
+                            />
+                          </div>
+                          <h4 className="font-medium">Boleto</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Boleto bancário
+                          </p>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card variant={formData.paymentMethods.includes("pix") ? "feature" : "outline"}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <CreditCard className="h-5 w-5" />
+                            <Checkbox
+                              checked={formData.paymentMethods.includes("pix")}
+                              onCheckedChange={(checked) => 
+                                handlePaymentMethodChange("pix", checked as boolean)
+                              }
+                            />
+                          </div>
+                          <h4 className="font-medium">PIX</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Pagamento instantâneo
+                          </p>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card variant={formData.paymentMethods.includes("cartao") ? "feature" : "outline"}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <CreditCard className="h-5 w-5" />
+                            <Checkbox
+                              checked={formData.paymentMethods.includes("cartao")}
+                              onCheckedChange={(checked) => 
+                                handlePaymentMethodChange("cartao", checked as boolean)
+                              }
+                            />
+                          </div>
+                          <h4 className="font-medium">Cartão</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Cartão de crédito/débito
+                          </p>
+                        </CardContent>
+                      </Card>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="font-semibold mb-4">Integração de pagamentos</h3>
-                    <Card variant={formData.asaasEnabled ? "feature" : "outline"}>
+                    <h3 className="font-semibold mb-4">Provedor de pagamentos</h3>
+                    <Card variant="outline">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div>
                             <h4 className="font-medium">ASAAS</h4>
                             <p className="text-sm text-muted-foreground">
-                              Gateway de pagamento brasileiro
+                              Gateway de pagamentos integrado
                             </p>
                           </div>
-                          <Checkbox
-                            checked={formData.asaasEnabled}
-                            onCheckedChange={(checked) => 
-                              setFormData(prev => ({ ...prev, asaasEnabled: checked as boolean }))
-                            }
-                          />
+                          <Badge variant="outline">Padrão</Badge>
                         </div>
                       </CardContent>
                     </Card>
@@ -530,77 +703,44 @@ export default function PortalCreate() {
 
         {/* Preview */}
         <div className="col-span-12 lg:col-span-4">
-          <Card variant="glass" className="sticky top-6">
+          <Card variant="outline" className="sticky top-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Eye className="h-5 w-5" />
-                Preview
+                Preview do Portal
               </CardTitle>
               <CardDescription>
-                Visualize como ficará seu portal
+                Visualização em tempo real
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div 
-                  className="rounded-lg border p-4 min-h-[200px] bg-gradient-to-br"
-                  style={{
-                    background: `linear-gradient(135deg, ${formData.primaryColor}20, ${formData.secondaryColor}10)`
-                  }}
+                  className="rounded-lg p-4 text-center"
+                  style={{ backgroundColor: formData.primaryColor + '10', borderColor: formData.primaryColor + '30' }}
                 >
-                  <div className="text-center space-y-3">
-                    <div 
-                      className="w-12 h-12 rounded-lg mx-auto flex items-center justify-center text-white font-bold"
-                      style={{ backgroundColor: formData.primaryColor }}
-                    >
-                      {formData.companyName ? formData.companyName.charAt(0).toUpperCase() : "L"}
-                    </div>
-                    <h3 className="font-semibold" style={{ fontFamily: formData.fontFamily }}>
-                      {formData.companyName || "Sua Empresa"}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Portal de Autoatendimento
-                    </p>
-                    {currentStep >= 2 && (
-                      <Badge variant="pill" className="text-xs">
-                        {formData.portalType === "subdomain" 
-                          ? `${formData.subdomain || "empresa"}.saiuacordo.com.br`
-                          : formData.customDomain || "portal.suaempresa.com.br"
-                        }
-                      </Badge>
-                    )}
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg mx-auto mb-2 flex items-center justify-center">
+                    <span className="text-white font-bold">
+                      {formData.companyName.charAt(0)}
+                    </span>
                   </div>
+                  <h3 className="font-semibold" style={{ color: formData.primaryColor }}>
+                    {formData.companyName || "Sua Empresa"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Portal de Autoatendimento
+                  </p>
                 </div>
                 
-                {currentStep >= 3 && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Formas de acesso:</h4>
-                    <div className="space-y-1">
-                      {formData.loginModes.map((mode) => (
-                        <Badge key={mode} variant="chip" className="text-xs mr-1">
-                          {mode === "cpf_otp" && "CPF + OTP"}
-                          {mode === "contract" && "Contrato"}
-                          {mode === "coupon" && "Cupom"}
-                        </Badge>
-                      ))}
-                    </div>
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Configurações:</div>
+                  <div className="space-y-1 text-xs">
+                    <div>Slug: /t/{formData.slug || "acrux"}</div>
+                    <div>Tipo: {formData.portalType === "semi" ? "Semi" : "Full White Label"}</div>
+                    <div>Login: {formData.loginModes.length} métodos</div>
+                    <div>Pagamentos: {formData.paymentMethods.length} métodos</div>
                   </div>
-                )}
-                
-                {currentStep >= 4 && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Pagamentos:</h4>
-                    <div className="space-y-1">
-                      {formData.paymentMethods.map((method) => (
-                        <Badge key={method} variant="chip" className="text-xs mr-1">
-                          {method === "boleto" && "Boleto"}
-                          {method === "pix" && "PIX"}
-                          {method === "cartao" && "Cartão"}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -608,27 +748,34 @@ export default function PortalCreate() {
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between">
+      <div className="flex items-center justify-between">
         <Button
           variant="outline"
           onClick={handlePrev}
           disabled={currentStep === 1}
+          className="flex items-center gap-2"
         >
-          <ChevronLeft className="h-4 w-4 mr-2" />
-          Voltar
+          <ChevronLeft className="h-4 w-4" />
+          Anterior
         </Button>
         
-        {currentStep < steps.length ? (
-          <Button onClick={handleNext} variant="pill">
-            Próximo
-            <ChevronRight className="h-4 w-4 ml-2" />
-          </Button>
-        ) : (
-          <Button variant="hero" size="lg">
-            Criar Portal
-            <Check className="h-4 w-4 ml-2" />
-          </Button>
-        )}
+        <div className="flex items-center gap-4">
+          {currentStep < steps.length ? (
+            <Button onClick={handleNext} className="flex items-center gap-2">
+              Próximo
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleCreatePortal} 
+              disabled={isCreating}
+              className="flex items-center gap-2"
+            >
+              {isCreating ? "Criando..." : "Criar Portal"}
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
