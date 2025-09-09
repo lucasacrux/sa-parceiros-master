@@ -1,6 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle } from "lucide-react";
+import { ComingSoonCard } from "@/components/ComingSoonCard";
 
 export default function Negativacao() {
   return (
@@ -12,23 +10,10 @@ export default function Negativacao() {
         </p>
       </div>
 
-      <Card variant="elevated">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5" />
-            Negativação
-          </CardTitle>
-          <CardDescription>
-            Esta funcionalidade será implementada em breve
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Aqui você poderá enviar registros para SERASA, SPC e outros órgãos
-            de proteção ao crédito de forma automatizada.
-          </p>
-        </CardContent>
-      </Card>
+      <ComingSoonCard 
+        title="Negativação"
+        description="Funcionalidade para enviar registros para SERASA, SPC e outros órgãos de proteção ao crédito de forma automatizada."
+      />
     </div>
   );
 }

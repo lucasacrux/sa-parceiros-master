@@ -18,6 +18,7 @@ import {
   ChevronDown,
   Briefcase,
   Zap,
+  Crown,
 } from "lucide-react";
 
 import {
@@ -41,25 +42,29 @@ import logoImage from "@/assets/logo-saiu-acordo.png";
 
 const mainMenuItems = [
   { title: "Home", url: "/app", icon: Home },
-  { title: "Criar carteira", url: "/app/carteiras/nova", icon: FolderPlus },
-  { title: "Criar portal de autoatendimento", url: "/app/portal", icon: Globe },
-  { title: "Connect mensagens", url: "/app/connect", icon: MessageSquare },
-  { title: "Faça uma negativação", url: "/app/negativacao", icon: AlertTriangle },
-  { title: "Dossiê do cliente", url: "/app/dossie", icon: User },
-  { title: "Clientes", url: "/app/clientes", icon: Users },
-  { title: "Contratos", url: "/app/contratos", icon: FileText },
-  { title: "Consultar CPF", url: "/app/consultas/cpf", icon: Search },
-  { title: "Dashboards", url: "/app/dashboards", icon: BarChart3 },
-  { title: "Integrações", url: "/app/integracoes", icon: Zap },
+  { title: "Criar carteira", url: "/app/carteiras/nova", icon: FolderPlus, comingSoon: true },
+  { title: "Connect mensagens", url: "/app/connect", icon: MessageSquare, comingSoon: true },
+  { title: "Faça uma negativação", url: "/app/negativacao", icon: AlertTriangle, comingSoon: true },
+  { title: "Dossiê do cliente", url: "/app/dossie", icon: User, comingSoon: true },
+  { title: "Clientes", url: "/app/clientes", icon: Users, comingSoon: true },
+  { title: "Contratos", url: "/app/contratos", icon: FileText, comingSoon: true },
+  { title: "Consultar CPF", url: "/app/consultas/cpf", icon: Search, comingSoon: true },
+  { title: "Dashboards", url: "/app/dashboards", icon: BarChart3, comingSoon: true },
+  { title: "Integrações", url: "/app/integracoes", icon: Zap, comingSoon: true },
+];
+
+const portalMenuItems = [
+  { title: "Gerenciar Portal", url: "/app/portal", icon: Globe },
+  { title: "Admin Portal", url: "/app/admin-portal", icon: Crown },
 ];
 
 const accountMenuItems = [
-  { title: "Empresa", url: "/app/minha-conta/empresa", icon: Building },
-  { title: "Administrador", url: "/app/minha-conta/administrador", icon: Shield },
-  { title: "Usuários", url: "/app/minha-conta/usuarios", icon: Users },
-  { title: "Planos", url: "/app/minha-conta/planos", icon: CreditCard },
-  { title: "Faturamento", url: "/app/minha-conta/faturamento", icon: Briefcase },
-  { title: "Segurança", url: "/app/minha-conta/seguranca", icon: Shield },
+  { title: "Empresa", url: "/app/minha-conta/empresa", icon: Building, comingSoon: true },
+  { title: "Administrador", url: "/app/minha-conta/administrador", icon: Shield, comingSoon: true },
+  { title: "Usuários", url: "/app/minha-conta/usuarios", icon: Users, comingSoon: true },
+  { title: "Planos", url: "/app/minha-conta/planos", icon: CreditCard, comingSoon: true },
+  { title: "Faturamento", url: "/app/minha-conta/faturamento", icon: Briefcase, comingSoon: true },
+  { title: "Segurança", url: "/app/minha-conta/seguranca", icon: Shield, comingSoon: true },
 ];
 
 export function AppSidebar() {
@@ -68,6 +73,9 @@ export function AppSidebar() {
   const currentPath = location.pathname;
   const [accountOpen, setAccountOpen] = useState(
     accountMenuItems.some((item) => currentPath === item.url)
+  );
+  const [portalOpen, setPortalOpen] = useState(
+    portalMenuItems.some((item) => currentPath === item.url)
   );
   const collapsed = state === "collapsed";
 
@@ -106,15 +114,74 @@ export function AppSidebar() {
               {mainMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end className={getNavClass}>
+                    <NavLink 
+                      to={item.url} 
+                      end 
+                      className={getNavClass}
+                      onClick={(e) => {
+                        if (item.comingSoon) {
+                          e.preventDefault();
+                          alert("🚧 Esta funcionalidade está sendo desenvolvida e estará disponível em breve!");
+                        }
+                      }}
+                    >
                       <item.icon className="h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      {!collapsed && (
+                        <span className="flex items-center gap-2">
+                          {item.title}
+                          {item.comingSoon && (
+                            <span className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded">
+                              Em breve
+                            </span>
+                          )}
+                        </span>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Portal Menu */}
+        <SidebarGroup>
+          <Collapsible open={portalOpen} onOpenChange={setPortalOpen}>
+            <CollapsibleTrigger asChild>
+              <SidebarGroupLabel className="text-sidebar-foreground/60 uppercase text-xs font-semibold tracking-wider cursor-pointer hover:text-sidebar-foreground flex items-center justify-between group">
+                {!collapsed && (
+                  <>
+                    <span>Meu Portal</span>
+                    <ChevronDown className="h-3 w-3 transition-transform group-data-[state=open]:rotate-180" />
+                  </>
+                )}
+              </SidebarGroupLabel>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {portalMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink 
+                          to={item.url} 
+                          end 
+                          className={getNavClass}
+                        >
+                          <item.icon className="h-4 w-4" />
+                          {!collapsed && (
+                            <span className="flex items-center gap-2">
+                              {item.title}
+                            </span>
+                          )}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </CollapsibleContent>
+          </Collapsible>
         </SidebarGroup>
 
         {/* Account Menu */}
@@ -136,9 +203,28 @@ export function AppSidebar() {
                   {accountMenuItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild>
-                        <NavLink to={item.url} end className={getNavClass}>
+                        <NavLink 
+                          to={item.url} 
+                          end 
+                          className={getNavClass}
+                          onClick={(e) => {
+                            if (item.comingSoon) {
+                              e.preventDefault();
+                              alert("🚧 Esta funcionalidade está sendo desenvolvida e estará disponível em breve!");
+                            }
+                          }}
+                        >
                           <item.icon className="h-4 w-4" />
-                          {!collapsed && <span>{item.title}</span>}
+                          {!collapsed && (
+                            <span className="flex items-center gap-2">
+                              {item.title}
+                              {item.comingSoon && (
+                                <span className="text-xs bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded">
+                                  Em breve
+                                </span>
+                              )}
+                            </span>
+                          )}
                         </NavLink>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

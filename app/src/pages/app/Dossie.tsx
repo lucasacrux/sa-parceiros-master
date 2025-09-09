@@ -1,6 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { User } from "lucide-react";
+import { ComingSoonCard } from "@/components/ComingSoonCard";
 
 export default function Dossie() {
   return (
@@ -12,23 +10,10 @@ export default function Dossie() {
         </p>
       </div>
 
-      <Card variant="elevated">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Dossiê Completo
-          </CardTitle>
-          <CardDescription>
-            Esta funcionalidade será implementada em breve
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Aqui você poderá visualizar todas as informações de um cliente,
-            histórico de pagamentos, score, dados cadastrais e muito mais.
-          </p>
-        </CardContent>
-      </Card>
+      <ComingSoonCard 
+        title="Dossiê Completo"
+        description="Funcionalidade para visualizar todas as informações de um cliente, histórico de pagamentos, score, dados cadastrais e muito mais."
+      />
     </div>
   );
 }

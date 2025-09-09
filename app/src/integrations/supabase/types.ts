@@ -52,6 +52,90 @@ export type Database = {
           },
         ]
       }
+      companies: {
+        Row: {
+          cnpj: string
+          company_name: string
+          created_at: string
+          email: string | null
+          id: string
+          phone: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          cnpj: string
+          company_name: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          phone?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          cnpj?: string
+          company_name?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          phone?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      company_members: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          is_main_contact: boolean | null
+          percentage: number | null
+          person_id: string
+          role: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          is_main_contact?: boolean | null
+          percentage?: number | null
+          person_id: string
+          role: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_main_contact?: boolean | null
+          percentage?: number | null
+          person_id?: string
+          role?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_members_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_members_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consumers: {
         Row: {
           cpf: string | null
@@ -195,6 +279,198 @@ export type Database = {
           },
         ]
       }
+      persons: {
+        Row: {
+          cpf: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          cpf: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          cpf?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      portal_authentications: {
+        Row: {
+          attempted_at: string
+          auth_channel: string | null
+          auth_method: string
+          failure_reason: string | null
+          id: string
+          identifier: string | null
+          metadata: Json | null
+          portal_user_id: string | null
+          session_id: string | null
+          success: boolean
+          tenant_id: string
+        }
+        Insert: {
+          attempted_at?: string
+          auth_channel?: string | null
+          auth_method: string
+          failure_reason?: string | null
+          id?: string
+          identifier?: string | null
+          metadata?: Json | null
+          portal_user_id?: string | null
+          session_id?: string | null
+          success?: boolean
+          tenant_id: string
+        }
+        Update: {
+          attempted_at?: string
+          auth_channel?: string | null
+          auth_method?: string
+          failure_reason?: string | null
+          id?: string
+          identifier?: string | null
+          metadata?: Json | null
+          portal_user_id?: string | null
+          session_id?: string | null
+          success?: boolean
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_authentications_portal_user_id_fkey"
+            columns: ["portal_user_id"]
+            isOneToOne: false
+            referencedRelation: "portal_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_authentications_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "portal_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_authentications_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portal_configs: {
+        Row: {
+          login_methods: Json
+          payments: Json
+          tenant_id: string
+          tokens: Json
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          login_methods: Json
+          payments: Json
+          tenant_id: string
+          tokens: Json
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          login_methods?: Json
+          payments?: Json
+          tenant_id?: string
+          tokens?: Json
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_configs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portal_sessions: {
+        Row: {
+          auth_method: string | null
+          ended_at: string | null
+          id: string
+          ip_address: unknown | null
+          is_authenticated: boolean | null
+          last_activity_at: string
+          pages_visited: Json | null
+          portal_user_id: string | null
+          session_id: string
+          started_at: string
+          tenant_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          auth_method?: string | null
+          ended_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          is_authenticated?: boolean | null
+          last_activity_at?: string
+          pages_visited?: Json | null
+          portal_user_id?: string | null
+          session_id: string
+          started_at?: string
+          tenant_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          auth_method?: string | null
+          ended_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          is_authenticated?: boolean | null
+          last_activity_at?: string
+          pages_visited?: Json | null
+          portal_user_id?: string | null
+          session_id?: string
+          started_at?: string
+          tenant_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_sessions_portal_user_id_fkey"
+            columns: ["portal_user_id"]
+            isOneToOne: false
+            referencedRelation: "portal_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_sessions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portal_settings: {
         Row: {
           created_at: string | null
@@ -231,6 +507,94 @@ export type Database = {
             foreignKeyName: "portal_settings_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portal_users: {
+        Row: {
+          auth_method: string | null
+          cnpj: string | null
+          company_id: string | null
+          company_name: string | null
+          contract_number: string | null
+          cpf: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_authenticated: boolean | null
+          last_login_at: string | null
+          legal_representative_name: string | null
+          metadata: Json | null
+          name: string | null
+          person_id: string | null
+          phone: string | null
+          tenant_id: string
+          updated_at: string
+          user_type: string | null
+        }
+        Insert: {
+          auth_method?: string | null
+          cnpj?: string | null
+          company_id?: string | null
+          company_name?: string | null
+          contract_number?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_authenticated?: boolean | null
+          last_login_at?: string | null
+          legal_representative_name?: string | null
+          metadata?: Json | null
+          name?: string | null
+          person_id?: string | null
+          phone?: string | null
+          tenant_id: string
+          updated_at?: string
+          user_type?: string | null
+        }
+        Update: {
+          auth_method?: string | null
+          cnpj?: string | null
+          company_id?: string | null
+          company_name?: string | null
+          contract_number?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_authenticated?: boolean | null
+          last_login_at?: string | null
+          legal_representative_name?: string | null
+          metadata?: Json | null
+          name?: string | null
+          person_id?: string | null
+          phone?: string | null
+          tenant_id?: string
+          updated_at?: string
+          user_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_users_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_users_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_users_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
             referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
@@ -296,9 +660,12 @@ export type Database = {
         Row: {
           cnpj: string | null
           created_at: string | null
+          created_by: string | null
           id: string
+          name: string
           nome: string
           site_oficial: string | null
+          site_url: string | null
           slug: string
           theme: Json | null
           updated_at: string | null
@@ -306,9 +673,12 @@ export type Database = {
         Insert: {
           cnpj?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
+          name: string
           nome: string
           site_oficial?: string | null
+          site_url?: string | null
           slug: string
           theme?: Json | null
           updated_at?: string | null
@@ -316,9 +686,12 @@ export type Database = {
         Update: {
           cnpj?: string | null
           created_at?: string | null
+          created_by?: string | null
           id?: string
+          name?: string
           nome?: string
           site_oficial?: string | null
+          site_url?: string | null
           slug?: string
           theme?: Json | null
           updated_at?: string | null
@@ -369,6 +742,10 @@ export type Database = {
       has_role: {
         Args: { _role: string; _tenant_id?: string; _user_id: string }
         Returns: boolean
+      }
+      reset_demo_data: {
+        Args: { _tenant_id: string }
+        Returns: undefined
       }
     }
     Enums: {
