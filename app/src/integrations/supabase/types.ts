@@ -734,6 +734,54 @@ export type Database = {
           },
         ]
       }
+      wallet_clients: {
+        Row: {
+          id: string
+          wallet_id: string
+          document: string
+          type: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          wallet_id: string
+          document: string
+          type: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          wallet_id?: string
+          document?: string
+          type?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      },
+      wallets: {
+        Row: {
+          id: string
+          name: string
+          type: string
+          tenant_id: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          type: string
+          tenant_id: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          type?: string
+          tenant_id?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
