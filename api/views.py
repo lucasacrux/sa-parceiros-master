@@ -8,6 +8,8 @@ from rest_framework import status
 import json
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
+import requests
+from .services.bigdatacorp import fetch_lawsuits
 
 
 class PropostasList(APIView):
@@ -46,8 +48,33 @@ class AcordosListConnect(APIView):
             ).exclude(status='Simulação').order_by('-created_at')
 
         serializer = AcordoSerializer(acordos, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)  
-    
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ConsultaCNPJView(APIView):
+    def post(self, request, *args, **kwargs):
+        cnpjs = request.data.get("cnpjs", [])
+        datasets = request.data.get("datasets", [])
+        if not isinstance(cnpjs, list) or not isinstance(datasets, list):
+            return Response(
+                {"detail": "cnpjs and datasets must be lists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        results = {}
+        errors = {}
+        for cnpj in cnpjs:
+            try:
+                results[cnpj] = fetch_lawsuits(cnpj, datasets)
+            except requests.RequestException as exc:
+                errors[cnpj] = str(exc)
+
+        data = {"results": results}
+        if errors:
+            data["errors"] = errors
+            return Response(data, status=status.HTTP_207_MULTI_STATUS)
+        return Response(data, status=status.HTTP_200_OK)
+
 
 def somenteNumeros(cpf):
     return cpf.replace('-', '').replace('.','').replace('(','').replace(')','').replace(' ', '')

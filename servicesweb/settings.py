@@ -29,6 +29,10 @@ SECRET_KEY = os.getenv("SECRET", "dev-secret")
 DEBUG = os.getenv("DEBUG", "1").lower() in ("1", "true", "t", "yes", "y")
 ALLOWED_HOSTS = ["*"]
 
+# Credenciais da BigDataCorp
+BIGDATA_TOKEN_ID = os.getenv("BIGDATA_TOKEN_ID", "")
+BIGDATA_ACCESS_TOKEN = os.getenv("BIGDATA_ACCESS_TOKEN", "")
+
 # --- Apps --------------------------------------------------------------------
 
 INSTALLED_APPS = [
