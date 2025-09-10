@@ -48,7 +48,7 @@ const mainMenuItems = [
   { title: "Dossiê do cliente", url: "/app/dossie", icon: User, comingSoon: true },
   { title: "Clientes", url: "/app/clientes", icon: Users, comingSoon: true },
   { title: "Contratos", url: "/app/contratos", icon: FileText, comingSoon: true },
-  { title: "Consultar CPF", url: "/app/consultas/cpf", icon: Search, comingSoon: true },
+  { title: "Consultar cliente", url: "/app/consultas", icon: Search },
   { title: "Dashboards", url: "/app/dashboards", icon: BarChart3, comingSoon: true },
   { title: "Integrações", url: "/app/integracoes", icon: Zap, comingSoon: true },
 ];
