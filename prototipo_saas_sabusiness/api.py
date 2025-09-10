@@ -31,6 +31,22 @@ def cnpj_lookup(request: HttpRequest):
             "tipo": d.get("natureza_juridica") or d.get("tipo") or "—",
             "situacao": d.get("descricao_situacao_cadastral") or d.get("situacao") or "—",
         }
+        # registra consulta no Supabase (ignora falhas)
+        try:
+            import datetime as dt
+            from utils import supabase_sso as sso
+            sso.upsert(
+                "consultations",
+                {
+                    "wallet_id": request.GET.get("wallet_id"),
+                    "dataset": "cnpj",
+                    "document": digits,
+                    "result": data,
+                    "requested_at": dt.datetime.utcnow().isoformat() + "Z",
+                },
+            )
+        except Exception:
+            pass
         return _ok(data)
     except Exception:
         return _fail("Erro ao consultar serviço público", 502)
