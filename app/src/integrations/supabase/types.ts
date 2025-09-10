@@ -733,6 +733,67 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      },
+      wallet_clients: {
+        Row: {
+          created_at: string | null
+          document: string
+          id: string
+          wallet_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document: string
+          id?: string
+          wallet_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document?: string
+          id?: string
+          wallet_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_clients_wallet_id_fkey"
+            columns: ["wallet_id"]
+            isOneToOne: false
+            referencedRelation: "wallets"
+            referencedColumns: ["id"]
+          },
+        ]
+      },
+      wallets: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          tenant_id: string | null
+          type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          tenant_id?: string | null
+          type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          tenant_id?: string | null
+          type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallets_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wallet_clients: {
         Row: {
