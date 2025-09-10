@@ -279,6 +279,33 @@ export type Database = {
           },
         ]
       }
+      datasets: {
+        Row: {
+          id: string
+          code: string
+          name: string
+          type: string
+          price: number
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          code: string
+          name: string
+          type: string
+          price: number
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          code?: string
+          name?: string
+          type?: string
+          price?: number
+          created_at?: string | null
+        }
+        Relationships: []
+      }
       persons: {
         Row: {
           cpf: string
