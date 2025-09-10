@@ -23,6 +23,8 @@ import Contratos from "./pages/app/Contratos";
 import ConsultaCPF from "./pages/app/ConsultaCPF";
 import Dashboards from "./pages/app/Dashboards";
 import Integracoes from "./pages/app/Integracoes";
+import Consultas from "./pages/app/Consultas";
+import ConsultasPrecos from "./pages/app/ConsultasPrecos";
 
 // Portal Routes
 import PortalHome from "./routes/portal/PortalHome";
@@ -57,6 +59,8 @@ const App = () => (
             <Route path="/app/clientes" element={<AppLayout><Clientes /></AppLayout>} />
             <Route path="/app/contratos" element={<AppLayout><Contratos /></AppLayout>} />
             <Route path="/app/consultas/cpf" element={<AppLayout><ConsultaCPF /></AppLayout>} />
+            <Route path="/app/consultas" element={<AppLayout><Consultas /></AppLayout>} />
+            <Route path="/app/consultas/precos" element={<AppLayout><ConsultasPrecos /></AppLayout>} />
             <Route path="/app/dashboards" element={<AppLayout><Dashboards /></AppLayout>} />
             <Route path="/app/integracoes" element={<AppLayout><Integracoes /></AppLayout>} />
             <Route path="/app/admin" element={<AppLayout><AdminPanel /></AppLayout>} />
