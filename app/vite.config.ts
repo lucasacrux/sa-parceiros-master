@@ -8,6 +8,25 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "0.0.0.0",
     port: 8080,
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
+      // Useful during dev when Django serves these paths
+      "/admin": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
+      "/static": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
+      "/media": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
+    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

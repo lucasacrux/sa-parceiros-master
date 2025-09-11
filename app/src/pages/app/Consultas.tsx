@@ -24,14 +24,44 @@ export default function Consultas() {
   const [apiResult, setApiResult] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Fallback when Supabase is not configured or empty
+  const SUPABASE_ENABLED = Boolean(
+    (import.meta as any)?.env?.VITE_SUPABASE_URL && (import.meta as any)?.env?.VITE_SUPABASE_ANON_KEY
+  );
+  const DEFAULT_DATASETS: Record<string, Dataset[]> = {
+    cnpj: [
+      { id: "lawsuits", code: "lawsuits", name: "Processos (BigDataCorp)", type: "cnpj", price: 0 },
+    ],
+    cpf: [
+      { id: "cpf_basic", code: "cpf_basic", name: "Consulta CPF básica", type: "cpf", price: 0 },
+    ],
+  };
+
   useEffect(() => {
     const loadDatasets = async () => {
       if (!clientType) return;
-      const { data } = await supabase
-        .from("datasets")
-        .select("*")
-        .eq("type", clientType);
-      setDatasets(data ?? []);
+      let list: Dataset[] | null = null;
+      if (SUPABASE_ENABLED) {
+        try {
+          const { data } = await supabase
+            .from("datasets")
+            .select("*")
+            .eq("type", clientType);
+          list = data ?? null;
+        } catch {
+          list = null;
+        }
+      }
+      if (!list || list.length === 0) {
+        list = DEFAULT_DATASETS[clientType] ?? [];
+      }
+      setDatasets(list);
+      // Preselect first dataset for convenience
+      if (list.length > 0) {
+        setSelected([list[0].id]);
+      } else {
+        setSelected([]);
+      }
     };
     loadDatasets();
   }, [clientType]);
@@ -60,13 +90,39 @@ export default function Consultas() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cnpjs, datasets: selected }),
       });
-      const data = await resp.json();
-      setApiResult(data);
+      const text = await resp.text();
+      try {
+        const data = text ? JSON.parse(text) : { status: resp.status };
+        setApiResult(data);
+      } catch {
+        setApiResult({ status: resp.status, body: text });
+      }
     } catch (e) {
       setApiResult({ error: String(e) });
     } finally {
       setLoading(false);
     }
+  };
+
+  // --- Masks ---------------------------------------------------------------
+  const onlyDigits = (s: string) => s.replace(/\D+/g, "");
+  const maskCPF = (digits: string) => {
+    const d = onlyDigits(digits).slice(0, 11);
+    return d.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, (_, a, b, c, d2) =>
+      [a, b, c].filter(Boolean).join(".") + (d2 ? "-" + d2 : "")
+    );
+  };
+  const maskCNPJ = (digits: string) => {
+    const d = onlyDigits(digits).slice(0, 14);
+    return d.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, (_, a, b, c, d4, e) =>
+      `${a}.${b}.${c}/${d4}` + (e ? `-${e}` : "")
+    );
+  };
+  const maskList = (value: string, kind: string) => {
+    const maskFn = kind === "cpf" ? maskCPF : maskCNPJ;
+    const parts = value.split(/,|\n/);
+    const masked = parts.map((p) => maskFn(p.trim())).join(", ");
+    return masked;
   };
 
   return (
@@ -129,18 +185,20 @@ export default function Consultas() {
               <div className="flex justify-end font-semibold">
                 Total: R$ {total.toFixed(2)}
               </div>
-              {clientType === "cnpj" && (
+              {clientType && (
                 <div className="space-y-2">
-                  <label className="text-sm">CNPJs (separe por vírgula ou quebra de linha)</label>
+                  <label className="text-sm">
+                    {clientType === "cnpj" ? "CNPJs" : "CPFs"} (separe por vírgula ou quebra de linha)
+                  </label>
                   <Input
-                    placeholder="00.000.000/0000-00, 11.111.111/1111-11"
+                    placeholder={clientType === "cnpj" ? "00.000.000/0000-00, 11.111.111/1111-11" : "000.000.000-00, 111.111.111-11"}
                     value={cnpjsText}
-                    onChange={(e) => setCnpjsText(e.target.value)}
+                    onChange={(e) => setCnpjsText(maskList(e.target.value, clientType))}
                   />
                 </div>
               )}
               <div className="flex gap-2">
-                <Button onClick={handleConsulta} disabled={selected.length === 0 || (clientType === "cnpj" && !cnpjsText) || loading}>
+                <Button onClick={handleConsulta} disabled={!cnpjsText.trim() || loading}>
                   {loading ? "Consultando..." : "Realizar consulta"}
                 </Button>
                 {apiResult && (
