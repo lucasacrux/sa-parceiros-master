@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 import requests
 from .services.bigdatacorp import fetch_lawsuits
+from .services.supabase_logger import insert_consultation, extract_process_rows, insert_processes
 from .services.supabase_logger import insert_consultation
 
 
@@ -68,9 +69,15 @@ class ConsultaCNPJView(APIView):
             try:
                 res = fetch_lawsuits(cnpj, datasets)
                 results[cnpj] = res
+                saved_id = None
                 # Best effort: log into Supabase if configured
                 try:
-                    insert_consultation(cnpj, (datasets[0] if datasets else "processes"), res)
+                    ins = insert_consultation(cnpj, (datasets[0] if datasets else "processes"), res)
+                    if isinstance(ins, dict):
+                        saved_id = ins.get("inserted", {}).get("id")
+                    rows = extract_process_rows(cnpj, (datasets[0] if datasets else "processes"), res, saved_id)
+                    if rows:
+                        insert_processes(rows)
                 except Exception:
                     pass
             except requests.RequestException as exc:

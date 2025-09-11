@@ -7,6 +7,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
+import ConsultasResultado from "./ConsultasResultado";
 
 interface Dataset {
   id: string;
@@ -222,9 +223,31 @@ export default function Consultas() {
                 )}
               </div>
               {apiResult && (
-                <pre className="bg-muted p-3 rounded text-xs overflow-auto max-h-64">
-                  {JSON.stringify(apiResult, null, 2)}
-                </pre>
+                <>
+                  <Card variant="feature">
+                    <CardHeader>
+                      <CardTitle>Resumo</CardTitle>
+                      <CardDescription>Visualize os principais dados. Para ver o JSON completo, use o botão "Baixar JSON".</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <div className="text-xs text-muted-foreground">Dataset</div>
+                          <div className="font-medium">{(apiResult as any)?.meta?.dataset ?? selected[0]}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">Consulta</div>
+                          <div className="font-medium break-all">{(apiResult as any)?.meta?.q ?? "-"}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">Status</div>
+                          <div className="font-medium">{(apiResult as any)?.status_code ?? 200}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <ConsultasResultado result={apiResult} />
+                </>
               )}
             </div>
           )}
