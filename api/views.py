@@ -10,7 +10,15 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 import requests
 from .services.bigdatacorp import fetch_lawsuits
-from .services.supabase_logger import insert_consultation, extract_process_rows, insert_processes
+from .services.supabase_logger import (
+    insert_consultation,
+    extract_process_rows,
+    insert_processes,
+    upsert_integration_setting,
+    get_integration_setting,
+)
+import os
+import requests
 from .services.supabase_logger import insert_consultation
 
 
@@ -68,7 +76,7 @@ class ConsultaCNPJView(APIView):
         for cnpj in cnpjs:
             try:
                 res = fetch_lawsuits(cnpj, datasets)
-                results[cnpj] = res
+                results[cnpj] = {"data": res}
                 saved_id = None
                 # Best effort: log into Supabase if configured
                 try:
@@ -80,6 +88,8 @@ class ConsultaCNPJView(APIView):
                         insert_processes(rows)
                 except Exception:
                     pass
+                if saved_id:
+                    results[cnpj]["saved_id"] = saved_id
             except requests.RequestException as exc:
                 errors[cnpj] = str(exc)
 
@@ -88,6 +98,37 @@ class ConsultaCNPJView(APIView):
             data["errors"] = errors
             return Response(data, status=status.HTTP_207_MULTI_STATUS)
         return Response(data, status=status.HTTP_200_OK)
+
+
+class BigDataIntegrationView(APIView):
+    def get(self, request, *args, **kwargs):
+        data = get_integration_setting("bigdatacorp")
+        return Response(data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        token_id = request.data.get("token_id")
+        access_token = request.data.get("access_token")
+        if not token_id or not access_token:
+            return Response({"detail": "token_id and access_token are required"}, status=400)
+        res = upsert_integration_setting("bigdatacorp", token_id, access_token)
+        return Response(res, status=status.HTTP_200_OK)
+
+
+class PublicConsultationsProxy(APIView):
+    def get(self, request, *args, **kwargs):
+        # Simple passthrough to Supabase REST with service role (server-side only)
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_SERVICE_ROLE")
+        if not url or not key:
+            return Response({"detail": "Supabase not configured"}, status=400)
+        qs = request.META.get('QUERY_STRING', '')
+        endpoint = url.rstrip('/') + "/rest/v1/consultations" + ("?" + qs if qs else "")
+        resp = requests.get(endpoint, headers={"Authorization": f"Bearer {key}", "apikey": key})
+        try:
+            data = resp.json()
+        except ValueError:
+            data = {"status_code": resp.status_code, "text": resp.text}
+        return Response(data, status=resp.status_code)
 
 
 def somenteNumeros(cpf):

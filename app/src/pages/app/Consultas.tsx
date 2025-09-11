@@ -23,6 +23,15 @@ export default function Consultas() {
   const [selected, setSelected] = useState<string[]>([]);
   const [cnpjsText, setCnpjsText] = useState("");
   const [apiResult, setApiResult] = useState<any | null>(null);
+  const savedId = (() => {
+    try {
+      const keys = apiResult && apiResult.results ? Object.keys(apiResult.results) : [];
+      if (keys.length) {
+        return apiResult.results[keys[0]]?.saved_id;
+      }
+    } catch {}
+    return undefined;
+  })();
   const [loading, setLoading] = useState(false);
 
   // Fallback when Supabase is not configured or empty
@@ -244,6 +253,13 @@ export default function Consultas() {
                           <div className="font-medium">{(apiResult as any)?.status_code ?? 200}</div>
                         </div>
                       </div>
+                      {savedId && (
+                        <div className="mt-4">
+                          <Button asChild variant="outline">
+                            <Link to={`/app/consultas/resultado?id=${savedId}`}>Ver resultados completos</Link>
+                          </Button>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                   <ConsultasResultado result={apiResult} />

@@ -15,6 +15,8 @@ import {
   AlertCircle,
   Plus
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const integrations = [
   {
@@ -66,6 +68,33 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function Integracoes() {
+  const [bdc, setBdc] = useState<{ token_id?: string; access_token?: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    // Load from backend (which reads Supabase service config)
+    fetch('/api/integrations/bigdatacorp/')
+      .then(r => r.json())
+      .then(d => {
+        const row = Array.isArray(d?.data) && d.data.length ? d.data[0] : null;
+        if (row) setBdc({ token_id: row.token_id, access_token: row.access_token });
+      })
+      .catch(() => {});
+  }, []);
+
+  const saveBdc = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await fetch('/api/integrations/bigdatacorp/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token_id: bdc?.token_id, access_token: bdc?.access_token })
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -125,6 +154,38 @@ export default function Integracoes() {
           </Card>
         ))}
       </div>
+
+      {/* BigDataCorp Configuration */}
+      <Card variant="elevated">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="h-5 w-5" />
+            Configuração BigDataCorp
+          </CardTitle>
+          <CardDescription>Defina suas credenciais para habilitar consultas de CNPJ/CPF e listar datasets.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={saveBdc} className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="bdc-token-id">Token ID</Label>
+                <Input id="bdc-token-id" value={bdc?.token_id ?? ''} onChange={(e) => setBdc({ ...(bdc ?? {}), token_id: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bdc-access-token">Access Token</Label>
+                <Input id="bdc-access-token" type="password" value={bdc?.access_token ?? ''} onChange={(e) => setBdc({ ...(bdc ?? {}), access_token: e.target.value })} />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" variant="pill" disabled={saving}>{saving ? 'Salvando...' : 'Salvar & Conectar'}</Button>
+              <Button type="button" variant="outline" onClick={async () => {
+                // Quick test: call the CNPJ endpoint with a known doc (masked input not needed here)
+                await fetch('/api/consultas/cnpj/', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ cnpjs: ['00000000000000'], datasets: ['lawsuits'] }) });
+              }}>Testar</Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
       {/* Configuration Example */}
       <Card variant="elevated">

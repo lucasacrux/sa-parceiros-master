@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 
 import requests
 from django.conf import settings
+from .supabase_logger import get_integration_setting
 
 # BigDataCorp base endpoint (companies search)
 BASE_URL = "https://plataforma.bigdatacorp.com.br/empresas"
@@ -29,8 +30,26 @@ def fetch_lawsuits(cnpj: str, datasets: List[str]) -> Dict[str, Any]:
 
     Returns a dict. If response is not JSON, returns { "status_code": ..., "text": ... }.
     """
-    token_id = getattr(settings, "BIGDATA_TOKEN_ID", "")
-    access_token = getattr(settings, "BIGDATA_ACCESS_TOKEN", "")
+    # Prefer Supabase-stored credentials when available
+    token_id = ""
+    access_token = ""
+    try:
+        supa = get_integration_setting("bigdatacorp")
+        if isinstance(supa, dict):
+            items = supa.get("data") if "data" in supa else None
+            row = None
+            if isinstance(items, list) and items:
+                row = items[0]
+            elif isinstance(supa, dict) and supa.get("name") == "bigdatacorp":
+                row = supa
+            if row:
+                token_id = row.get("token_id") or ""
+                access_token = row.get("access_token") or ""
+    except Exception:
+        pass
+    if not token_id or not access_token:
+        token_id = token_id or getattr(settings, "BIGDATA_TOKEN_ID", "")
+        access_token = access_token or getattr(settings, "BIGDATA_ACCESS_TOKEN", "")
     if not token_id or not access_token:
         return {
             "error": "Missing BigDataCorp credentials",

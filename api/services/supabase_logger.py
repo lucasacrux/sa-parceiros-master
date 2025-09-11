@@ -1,6 +1,6 @@
 import os
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import requests
 
@@ -118,3 +118,35 @@ def extract_process_rows(document: str, dataset: str, result: Dict[str, Any], co
         })
 
     return out
+
+
+def _supabase_rest(method: str, path: str, json_body: Optional[dict | list] = None) -> Dict[str, Any]:
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_SERVICE_ROLE")
+    if not url or not key:
+        return {"error": "missing_supabase_config"}
+    endpoint = url.rstrip("/") + path
+    headers = {
+        "Authorization": f"Bearer {key}",
+        "apikey": key,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+    }
+    try:
+        resp = requests.request(method, endpoint, headers=headers, json=json_body, timeout=20)
+        try:
+            data = resp.json()
+        except ValueError:
+            data = {"status_code": resp.status_code, "text": resp.text}
+        return data if isinstance(data, dict) else {"data": data, "status_code": resp.status_code}
+    except requests.RequestException as exc:
+        return {"error": str(exc)}
+
+
+def upsert_integration_setting(name: str, token_id: str, access_token: str) -> Dict[str, Any]:
+    payload = [{"name": name, "token_id": token_id, "access_token": access_token}]
+    return _supabase_rest("POST", "/rest/v1/integration_settings?on_conflict=name", payload)
+
+
+def get_integration_setting(name: str) -> Dict[str, Any]:
+    return _supabase_rest("GET", f"/rest/v1/integration_settings?name=eq.{name}&select=name,token_id,access_token&limit=1")
