@@ -1,0 +1,33 @@
+Dashboard page
+Add a summary page under “Dashboards” showing:
+Total processes stored, recent publications, per‑CNPJ counts, and trend by publish_date.
+Also add “how many portals the customer has” (we can wire to your existing tenants/portals tables if present; otherwise stub, then hook).
+Consultas history and drilldown
+“Histórico de consultas” list: shows recent consultations (document, date, dataset).
+A detail view: pretty table + filters + export to CSV/JSON.
+Integrations > BigDataCorp (like Configuração ASAAS)
+Add a live form on Integracoes.tsx to set TokenId and AccessToken from the frontend:
+Store in Supabase settings/integrations table (I can add a table public.integrations_settings if you don’t already have one).
+On the backend, read from Supabase on every request or cache temporarily.
+After saving, show the datasets available (for now, we’ll list the core ones you gave; later we can request from BigData docs to enumerate).
+Update the “Integrações” link under dashboard to redirect to the “Docs” view for now.
+“Criar Carteira”
+CSV/XLSX 1‑column importer (CPF/CNPJ) with a stepper UI and a backend endpoint that normalizes identifiers and creates a carteira + entries.
+Option to use a Carteira to prefill the Consultas input.
+What you need to do right now
+
+Apply the new Supabase tables
+In your Supabase SQL editor, run the migration file:
+app/supabase/migrations/20250911000000_processes_table.sql
+Note: consultations table already exists from earlier migration (app/supabase/migrations/20250909043000_...).
+Verify persistence
+Run a CNPJ consulta again.
+Check Supabase:
+select document, dataset, requested_at from public.consultations order by requested_at desc
+select count(*) from public.processes
+select document, count(*) from public.processes group by document order by count desc
+Open questions to confirm before I wire the rest
+
+Where in Supabase should I store integration tokens? I can create public.integrations_settings with columns:
+id uuid, tenant_id text, name text (e.g., 'bigdatacorp'), data jsonb (stores tokenId, accessToken), created_at, updated_at
+Dashboards: Do you want tenant‑scoped views by default? If so, tell me how to resolve the tenant context in the app (cookie, header, or chosen company).

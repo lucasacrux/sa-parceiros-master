@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const integrations = [
   {
@@ -70,6 +72,9 @@ const getStatusBadge = (status: string) => {
 export default function Integracoes() {
   const [bdc, setBdc] = useState<{ token_id?: string; access_token?: string } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [datasets, setDatasets] = useState<any[]>([]);
+  const [newDs, setNewDs] = useState<{ key: string; display_name: string; url_template: string; doc_type: 'CPF'|'CNPJ'|'BOTH' }>({ key: '', display_name: '', url_template: '', doc_type: 'CNPJ' });
+  const { toast } = useToast();
 
   useEffect(() => {
     // Load from backend (which reads Supabase service config)
@@ -79,6 +84,10 @@ export default function Integracoes() {
         const row = Array.isArray(d?.data) && d.data.length ? d.data[0] : null;
         if (row) setBdc({ token_id: row.token_id, access_token: row.access_token });
       })
+      .catch(() => {});
+    fetch('/api/datasets/registry/')
+      .then(r => r.json())
+      .then(d => setDatasets(Array.isArray(d?.data) ? d.data : []))
       .catch(() => {});
   }, []);
 
@@ -184,6 +193,63 @@ export default function Integracoes() {
               }}>Testar</Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Dataset Registry */}
+      <Card variant="elevated">
+        <CardHeader>
+          <CardTitle>Catálogo de datasets</CardTitle>
+          <CardDescription>Cadastre chaves como "processes", "registration_data" e a URL/Template</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-4">
+              <div>
+                <Label>Key</Label>
+                <Input value={newDs.key} onChange={(e)=>setNewDs({...newDs, key: e.target.value})} placeholder="processes" />
+              </div>
+              <div>
+                <Label>Nome</Label>
+                <Input value={newDs.display_name} onChange={(e)=>setNewDs({...newDs, display_name: e.target.value})} placeholder="Processos..." />
+              </div>
+              <div className="md:col-span-2">
+                <Label>URL Template</Label>
+                <Input value={newDs.url_template} onChange={(e)=>setNewDs({...newDs, url_template: e.target.value})} placeholder="https://...{{document}}" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={async ()=>{
+                if (!newDs.key || !newDs.display_name || !newDs.url_template){ return; }
+                await fetch('/api/datasets/registry/', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify([{...newDs}]) });
+                setNewDs({ key:'', display_name:'', url_template:'', doc_type:'CNPJ' });
+                const d = await fetch('/api/datasets/registry/').then(r=>r.json()).catch(()=>({data:[]}));
+                setDatasets(Array.isArray(d?.data)? d.data: []);
+              }}>Adicionar</Button>
+            </div>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Key</TableHead>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>URL Template</TableHead>
+                    <TableHead>Tipo</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {datasets.map((d:any)=> (
+                    <TableRow key={d.id}>
+                      <TableCell className="font-mono">{d.key}</TableCell>
+                      <TableCell>{d.display_name}</TableCell>
+                      <TableCell className="max-w-[500px] truncate" title={d.url_template}>{d.url_template}</TableCell>
+                      <TableCell>{d.doc_type}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

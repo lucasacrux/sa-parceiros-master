@@ -1,7 +1,9 @@
 -- Structured table to hold flattened process records from BigDataCorp
+-- Structured table to hold flattened process records from BigDataCorp
 create table if not exists public.processes (
   id uuid primary key default gen_random_uuid(),
-  consultation_id uuid references public.consultations(id) on delete set null,
+  -- FK to consultations is added conditionally later to avoid dependency errors
+  consultation_id uuid,
   document text not null,
   dataset text not null,
   process_id text,
@@ -17,3 +19,19 @@ create table if not exists public.processes (
 );
 
 alter table public.processes enable row level security;
+
+-- Add FK to consultations only if the table exists
+do $$
+begin
+  if exists (
+    select 1 from information_schema.tables
+    where table_schema = 'public' and table_name = 'consultations'
+  ) then
+    -- ensure column exists without FK first
+    alter table public.processes
+      add constraint processes_consultation_id_fkey
+      foreign key (consultation_id)
+      references public.consultations(id)
+      on delete set null;
+  end if;
+end $$;

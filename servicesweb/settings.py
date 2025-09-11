@@ -139,11 +139,19 @@ DATABASE_ROUTERS = [
 USE_SQLITE_LOCAL = os.getenv("SA_LOCAL_SQLITE", "1" if DEBUG else "0").lower() in ("1","true","t","yes","y")
 
 if USE_SQLITE_LOCAL:
+    # Em desenvolvimento local, usamos um Único arquivo SQLite e expomos
+    # um alias "business" para compatibilidade com .using('business') no código.
+    sqlite_path = BASE_DIR / "db.sqlite3"
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+            "NAME": sqlite_path,
+        },
+        # Alias apontando para o mesmo SQLite local
+        "business": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": sqlite_path,
+        },
     }
     # Evita que routers tentem resolver consultas nos outros bancos
     DATABASE_ROUTERS = []

@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 import requests
 
 
-def insert_consultation(document: str, dataset: str, result: Dict[str, Any]) -> Dict[str, Any]:
+def insert_consultation(document: str, dataset: str, result: Dict[str, Any], *, tenant_id: Optional[str] = None, document_type: Optional[str] = None) -> Dict[str, Any]:
     """Insert a consultation record into Supabase (public.consultations).
 
     Requires env vars:
@@ -24,11 +24,15 @@ def insert_consultation(document: str, dataset: str, result: Dict[str, Any]) -> 
         "Content-Type": "application/json",
         "Prefer": "return=representation",
     }
-    payload = {
+    payload: Dict[str, Any] = {
         "document": document,
         "dataset": dataset,
         "result": result,
     }
+    if tenant_id:
+        payload["tenant_id"] = tenant_id
+    if document_type:
+        payload["document_type"] = document_type
     try:
         resp = requests.post(table_endpoint, headers=headers, data=json.dumps(payload), timeout=20)
     except requests.RequestException as exc:
@@ -45,7 +49,7 @@ def insert_consultation(document: str, dataset: str, result: Dict[str, Any]) -> 
         return data
     return {"inserted": data}
 
-def insert_processes(process_rows: list[dict]) -> Dict[str, Any]:
+def insert_processes(process_rows: list[dict], *, tenant_id: Optional[str] = None) -> Dict[str, Any]:
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_SERVICE_ROLE")
     if not url or not key:
@@ -57,6 +61,10 @@ def insert_processes(process_rows: list[dict]) -> Dict[str, Any]:
         "Content-Type": "application/json",
         "Prefer": "return=minimal",
     }
+    # Attach tenant_id if provided
+    if tenant_id:
+        for r in process_rows:
+            r.setdefault("tenant_id", tenant_id)
     try:
         resp = requests.post(endpoint, headers=headers, data=json.dumps(process_rows), timeout=30)
         return {"status_code": resp.status_code}

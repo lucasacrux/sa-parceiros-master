@@ -1,0 +1,19 @@
+I have added the processos.json to this project witch is the returned json of my first consult of a CNPJ. The JSON IS REALLY BIG. Our vars of SUPABASE already existed in .env of the app and .env of the root. 
+
+One thing I notice was the page became almost infinit to the right when i consulted the cnpj that returned that really big json. So is really necessary read the json processos.json, create the infrastructure at supabase that can receive the data inside the json and insert it correclty in columns to gerenate the pretty dashboard in the dashboard area and a resume dashboard right after making the consult, still in the cnpj consult page. This time I consulted 1 cnpj and the return was so long that freaked me out breaking the hole element. 
+
+Under the "Consultar cliente" item of the side menu, there is the Dashboard item. It would be the dashboard page of the all customer base. Including the process of wich he had consulted. 
+
+Besides thete is a item under dashboard witch is "Integrações" and it should redirect to the same page the "Docs" item in the top bar menu is redirecting to. This top bar docs will redirect to another page in the future when we write the whole api of this SAAS.
+
+Now I want you to navigate to the app/integracoes area, wich is totaly fulled of mocked data and configure the "BIGDATACORP" Integration. I want this area functional and as we have already done in code, I want to configurate tha integration with big data at the web directly in the frontend. To integrate to bigdata corp we can use set a form that asks to the costumer the token ID and the access token. When the client set the tokens and push the button integrate, he is able to see all the datasets the sistem have. Now we have just one datasets, but the documentation of the bigdata corp apis have plenty datasets apis to consult diferent data of a CNPJ and a CPF. Like the datasetempresas.txt i created here inthis repository.
+
+Now I want you to do all the things I talked about in this text, focusing on delivering the best user experience, ui and design to the account manager of the company who will use the SAAS saiuacordobusiness saas.
+
+Tasks:
+
+Implement the feature "dashboards" menu item (wich has only few data like how many portals the customer has created and is avaliable and the process data we are inserting.
+Implement the feature of "integrations" first with the BIGDATACORP integration like the front end has made with ASAAS in the "Configuração ASAAS" element.
+Improve the "Consultar cliente " feature to save the list of the consults that were already made and show all the data that came of the json in a beautiful structure way with a beautiful small and lean dashboard eiter.
+
+Don't let the page broke because of how huge is the return of the consult. If its really big, bring just tha dash board and the button: see de results in the Results area - create a page for it.

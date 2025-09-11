@@ -12,5 +12,11 @@ urlpatterns = [
     path('consultas/cnpj/', views.ConsultaCNPJView.as_view(), name='consulta-cnpj'),
     path('integrations/bigdatacorp/', views.BigDataIntegrationView.as_view(), name='integration-bdc'),
     path('public/consultations', views.PublicConsultationsProxy.as_view(), name='public-consultations'),
+    path('consultations/history/', views.ConsultationsHistoryView.as_view(), name='consultations-history'),
+    path('consultations/aggregations/time-series/', views.ProcessesTimeSeriesView.as_view(), name='processes-time-series'),
+    path('consultations/aggregations/by-cnpj/', views.ProcessesByCNPJView.as_view(), name='processes-by-cnpj'),
+    path('wallets/<uuid:wallet_id>/import/', views.WalletImportView.as_view(), name='wallets-import'),
+    path('datasets/registry/', views.DatasetsRegistryView.as_view(), name='datasets-registry'),
+    path('datasets/consult', views.ConsultByDatasetKeyView.as_view(), name='datasets-consult-by-key'),
 
 ]

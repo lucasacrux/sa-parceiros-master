@@ -1,0 +1,179 @@
+DADOS DE EMPRESAS
+Atividades
+
+Acordos Sindicais
+post
+Dados de Categoria Comercial - MCC
+post
+Dados de Fundos de Investimento
+post
+Dados de Obras Civis
+post
+Doações Eleitorais
+post
+Doações Eleitorais de Sócios
+post
+Evolução da Empresa
+post
+Indicadores de Atividade
+post
+Interesses e Comportamentos
+post
+Licenças e Autorizações
+post
+Mercado Financeiro
+post
+Prestadores de Serviços Eleitorais
+post
+Propriedades Industriais
+post
+Propriedades Industriais de Funcionários
+post
+Propriedades Industriais de Sócios
+post
+Contatos
+
+E-mails - Estendido
+post
+Emails - Pessoas Relacionadas
+post
+Telefones - Estendido
+post
+Telefones - Pessoas Relacionadas
+post
+Dados Básicos
+
+Dados Cadastrais
+post
+Dados Cadastrais Básicos
+post
+Histórico de Dados Básicos Cadastrais
+post
+Dados de Endereços
+
+Endereços - Estendido
+post
+Endereços - Pessoas Relacionadas
+post
+Exposição Pública e Restrições
+
+Envolvimento Político
+post
+Exposição e Perfil na Mídia
+post
+Influência do Quadro Societário
+post
+KYC e Compliance
+post
+KYC e Compliance do Grupo Econômico
+post
+KYC e Compliance dos Funcionários
+post
+KYC e Compliance dos Sócios
+post
+IA Generativa
+
+Firmografia da Empresa - GPT x1.0
+post
+Firmografia da Empresa - GPT x1.5
+post
+Firmografia da Empresa - Mistral x1.0
+post
+Firmografia da Empresa - Nova x1.5
+post
+Firmografia da Empresa - Nova x1.0
+post
+Firmografia da Empresa - Mistral x1.5
+post
+Modelagem
+
+Dados Unificados para Modelagem x1.0
+post
+Dados Unificados para Modelagem x1.5
+post
+Presença Digital
+
+Anúncios Online
+post
+Dados de Sites
+post
+Dados de Sites - Estendido
+post
+Presença em Apps e Plataformas
+post
+Marketplaces
+post
+Presença em Cobrança
+post
+Processos Judiciais
+
+Dados de Distribuição de Processos dos Sócios
+post
+Dados de Distribuição de Processos Judiciais
+post
+Processos Judiciais e Administrativos
+post
+Processos Judiciais dos Sócios
+post
+Relacionamentos
+
+Círculos - Funcionários
+post
+Grupo Empresarial - Prédio
+post
+Círculos - Representantes Legais
+post
+Círculos - Sócios de Primeiro Nível
+post
+Grupo Econômico Completo
+post
+Grupo Econômico Completo Estendido
+post
+Grupo Econômico de Primeiro Nível
+post
+Grupo Econômico de Primeiro Nível Estendido
+post
+Grupo Econômico de Segundo Nível
+post
+Grupo Econômico de Segundo Nível Estendido
+post
+Grupo Econômico de Terceiro Nível
+post
+Grupo Econômico de Terceiro Nível Estendido
+post
+Grupo Empresarial - Atividade no Mesmo Endereço
+post
+Grupo Empresarial - Atividade no Mesmo Prédio
+post
+Grupo Empresarial - Contato na Receita Federal
+post
+Grupo Empresarial - Mesmo Endereço
+post
+Grupo Empresarial - Nome Fantasia
+post
+Grupo Empresarial - Nome Fantasia por Cidade
+post
+Grupo Empresarial - Raiz do CNPJ
+post
+Grupo Empresarial - Razão Social
+post
+Grupo Empresarial - Representante Legal
+post
+Grupo Empresarial - Sócios
+post
+Grupo Empresarial - Sócios Relacionados no Mesmo Endereço
+post
+Relacionamentos
+post
+Relacionamentos - Grupo Econômico
+post
+Reputação
+
+Avaliações e Reputação
+post
+Consciência Social
+post
+Devedores do Governo
+post
+Prêmios e Certificações
+post

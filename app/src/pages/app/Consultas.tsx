@@ -144,9 +144,14 @@ export default function Consultas() {
             Selecione o tipo de cliente e os datasets desejados
           </p>
         </div>
+        <div className="flex items-center gap-2">
         <Button variant="link" asChild>
           <Link to="/app/consultas/precos">Tabela de preços</Link>
         </Button>
+        <Button variant="outline" asChild>
+          <Link to="/app/consultas/historico">Historico de consultas</Link>
+        </Button>
+        </div>
       </div>
 
       <Card variant="elevated">
