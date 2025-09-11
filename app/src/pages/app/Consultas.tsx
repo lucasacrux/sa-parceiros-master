@@ -202,7 +202,23 @@ export default function Consultas() {
                   {loading ? "Consultando..." : "Realizar consulta"}
                 </Button>
                 {apiResult && (
-                  <Button variant="outline" onClick={() => setApiResult(null)}>Limpar resultado</Button>
+                  <>
+                    <Button variant="outline" onClick={() => setApiResult(null)}>Limpar resultado</Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        const blob = new Blob([JSON.stringify(apiResult, null, 2)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `consulta_${clientType ?? 'cnpj'}_${Date.now()}.json`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                      }}
+                    >
+                      Baixar JSON
+                    </Button>
+                  </>
                 )}
               </div>
               {apiResult && (
