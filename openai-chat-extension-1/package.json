@@ -1,0 +1,42 @@
+{
+  "name": "openai-chat-extension",
+  "version": "1.0.0",
+  "description": "An extension for integrating OpenAI Chat functionality.",
+  "main": "./src/extension.ts",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "vscode",
+    "extension",
+    "openai",
+    "chat"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "openai": "^3.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.0",
+    "vscode": "^1.1.37",
+    "eslint": "^7.0.0"
+  },
+  "engines": {
+    "vscode": "^1.50.0"
+  },
+  "activationEvents": [
+    "onCommand:openai-chat.start"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "openai-chat.start",
+        "title": "Start OpenAI Chat"
+      }
+    ]
+  }
+}

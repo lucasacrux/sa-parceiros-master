@@ -1,0 +1,5 @@
+
+- criar pasta backend-resumido-dashboard 
+Nela colocar API e API V2 do datahub-portal
+- criar uma pasta frontend-resumido-dashboard
+Nela colocar as pastas pages, components, api e styles
