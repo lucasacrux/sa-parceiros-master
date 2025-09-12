@@ -25,7 +25,7 @@ def _sanitize_doc(doc: str) -> str:
 def fetch_lawsuits(cnpj: str, datasets: List[str]) -> Dict[str, Any]:
     """
     Consulta BigDataCorp. Expects:
-      - headers: TokenId + AccessToken
+      - headers: x-authorization-tokenid + x-authorization-accesstoken
       - body: { "Datasets": "processes", "q": "doc{<CNPJ>}", "Limit": 1 }
 
     Returns a dict. If response is not JSON, returns { "status_code": ..., "text": ... }.
@@ -60,8 +60,8 @@ def fetch_lawsuits(cnpj: str, datasets: List[str]) -> Dict[str, Any]:
     doc = _sanitize_doc(cnpj)
     headers = {
         # BigData expects these exact header names
-        "TokenId": token_id,
-        "AccessToken": access_token,
+        "x-authorization-tokenid": token_id,
+        "x-authorization-accesstoken": access_token,
         "accept": "application/json",
         "content-type": "application/json",
     }
